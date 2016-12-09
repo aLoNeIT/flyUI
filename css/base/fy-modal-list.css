@@ -1,0 +1,76 @@
+.fly-listbox-overlay {
+	background-color: black;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+	background-color: rgba(0, 0, 0, 0.4);
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 10000;
+}
+.fly-listbox-dialog {
+	position: relative;
+	margin: 50px auto;
+	background-color: white;
+	font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	width: 478px;/* 这里加宽度 ,高度自适应 可不加*/
+	border-radius: 5px;
+	text-align: center;
+	overflow: hidden;
+	z-index: 99999;
+}
+.fly-listbox-header {
+	padding: 15px 5px;
+	border-bottom: 1px solid #e5e5e5;
+	text-align: center;
+}
+.close {
+	float: right;
+	font-size: 21px;
+	font-weight: 700;
+	line-height: 1;
+	color: #000;
+	text-shadow: 0 1px 0 #fff;
+	filter: alpha(opacity=20);
+	opacity: .2;
+}
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0,0,0,0);
+	border: 0;
+}
+.fly-listbox-title{
+	font-size: 26px;
+}
+.fly-listbox-body {
+	position: relative;
+	text-align: left;
+}
+.fly-listbox-body ul{
+	/*height: 300px;
+	表格的高度 超出自动滚动条 可不加*/
+	overflow: auto;
+	margin: 0;
+}
+.fly-listbox-footer {
+	padding: 15px;
+	text-align: right;
+	border-top: 1px solid #e5e5e5;
+}
+.list-group {
+	padding-left: 0;
+}
+.list-group-item {
+	background-color: inherit;
+	border-bottom: 1px solid #e7eaec;
+	display: block;
+	margin-bottom: -1px;
+	padding: 10px 15px;
+	position: relative;
+}

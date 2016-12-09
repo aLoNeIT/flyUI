@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Avalon" />
+	<meta name="keywords" content="Avalon" />
+	<title>Hello Avalon</title>
+	<link href="../css/base/fy-datepicker.css" rel="stylesheet" />
+</head>
+<body class="white-bg">
+<div ms-controller="vm">
+	<wbr ms-widget="[{is:'fy-datepicker',$id:'datepicker'},@config]" />
+	<button type="button" ms-click="@open">打开日历</button>
+	<input id="myinput" ms-duplex="@selectedDate"/>
+	<button type="button" ms-click="@close">关闭日历</button>
+	<label><input type="radio" name="autoclose" ms-duplex="@config.autoClose" value="true" />打开自动关闭</label>
+	<label><input type="radio" name="autoclose" ms-duplex="@config.autoClose" value="false" />禁用自动关闭</label>
+</div>
+</body>
+<script type="text/javascript" src="../support/avalon2.2.2.js"></script>
+<script type="text/javascript" src="../support/avalon-extend.js"></script>
+<script type="text/javascript" src="../base/fy-datepicker.js"></script>
+
+<script type="text/javascript">
+	avalon.ready(function(){
+		var vm=avalon.define({
+			$id:"vm",
+			$dp:null,
+			selectedDate:"",
+			autoClose:false,
+			config:{
+				isShow:false,
+				autoClose:true,
+				onSelected:function(oDate){
+					vm.selectedDate=avalon.filters.formatDate(oDate,"yyyy-MM-dd");
+				}
+			},
+			open:function(){
+				//var dp=avalon.vmodels["datepicker"];
+				//dp.selectType="years";
+				//dp.show({dom:document.getElementById("myinput")});
+				this.$dp.show({dom:document.getElementById("myinput")});
+			},
+			close:function(){
+				this.$dp.hide();
+			},
+			onReady:function(){
+				this.$dp=avalon.vmodels["datepicker"];
+			}
+		});
+		vm.$watch("onReady",function(){
+			vm.$dp=avalon.vmodels["datepicker"];
+		});
+		avalon.scan(document.body);
+	});
+</script>
+</html>
