@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Avalon" />
+	<meta name="keywords" content="Avalon" />
+	<title>Hello Avalon</title>
+	<link href="../css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../css/style.min.css" rel="stylesheet" />
+	<link href="../css/animate.css" rel="stylesheet" />
+</head>
+<body class="white-bg">
+<div ms-controller="vm">
+	<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗</a>
+	<wbr ms-widget="[{is:'fy-modal-amap',$id:'modalamap'},@config]" />
+</div>
+<div id="amap" style="width:100%;height:100%;"></div>
+</body>
+<script type="text/javascript" src="../support/avalon2.2.2.js"></script>
+<script type="text/javascript" src="../support/avalon-extend.js"></script>
+<script type="text/javascript" src="../base/fy-modal-amap.js"></script>
+<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=2f7830fd27b8c699d555954768c44ba1&plugin=AMap.Geocoder"></script>
+<script type="text/javascript">
+	var amap=new AMap.Map("amap",{
+		resizeEnable:true,
+		zoom:15
+	});
+	avalon.ready(function(){
+		var vm = avalon.define({
+			$id:"vm",
+			open:function(){
+				var oModalAmap=avalon.vmodels["modalamap"];
+				oModalAmap.show();
+			},
+			config:{
+				isShow:false,
+			}
+		});
+		avalon.scan(document.body);
+	});
+</script>
+</html>
