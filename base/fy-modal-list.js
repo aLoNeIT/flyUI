@@ -11,7 +11,7 @@ avalon.component('fy-modal-list', {
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
 								'<h2 class="fly-listbox-title" ms-text="@title"></h2>'+
 								'<div class="input-group">'+
-									'<input type="text" placeholder="搜索list" class="input form-control" ms-duplex="@searchText | debounce(200)">'+
+									'<input type="text" placeholder="搜索list" class="form-control" ms-duplex="@searchText | debounce(200)">'+
 									'<span class="input-group-btn">'+
 									'<button type="button" class="btn btn btn-primary"> <i class="fa fa-search"></i>搜索</button>'+
 									'</span>'+
