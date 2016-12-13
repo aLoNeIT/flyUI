@@ -30,7 +30,7 @@
 								"</div>"+
 								"<i class=\"icon-collapse-alt icon-large modal-close\" ms-visible=\"@showOk\" ms-click=\"@_onClose()\"></i>"+
 								"<h2>{{@tip.title}}</h2>"+
-								"<p>{{@tip.text}}</p>"+
+								"<p ms-visible=\"@tip.text!=''\">{{@tip.text}}</p>"+
 								"<div class=\"sa-button-container\">"+
 									"<button type=\"button\" class=\"cancel\" ms-click=\"@onClose()\" ms-visible=\"@tip._onClose!=avalon.noop&&!@autoClose\">取消</button>"+
 									"<button type=\"button\" class=\"confirm\" ms-click=\"@onConfirm()\" ms-visible=\"@tip._onConfirm!=avalon.noop&&!@autoClose\">确定</button>"+
