@@ -14,7 +14,7 @@
 <body class="white-bg">
 <div ms-controller="vm">
 <a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗</a>
-<wbr ms-widget="[{is:'fy-modal-list',$id:'modalList'},@config]" />
+<wbr ms-widget="{is:'fy-modal-list',$id:'modalList',isShow:false,multiSelect:true,onSelected:@onSelected}" />
 </div>
 </body>
 <script type="text/javascript" src="../support/avalon2.2.2.js"></script>
@@ -29,8 +29,8 @@
 				var oModalList=avalon.vmodels["modalList"];
 				oModalList.show("Hello World!",["first","second","third","third","third","third","third","third","third","third","third","third","third"]);
 			},
-			config:{
-				isShow:false,
+			onSelected:function(uData){
+				avalon.log(uData);
 			}
 		});
 		avalon.scan(document.body);

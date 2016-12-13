@@ -5,7 +5,7 @@
 avalon.component('fy-modal-list', {
 	template:(function(){
 		// 内容表格部分
-		var sHtml=	'<div class="fly-listbox-overlay" ms-click1="@hide" ms-visible="@isShow">'+
+		var sHtml=	'<div class="fly-listbox-overlay" ms-click="@hide" ms-visible="@isShow">'+
 						'<div class="fly-listbox-dialog" ms-css="{width:@width}">'+
 							'<div class="fly-listbox-header">'+
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
@@ -17,14 +17,14 @@ avalon.component('fy-modal-list', {
 									'</span>'+
 								'</div>'+
 							'</div>'+
-							'<div class="fly-listbox-body">'+
+							'<div class="fly-listbox-body" style="height:270px;overflow-y:scroll;">'+
 								'<ul class="list-group">'+
-									'<li class="list-group-item" ms-for="($index,value) in @data" ms-text="value" ms-click="@selectData($event,$index,value)" ms-class="@selectedData[$index]?\'selectRow\':\'\'">'+
+									'<li class="list-group-item" ms-for="($index,value) in @data | filterBy(@search)" ms-text="value" ms-click="@selectData($event,$index,value) | stop" ms-class="getSelectedClass($index)">'+
 									'</li>'+
 								'</ul>'+
 							'</div>'+
 							'<div class="fly-listbox-footer">'+
-								'<button type="button" class="btn btn-primary m-r-xs" ms-click="@ok">确定</button>'+
+								'<button type="button" class="btn btn-primary m-r-xs" ms-click="@confirm">确定</button>'+
 								'<button type="button" class="btn btn-primary" ms-click="@hide">关闭</button>'+
 							'</div>'+
 						'</div>'+
@@ -32,13 +32,17 @@ avalon.component('fy-modal-list', {
 		return sHtml;
 	}).call(this),
 	defaults: {
-		width:"300px",
-		isShow: true,//是否显示界面
+		width:"300px",//list宽度
+		isShow: false,//是否显示界面
 		title:"ListBox",//标题部分内容
 		data:[],//纯数组
 		$source:[],//原数组
-		selectedData:{},
-		searchText:"",
+		selectedData:[],//选中的数据
+		searchText:"",//查询的文本
+		search:function(oItem,iIndex){//查询过滤器，不过暂时无效果
+			var sText=this.searchText||"";
+			return oItem.indexOf(sText)>=0;
+		},
 		show:function(sTitle,aData){
 			sTitle=sTitle||this.title;
 			this.title=sTitle;
@@ -48,17 +52,27 @@ avalon.component('fy-modal-list', {
 		hide:function(){
 			this.isShow=false;
 		},
-		ok:function(){
-			this.onSelected(this.selectedData);
+		confirm:function(){
+			var uData=null;
+			if(this.multiSelect){
+				//多选情况，返回的是一个数组
+				uData=[];
+				avalon.each(this.selectedData.$model,function(iIndex,oItem){
+					uData.push(oItem.value);
+				});
+			}else{
+				uData=this.selectedData.length>0?this.selectedData[0].$model:"";
+			}
+			this.onSelected(uData);
 			this.hide();
 		},
 		// currRow:-1,//选中行
 		getSelectedClass:function(iIndex){
-			if(this.selectedData[iIndex]) return "selectRow";
-			else return "";
+			//if(oSelectedData[iIndex]) return ["selectRow"];
+			//else return [""];
 			// if(this.selectedData.length>iIndex) return "selectRow";
 			for(var i=0;i<this.selectedData.length;i++){
-				if(iIndex==this.selectedData[i]) return "selectRow";
+				if(iIndex==this.selectedData[i].index) return "selectRow";
 			}
 			return "";
 		},
@@ -66,10 +80,13 @@ avalon.component('fy-modal-list', {
 		selectData:function($event,iIndex,sValue){
 			if(this.multiSelect){
 				var bResult=false;
-				//var bResult=avalon.Array.remove(this.selectedData,iIndex);
+				var bResult=avalon.Array.remove(this.selectedData,iIndex);
 				if(!bResult){
-					this.selectedData[iIndex]=sValue;
-					//this.selectedData.push(iIndex);// 多选
+					//this.selectedData[iIndex]=sValue;
+					this.selectedData.push({
+						index:iIndex,
+						value:sValue
+					});// 多选
 				}
 			}else{
 				// this.currRow=iIndex;
@@ -85,8 +102,8 @@ avalon.component('fy-modal-list', {
 				avalon.each(this.$source,function(iIndex,oItem){
 					if(oItem.indexOf(sValue)>=0) aData.push(oItem);
 				});
+				this.selectedData=[];
 				this.data=aData;
-				avalon.log(sValue);
 			})
 		}
 	}
