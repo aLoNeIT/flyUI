@@ -45,14 +45,14 @@
 	clip: rect(0,0,0,0);
 	border: 0;
 }
-.fly-listbox-title{
+.fly-listbox-title {
 	font-size: 26px;
 }
 .fly-listbox-body {
 	position: relative;
 	text-align: left;
 }
-.fly-listbox-body ul{
+.fly-listbox-body ul {
 	/*height: 300px;
 	表格的高度 超出自动滚动条 可不加*/
 	overflow: auto;
@@ -73,4 +73,10 @@
 	margin-bottom: -1px;
 	padding: 10px 15px;
 	position: relative;
+}
+.list-group-item:hover {
+	cursor: pointer;
+}
+.list-group-item.selectRow {
+	background-color: #f2fbff;
 }

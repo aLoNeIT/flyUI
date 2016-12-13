@@ -6,7 +6,7 @@ avalon.component('fy-modal-list', {
 	template:(function(){
 		// 内容表格部分
 		var sHtml=	'<div class="fly-listbox-overlay" ms-click1="@hide" ms-visible="@isShow">'+
-						'<div class="fly-listbox-dialog" ms-class="{width:@width}">'+
+						'<div class="fly-listbox-dialog" ms-css="{width:@width}">'+
 							'<div class="fly-listbox-header">'+
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
 								'<h2 class="fly-listbox-title" ms-text="@title"></h2>'+
@@ -19,7 +19,7 @@ avalon.component('fy-modal-list', {
 							'</div>'+
 							'<div class="fly-listbox-body">'+
 								'<ul class="list-group">'+
-									'<li class="list-group-item" ms-for="($index,value) in @data" ms-text="value" ms-click="@selectData(value)">'+
+									'<li class="list-group-item" ms-for="($index,value) in @data" ms-text="value" ms-click="@selectData($event,$index,value)" ms-class="@selectedData[$index]?\'selectRow\':\'\'">'+
 									'</li>'+
 								'</ul>'+
 							'</div>'+
@@ -32,12 +32,12 @@ avalon.component('fy-modal-list', {
 		return sHtml;
 	}).call(this),
 	defaults: {
-		width:"500px",
+		width:"300px",
 		isShow: true,//是否显示界面
 		title:"ListBox",//标题部分内容
 		data:[],//纯数组
 		$source:[],//原数组
-		selectedData:"",
+		selectedData:{},
 		searchText:"",
 		show:function(sTitle,aData){
 			sTitle=sTitle||this.title;
@@ -52,8 +52,29 @@ avalon.component('fy-modal-list', {
 			this.onSelected(this.selectedData);
 			this.hide();
 		},
-		selectData:function(sValue){
-			this.selectedData=sValue;
+		// currRow:-1,//选中行
+		getSelectedClass:function(iIndex){
+			if(this.selectedData[iIndex]) return "selectRow";
+			else return "";
+			// if(this.selectedData.length>iIndex) return "selectRow";
+			for(var i=0;i<this.selectedData.length;i++){
+				if(iIndex==this.selectedData[i]) return "selectRow";
+			}
+			return "";
+		},
+		multiSelect:true,//多选
+		selectData:function($event,iIndex,sValue){
+			if(this.multiSelect){
+				var bResult=false;
+				//var bResult=avalon.Array.remove(this.selectedData,iIndex);
+				if(!bResult){
+					this.selectedData[iIndex]=sValue;
+					//this.selectedData.push(iIndex);// 多选
+				}
+			}else{
+				// this.currRow=iIndex;
+				this.selectedData=[iIndex];	
+			}
 		},
 		onSelected:avalon.noop,
 		onReady:function(){
