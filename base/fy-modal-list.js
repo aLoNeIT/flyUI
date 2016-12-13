@@ -18,13 +18,13 @@ avalon.component('fy-modal-list', {
 								'</div>'+
 							'</div>'+
 							'<div class="fly-listbox-body">'+
-								'<ul class="list-group clear-list">'+
-									'<li class="list-group-item fist-item" ms-for="($index,value) in @data" ms-text="value" ms-click="@selectData(value)">'+
+								'<ul class="list-group">'+
+									'<li class="list-group-item" ms-for="($index,value) in @data" ms-text="value" ms-click="@selectData(value)">'+
 									'</li>'+
 								'</ul>'+
 							'</div>'+
 							'<div class="fly-listbox-footer">'+
-								'<button type="button" class="btn btn-primary" ms-click="@ok">确定</button>'+
+								'<button type="button" class="btn btn-primary m-r-xs" ms-click="@ok">确定</button>'+
 								'<button type="button" class="btn btn-primary" ms-click="@hide">关闭</button>'+
 							'</div>'+
 						'</div>'+
