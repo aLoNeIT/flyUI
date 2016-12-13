@@ -120,7 +120,7 @@
 			this.tip={
 				title:sTitle||"执行失败",
 				text:sText||"",
-				iconType:"warn",
+				iconType:"error",
 				_onClose:fnClose||avalon.noop,
 				_onConfirm:fnConfirm||avalon.noop,
 			};
