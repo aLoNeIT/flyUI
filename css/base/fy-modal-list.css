@@ -51,11 +51,11 @@
 .fly-listbox-body {
 	position: relative;
 	text-align: left;
+	overflow: auto;
 }
 .fly-listbox-body ul {
 	/*height: 300px;
 	表格的高度 超出自动滚动条 可不加*/
-	overflow: auto;
 	margin: 0;
 }
 .fly-listbox-footer {
@@ -78,5 +78,6 @@
 	cursor: pointer;
 }
 .list-group-item.selectRow {
-	background-color: #f2fbff;
+	background-color: #999;
+	color: #fff;
 }

@@ -5,7 +5,8 @@
 avalon.component('fy-modal-list', {
 	template:(function(){
 		// 内容表格部分
-		var sHtml=	'<div class="fly-listbox-overlay" ms-click="@hide" ms-visible="@isShow">'+
+		var sHtml='<div ms-visible="@isShow">'+
+						'<div class="fly-listbox-overlay" ms-click="@hide"></div>'+
 						'<div class="fly-listbox-dialog" ms-css="{width:@width}">'+
 							'<div class="fly-listbox-header">'+
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
@@ -17,7 +18,7 @@ avalon.component('fy-modal-list', {
 									'</span>'+
 								'</div>'+
 							'</div>'+
-							'<div class="fly-listbox-body" style="height:270px;overflow-y:scroll;">'+
+							'<div class="fly-listbox-body" ms-css="{height:@height}">'+
 								'<ul class="list-group">'+
 									'<li class="list-group-item" ms-for="($index,value) in @data | filterBy(@search)" ms-text="value" ms-click="@selectData($event,$index,value) | stop" ms-class="getSelectedClass($index)">'+
 									'</li>'+
@@ -32,6 +33,7 @@ avalon.component('fy-modal-list', {
 		return sHtml;
 	}).call(this),
 	defaults: {
+		height:"300px",
 		width:"300px",//list宽度
 		isShow: false,//是否显示界面
 		title:"ListBox",//标题部分内容
@@ -79,17 +81,21 @@ avalon.component('fy-modal-list', {
 		multiSelect:true,//多选
 		selectData:function($event,iIndex,sValue){
 			if(this.multiSelect){
-				var bResult=false;
-				var bResult=avalon.Array.remove(this.selectedData,iIndex);
-				if(!bResult){
-					//this.selectedData[iIndex]=sValue;
+				var bFind=false;
+				for(var i=0;i<this.selectedData.length;i++){
+					if(this.selectedData[i].index==iIndex){
+						bFind=true;
+						avalon.Array.removeAt(this.selectedData,i);
+						break;
+					}
+				}
+				if(!bFind){
 					this.selectedData.push({
 						index:iIndex,
 						value:sValue
-					});// 多选
+					});
 				}
 			}else{
-				// this.currRow=iIndex;
 				this.selectedData=[iIndex];	
 			}
 		},
