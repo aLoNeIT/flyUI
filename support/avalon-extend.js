@@ -425,3 +425,33 @@ avalon.showWait=function(oConfig,sTitle){
 avalon.closeWait=function(oTips){
 	oTips.isShow=false;
 };
+
+//参数:组件名称,
+avalon.fyComponentId={};
+avalon.createComponent=function(sComName,sComId){
+	var oComponent=avalon.vmodels[sComId];
+	if(!oComponent){
+		//检查是否创建过controller对象
+		var oVm=document.getElementById("fy_component");
+		if(!oVm){
+			//不存在则新建controller对象
+			oVm=document.createElement("div");
+			avalon(oVm).attr("id","fy_component");
+			avalon(oVm).attr("ms-controller","fy_component");
+			document.body.appendChild(oVm);
+			avalon.define({
+				$id:"fy_component"
+			})
+		}
+		var sId=avalon.fyComponentId[sComName]?avalon.fyComponentId[sComName]:1;
+		sComId=sComName+"_"+(sId++);
+		avalon.fyComponentId[sComName]=sId;
+		var oDiv=document.createElement("div");
+		avalon(oDiv).attr("id",sComId);
+		oDiv.innerHTML='<wbr ms-widget="{is:\''+sComName+'\',$id:\''+sComId+'\'}" />';
+		oVm.appendChild(oDiv);
+		avalon.scan(oVm);
+		oComponent=avalon.vmodels[sComId];
+	}
+	return oComponent;
+}

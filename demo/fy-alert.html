@@ -11,9 +11,13 @@
 	<link href="../css/plugins/sweetalert/sweetalert.css" rel="stylesheet" />
 </head>
 <body class="white-bg">
-<div ms-controller="vm">
+<div ms-controller="vm1" id="vm1">
+</div>
+<div ms-controller="vm" id="vm">
 <a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@alert">弹窗</a>
-<wbr ms-widget="[{is:'fy-alert',$id:'alert'},@config]" />
+<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@alert2">弹窗2</a>
+<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@alert3">弹窗3</a>
+<!-- <wbr ms-widget="[{is:'fy-alert',$id:'alert'},@config]" /> -->
 </div>
 </body>
 <script type="text/javascript" src="../support/avalon2.2.2.js"></script>
@@ -24,7 +28,27 @@
 	avalon.ready(function(){
 		var vm = avalon.define({
 			$id:"vm",
+			$alert:null,
 			alert:function(){
+				this.$alert=this.$alert||avalon.getAlert();
+				if(this.$alert) this.$alert.open({
+					title:"title",
+					showtime:2000,
+					iconType:"error",
+					_onConfirm:function(){
+						vm.$alert.open({
+							title:"hehe",
+							iconType:"wait",
+							showtime:0,
+							_onConfirm:function(){
+								console.log("llll");
+							}
+						});
+					}
+				});
+				return;
+				if(this.$alert) this.$alert.show("fuck",null,null,null,1000);
+				return;
 				var oAlert=avalon.vmodels["alert"];
 				oAlert.show("Hi","Hello World!",function(){
 					oAlert.warn(null,null,function(){
@@ -36,11 +60,16 @@
 					},null,2000);
 				},null,1000);
 			},
-			config:{
-				isShow:false,
+			alert2:function(){
+				avalon.openAlertWait();
+			},
+			alert3:function(){
+				this.$alert=this.$alert||avalon.getAlert();
+				if(this.$alert) this.$alert.show("1","2",function(){alert("1")},null);
 			}
 		});
-		avalon.scan(document.body);
+		avalon.scan(document.getElementById("vm"));
+		//avalon.scan(document.body);
 	});
 </script>
 </html>
