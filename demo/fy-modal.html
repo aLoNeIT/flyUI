@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Avalon" />
+	<meta name="keywords" content="Avalon" />
+	<title>Hello Avalon</title>
+	<link href="../css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../css/style.min.css" rel="stylesheet" />
+	<link href="../css/animate.css" rel="stylesheet" />
+	<link href="../css/base/fy-dialog.css" rel="stylesheet" />
+</head>
+<body class="white-bg">
+<div ms-controller="vm">
+<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗</a>
+<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@modalGrid">弹窗</a>
+<wbr ms-widget="{is:'fy-modal',$id:'modal',isShow:false}" />
+<wbr ms-widget="{is:'fy-modal-grid',$id:'modalGrid',isShow:false,fields:@config.fields,onSelect:@config.onSelect}" />
+</div>
+</body>
+<script type="text/javascript" src="../support/avalon2.2.3.js"></script>
+<script type="text/javascript" src="../support/avalon-extend.js"></script>
+<script type="text/javascript" src="../base/fy-modal.js"></script>
+
+<script type="text/javascript">
+	avalon.ready(function(){
+		var vm = avalon.define({
+			$id:"vm",
+			open:function(){
+				var oModal=avalon.vmodels["modal"];
+				oModal.show();
+			},
+			modalGrid:function(){
+				var aData=[
+					{
+						sgid:1,
+						sgname:"杜蕾斯",
+						sgprice:"6.00",
+						gcname:"情趣用品"
+					},
+					{
+						sgid:2,
+						sgname:"冈本",
+						sgprice:"8.00",
+						gcname:"情趣用品"
+					},
+					{
+						sgid:3,
+						sgname:"第六感",
+						sgprice:"18.00",
+						gcname:"情趣用品"
+					}
+				];
+				var oGrid=avalon.vmodels["modalGrid"];
+				oGrid.data = aData;
+				oGrid.show();
+			},
+			config:{
+				fields:{
+					sgid:"序号",
+					sgname:"商品名称",
+					sgprice:"商品价格",
+					gcname:"商品类别"
+				},
+				onSelect:function(el){
+					avalon.log(el);
+					alert(JSON.stringify(el));
+				}
+			}
+		});
+		avalon.scan(document.body);
+	});
+</script>
+</html>
