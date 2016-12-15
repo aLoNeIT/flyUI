@@ -9,34 +9,34 @@
 	template: (function(){
 		var content="<div>"+
 						"<div class=\"sweet-overlay\" ms-visible=\"@isShow\"></div>"+
-							"<div class=\"sweet-alert showSweetAlert\" ms-visible=\"@isShow\">"+
-								"<div class=\"sa-icon sa-error\" ms-visible=\"@tip.iconType=='error'\">"+
-									"<span class=\"sa-x-mark\">"+
-										"<span class=\"sa-line sa-left\"></span>"+
-										"<span class=\"sa-line sa-right\"></span>"+
-									"</span>"+
-								"</div>"+
-								"<div class=\"sa-icon sa-success animate\" ms-visible=\"@tip.iconType=='success'\">"+
-									"<span class=\"sa-line sa-tip animateSuccessTip\"></span>"+
-									"<span class=\"sa-line sa-long animateSuccessLong\"></span>"+
-									"<div class=\"sa-placeholder\"></div>"+
-									"<div class=\"sa-fix\"></div>"+
-								"</div>"+
-								"<div class=\"sa-icon sa-warning pulseWarning\" ms-visible=\"@tip.iconType=='warn'\">"+
-									"<span class=\"sa-body pulseWarningIns\"></span>"+
-									"<span class=\"sa-dot pulseWarningIns\"></span>"+
-								"</div>"+
-								"<div class=\"sa-icon sa-custom\" ms-visible=\"@tip.iconType=='wait'\">"+
-									"<img ms-attr=\"{src:@waitImg}\" style=\"width:80px;height:80px;'\" />"+
-								"</div>"+
-								"<i class=\"icon-collapse-alt icon-large modal-close\" ms-visible=\"@showOk\" ms-click=\"@_onClose()\"></i>"+
-								"<h2>{{@tip.title}}</h2>"+
-								"<p ms-visible=\"@tip.text!=''\">{{@tip.text}}</p>"+
-								"<div class=\"sa-button-container\">"+
-									"<button type=\"button\" class=\"cancel\" ms-click=\"@onClose()\" ms-visible=\"@tip._onClose!=avalon.noop&&!@autoClose\">取消</button>"+
-									"<button type=\"button\" class=\"confirm\" ms-click=\"@onConfirm()\" ms-visible=\"@tip._onConfirm!=avalon.noop&&!@autoClose\">确定</button>"+
-								"</div>"+
+						"<div class=\"sweet-alert showSweetAlert animated\" ms-class=\"@animateCss\" ms-visible=\"@isShow\">"+
+							"<div class=\"sa-icon sa-error\" ms-visible=\"@tip.iconType=='error'\">"+
+								"<span class=\"sa-x-mark\">"+
+									"<span class=\"sa-line sa-left\"></span>"+
+									"<span class=\"sa-line sa-right\"></span>"+
+								"</span>"+
 							"</div>"+
+							"<div class=\"sa-icon sa-success animate\" ms-visible=\"@tip.iconType=='success'\">"+
+								"<span class=\"sa-line sa-tip animateSuccessTip\"></span>"+
+								"<span class=\"sa-line sa-long animateSuccessLong\"></span>"+
+								"<div class=\"sa-placeholder\"></div>"+
+								"<div class=\"sa-fix\"></div>"+
+							"</div>"+
+							"<div class=\"sa-icon sa-warning pulseWarning\" ms-visible=\"@tip.iconType=='warn'\">"+
+								"<span class=\"sa-body pulseWarningIns\"></span>"+
+								"<span class=\"sa-dot pulseWarningIns\"></span>"+
+							"</div>"+
+							"<div class=\"sa-icon sa-custom\" ms-visible=\"@tip.iconType=='wait'\">"+
+								"<img ms-attr=\"{src:@waitImg}\" style=\"width:80px;height:80px;'\" />"+
+							"</div>"+
+							"<i class=\"icon-collapse-alt icon-large modal-close\" ms-visible=\"@showOk\" ms-click=\"@_onClose()\"></i>"+
+							"<h2>{{@tip.title}}</h2>"+
+							"<p ms-visible=\"@tip.text!=''\">{{@tip.text}}</p>"+
+							"<div class=\"sa-button-container\">"+
+								"<button type=\"button\" class=\"cancel\" ms-click=\"@onClose()\" ms-visible=\"!@autoClose\">关闭</button>"+
+								"<button type=\"button\" class=\"confirm\" ms-click=\"@onConfirm()\" ms-visible=\"@tip._onConfirm!=avalon.noop&&!@autoClose\">确定</button>"+
+							"</div>"+
+						"</div>"+
 					"</div>";
 		return content;
 	}).call(this),
@@ -52,6 +52,12 @@
 			_onConfirm:avalon.noop,
 		},
 		$timeId:0,
+		animateCss:"",
+		animate:{
+			show:"fadeInUp",
+			hide:"fadeOutDown",
+			time:500
+		},
 		onClose:function(){
 			this.hide();
 			this.tip._onClose.call(this);
@@ -60,7 +66,15 @@
 			this.hide();
 			this.tip._onConfirm.call(this);
 		},
+		clearTimeout:function(){
+			if(this.$timeId!=0){
+				clearTimeout(this.$timeId);
+				this.$timeId=0;
+			}
+		},
 		show:function(sTitle,sText,fnConfirm,fnClose,iShowTime){//显示success
+			iShowTime=iShowTime||0;
+			this.clearTimeout();
 			this.tip={
 				title:sTitle||"执行成功",
 				text:sText||"请稍等...",
@@ -68,28 +82,37 @@
 				_onClose:fnClose||avalon.noop,
 				_onConfirm:fnConfirm||avalon.noop,
 			};
+			this.animateCss=this.animate.show;
 			this.isShow=true;
-			this.autoClose=iShowTime&&iShowTime>0;
+			this.autoClose=iShowTime>0;
 			if(this.autoClose){
 				this.autoHide(fnConfirm,iShowTime);
 			}
 		},
-		autoHide:function(fnClose,iShowTime){//自动关闭
-			fnClose=fnClose||avalon.noop;
+		autoHide:function(fnConfirm,iShowTime){//自动关闭
+			fnConfirm=fnConfirm||avalon.noop;
 			iShowTime=iShowTime||1000;
-			if(this.$timeId!=0){
-				clearTimeout(this.$timeId);
-			}
 			var oSelf=this;
 			this.$timeId=setTimeout(function(){
 				oSelf.hide();
-				fnClose.call(oSelf);
+				fnConfirm.call(oSelf);
 			},iShowTime);
 		},
 		hide:function(){
-			this.isShow=false;
+			this.animateCss=this.animate.hide;
+			if(this.animate.time>0){
+				var oSelf=this;
+				this.$timeId=setTimeout(function(){
+					oSelf.$timeId=0;
+					oSelf.isShow=false;
+				},this.animate.time);
+			}else{
+				this.isShow=false;
+			}
 		},
 		wait:function(sTitle,sText,fnConfirm,fnClose,iShowTime){
+			iShowTime=iShowTime||0;
+			this.clearTimeout();
 			this.tip={
 				title:sTitle||"正在执行",
 				text:sText||"请稍等...",
@@ -97,13 +120,16 @@
 				_onClose:fnClose||avalon.noop,
 				_onConfirm:fnConfirm||avalon.noop,
 			};
+			this.animateCss=this.animate.show;
 			this.isShow=true;
-			this.autoClose=iShowTime&&iShowTime>0;
+			this.autoClose=iShowTime>0;
 			if(this.autoClose){
 				this.autoHide(fnConfirm,iShowTime);
 			}
 		},
 		warn:function(sTitle,sText,fnConfirm,fnClose,iShowTime){
+			iShowTime=iShowTime||0;
+			this.clearTimeout();
 			this.tip={
 				title:sTitle||"警告",
 				text:sText||"",
@@ -111,13 +137,16 @@
 				_onClose:fnClose||avalon.noop,
 				_onConfirm:fnConfirm||avalon.noop,
 			};
+			this.animateCss=this.animate.show;
 			this.isShow=true;
-			this.autoClose=iShowTime&&iShowTime>0;
+			this.autoClose=iShowTime>0;
 			if(this.autoClose){
 				this.autoHide(fnConfirm,iShowTime);
 			}
 		},
 		error:function(sTitle,sText,fnConfirm,fnClose,iShowTime){
+			iShowTime=iShowTime||0;
+			this.clearTimeout();
 			this.tip={
 				title:sTitle||"执行失败",
 				text:sText||"",
@@ -125,8 +154,9 @@
 				_onClose:fnClose||avalon.noop,
 				_onConfirm:fnConfirm||avalon.noop,
 			};
+			this.animateCss=this.animate.show;
 			this.isShow=true;
-			this.autoClose=iShowTime&&iShowTime>0;
+			this.autoClose=iShowTime>0;
 			if(this.autoClose){
 				this.autoHide(fnConfirm,iShowTime);
 			}
@@ -139,7 +169,9 @@
 			_onConfirm:avalon.noop,
 		},
 		open:function(oOption){
+			this.clearTimeout();
 			this.tip=avalon.mix(this.$tip,oOption);
+			this.animateCss=this.animate.show;
 			this.isShow=true;
 			this.autoClose=(oOption["showtime"]&&oOption["showtime"]>0);
 			if(this.autoClose){
