@@ -426,10 +426,26 @@ avalon.closeWait=function(oTips){
 	oTips.isShow=false;
 };
 
+/*
+  组件继承
+  sComName,组件名称
+  sComParentName,父组件名称
+  oConfig,配置对象
+*/
+avalon.extendComponent=function(sComName,sComParentName,oConfig){
+	var oComponent=avalon.components[sComParentName];
+	if(!oComponent) return;//不存在组件则直接退出
+	oComponent.extend({
+		displayName:sComName,
+		defaults:oConfig
+	});
+};
+
+
 //参数:组件名称,
-avalon.fyComponentId={};
-avalon.createComponent=function(sComName,sComId){
-	var oComponent=avalon.vmodels[sComId];
+//avalon.fyComponentId={};
+avalon.createComponent=function(sComName,sComId,oConfig){
+	var oComponent=avalon.vmodels[sComId]||avalon.vmodels[sComName+"_"+sComId];
 	if(!oComponent){
 		//检查是否创建过controller对象
 		var oVm=document.getElementById("fy_component");
@@ -441,17 +457,126 @@ avalon.createComponent=function(sComName,sComId){
 			document.body.appendChild(oVm);
 			avalon.define({
 				$id:"fy_component"
-			})
+			});
 		}
-		var sId=avalon.fyComponentId[sComName]?avalon.fyComponentId[sComName]:1;
-		sComId=sComName+"_"+(sId++);
-		avalon.fyComponentId[sComName]=sId;
+		//从组件池中获取该对象最新的id
+		var iId=1;
+		if(!avalon.componentPool[sComName]){
+			avalon.componentPool[sComName]={
+				id:1,
+				components:{}
+			}
+		}else{
+			iId=avalon.componentPool[sComName].id;
+		}
+		//var iId=avalon.fyComponentId[sComName]?avalon.fyComponentId[sComName]:1;
+		sComId=sComName+"_"+(iId++);
+		//avalon.fyComponentId[sComName]=iId;
 		var oDiv=document.createElement("div");
 		avalon(oDiv).attr("id",sComId);
 		oDiv.innerHTML='<wbr ms-widget="{is:\''+sComName+'\',$id:\''+sComId+'\'}" />';
 		oVm.appendChild(oDiv);
 		avalon.scan(oVm);
 		oComponent=avalon.vmodels[sComId];
+		//合并配置项
+		if(oConfig) oComponent=avalon.mix(oComponent.$model,oConfig);
+		//创建成功，则将新创建的组件写入到对象池中
+		avalon.componentPool[sComName].id=iId;
+		avalon.componentPool[sComName].components[iId]={
+			state:1,//可用
+			obj:oComponent
+		}
 	}
 	return oComponent;
+};
+avalon.clearComponent=function(sComName){
+	
+};
+avalon.resetComponent=function(sComName,bInit){
+	if(true===bInit){
+		//当对象池没有该组件时候，只进行初始化
+		if(!avalon.componentPool[sComName]){
+			avalon.componentPool[sComName]={
+				id:1,
+				components:{}
+			}
+		}
+		return;
+	}
+	//对对象池该该类型组件进行状态复位
+	
 }
+/*
+  创建新组件
+*/
+avalon.addComponent=function(sComName){
+	
+};
+/*
+  从对象池获取对象
+*/
+avalon.getComponent=function(sComName,uComId){
+	var oComponent=null;
+	if(avalon.isString(uComId)){//根据名字获取
+		oComponent = avalon.vmodels[uComId]||null;
+	}else{
+		//这里需要先检查池中是否有对应的对象资源
+		avalon.resetComponent(sComName,true);
+		if(true===uComId){//从对象池获取一个可用对象
+			//遍历该组件
+			avalon.each(avalon.componentPool[sComName].components,function(k,v){
+				if(v.state==1) {
+					oComponent=v.obj;
+					v.state=0;
+					return false;
+				}
+			});
+			if(!oComponent){
+				//组件未获取到，创建新组件
+				
+			}
+		}else if(avalon.isNumber(uComId)){
+			oComponent=avalon.componentPool[sComName].components[uComId]&&avalon.componentPool[sComName].components[uComId].state==1?avalon.componentPool[sComName].components[uComId].obj:null;
+		}
+	}
+	if(true===uComId){//从对象池获取一个可用对象
+		
+	}else if(avalon.isString(uComId)){//根据名字获取
+		oComponent = avalon.vmodels[uComId]||null;
+	}else if(avalon.isNumber(uComId)){
+		oComponent=avalon.componentPool[sComName].components[uComId]&&avalon.componentPool[sComName].components[uComId].state==1?avalon.componentPool[sComName].components[uComId].obj:null;
+	}
+	return oComponent;
+};
+
+avalon.returnComponent=function(sComName){
+	
+};
+/*组件对象池
+{
+	"fy-alert":{
+		id:1,//当前可用id序号，自增
+		max:0,//最大数量，0代表不限制
+		components:{//对象集合
+			1:{//对象序号值
+				state:1,//对象当前状态
+				obj:{}//具体的对象引用
+			}
+		}
+	},
+	"fy-grid":{
+		id:2,//当前可用id序号，自增
+		components:{//对象集合
+			1:{//对象序号值
+				state:1,//对象当前状态
+				obj:{}//具体的对象引用
+			},
+			2:{//对象序号值
+				state:0,//对象当前状态，不可用
+				obj:{}//具体的对象引用
+			}
+		}
+	}
+}
+*/
+avalon.componentPool={};
