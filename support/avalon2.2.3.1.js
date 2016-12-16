@@ -227,7 +227,7 @@ IE7的checked属性应该使用defaultChecked来设置
             Function.apply.call(method, console, arguments);
         }
     }
-    function error(e, str) {
+    function error(str,e) {
         throw (e || Error)(str);
     }
     function noop() {}
