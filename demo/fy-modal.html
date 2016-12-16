@@ -9,14 +9,14 @@
 	<link href="../css/bootstrap.min.css" rel="stylesheet" />
 	<link href="../css/style.min.css" rel="stylesheet" />
 	<link href="../css/animate.css" rel="stylesheet" />
-	<link href="../css/base/fy-dialog.css" rel="stylesheet" />
+	<link href="../css/base/fy-modal.css" rel="stylesheet" />
 </head>
 <body class="white-bg">
 <div ms-controller="vm">
 <a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗</a>
 <a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@modalGrid">弹窗</a>
-<wbr ms-widget="{is:'fy-modal',$id:'modal',isShow:false}" />
-<wbr ms-widget="{is:'fy-modal-grid',$id:'modalGrid',isShow:false,fields:@config.fields,onSelect:@config.onSelect}" />
+<wbr ms-widget="{is:'fy-modal',$id:'modal',content:@scontent}" />
+<wbr ms-widget="{is:'fy-modal-grid',$id:'modalGrid',fields:@config.fields,onSelect:@config.onSelect}" />
 </div>
 </body>
 <script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
@@ -27,9 +27,11 @@
 	avalon.ready(function(){
 		var vm = avalon.define({
 			$id:"vm",
+			scontent:"<button ms-click='@myclick'>fuck</button>"+
+					"<button>fuck</button>",
 			open:function(){
 				var oModal=avalon.vmodels["modal"];
-				oModal.show();
+				oModal.show("title");
 			},
 			modalGrid:function(){
 				var aData=[
@@ -53,8 +55,8 @@
 					}
 				];
 				var oGrid=avalon.vmodels["modalGrid"];
-				oGrid.data = aData;
-				oGrid.show();
+				//oGrid.data = aData;
+				oGrid.show("grid",aData);
 			},
 			config:{
 				fields:{
@@ -68,6 +70,12 @@
 					alert(JSON.stringify(el));
 				}
 			}
+		});
+		vm.$watch("onReady",function(){
+			var oModal=avalon.vmodels["modal"];
+			oModal.myclick=function(){
+				alert("1");
+			};
 		});
 		avalon.scan(document.body);
 	});

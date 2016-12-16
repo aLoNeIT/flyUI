@@ -1,4 +1,12 @@
-.fly-modal-overlay {
+.fy-modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	outline: 0;
+}
+.fy-modal .modal-overlay {
 	background-color: black;
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
 	background-color: rgba(0, 0, 0, 0.4);
@@ -9,23 +17,23 @@
 	bottom: 0;
 	z-index: 10000;
 }
-.fly-modal-dialog {
+.fy-modal .modal-dialog {
 	position: relative;
 	margin: 50px auto;
 	background-color: white;
 	font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	width: 478px;/* 这里加宽度 ,高度自适应 可不加*/
+	width: 478px;
 	border-radius: 5px;
 	text-align: center;
 	overflow: hidden;
 	z-index: 99999;
 }
-.fly-modal-header {
+.fy-modal .modal-header {
 	padding: 15px 5px;
 	border-bottom: 1px solid #e5e5e5;
 	text-align: center;
 }
-.close {
+/*.close {
 	float: right;
 	font-size: 21px;
 	font-weight: 700;
@@ -44,15 +52,15 @@
 	overflow: hidden;
 	clip: rect(0,0,0,0);
 	border: 0;
-}
-.fly-modal-title{
+}*/
+.fy-modal .modal-title{
 	font-size: 26px;
 }
-.fly-modal-body {
+.fy-modal .modal-body {
 	position: relative;
 	padding: 15px;
 }
-.fly-modal-footer {
+.fy-modal .modal-footer {
 	padding: 15px;
 	text-align: right;
 	border-top: 1px solid #e5e5e5;

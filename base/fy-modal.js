@@ -6,17 +6,18 @@ description:flyui的带对话框的基础组件
 avalon.component("fy-modal", {
 	template:(function(){
 		// 内容表格部分
-		var sHtml=	'<div class="fly-modal-overlay animate fadeIn" ms-click="@hide" ms-visible="@isShow">'+
-						'<div class="fly-modal-dialog" ms-class="{width:@width}">'+
-							'<div class="fly-modal-header">'+
+		var sHtml=	'<div class="fy-modal" ms-visible="@isShow">'+
+						'<div class="modal-overlay" ms-click="@hide"></div>'+
+						'<div class="modal-dialog animated" ms-class=\"@animateCss\" ms-css="{width:@width}">'+
+							'<div class="modal-header">'+
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
-								'<h2 class="fly-modal-title" ms-text="@title"></h2>'+
+								'<h2 class="modal-title" ms-text="@title"></h2>'+
 							'</div>'+
-							'<div class="fly-modal-body" ms-html="@content">'+
+							'<div class="modal-body" ms-css="{height:@height,overflow:\'auto\'}" ms-html="@content">'+
 							'</div>'+
-							'<div class="fly-modal-footer">'+
+							'<div class="modal-footer">'+
 								'<button type="button" class="btn btn-white" ms-click="@_OnClose">关闭</button>'+
-								'<button type="button" class="btn btn-primary" ms-click="@_OnConfirm" ms-visible="@onConfirm!=avalon.noop">确定</button>'+
+								'<button type="button" class="btn btn-primary" ms-click="@_OnConfirm" ms-visible="@buttons.onConfirm!=avalon.noop">确定</button>'+
 							'</div>'+
 						'</div>'+
 					'</div>';
@@ -24,28 +25,48 @@ avalon.component("fy-modal", {
 	}).call(this),
 	defaults: {
 		width:"600px",
-		height:"400px",
-		isShow: true,//是否显示界面
+		height:"auto",
+		isShow: false,//是否显示界面
 		autoClose:false,//自动关闭
 		title:"Modal",//标题部分内容
 		content:"",//主要内容区
-		show:function(sTitle,sContent){
+		animateCss:"",
+		animate:{
+			show:"fadeInUp",
+			hide:"fadeOutDown",
+			time:500
+		},
+		buttons:{
+			onConfirm:avalon.noop,
+			onClose:avalon.noop,
+		},
+		show:function(sTitle,sContent,fnConfirm){
 			sTitle=sTitle||this.title;
 			sContent=sContent||this.content;
+			fnConfirm=fnConfirm||avalon.noop;
 			this.title=sTitle;
 			this.content=sContent;
+			this.animateCss=this.animate.show;;
 			this.isShow=true;
 		},
 		hide:function(){
-			this.isShow=false;
+			var oSelf=this;
+			this.animateCss=this.animate.hide;
+			if(this.animate.time>0){
+				setTimeout(function(){
+					oSelf.isShow=false;
+				},this.animate.time);
+			}else{
+				this.isShow=false;
+			}
 		},
-		onConfirm:avalon.noop,
-		onClose:avalon.noop,
 		_OnClose:function(){
-			if(this.onClose()!==false) this.hide();
+			this.hide();
+			this.buttons.onConfirm();
 		},
 		_OnConfirm:function(){
-			if(this.onConfirm()!==false) this.hide();
+			this.hide();
+			this.buttons.onClose();
 		}
 	}
 });
@@ -56,7 +77,7 @@ avalon.component("fy-modal", {
 			displayName:"fy-modal-grid",
 			defaults:{
 				content:(function(){
-					return  '<div ms-css="{height:@height,width:@width,overflow:\'auto\'}">'+
+					return  '<div ms-css="{height:@height,width:auto,overflow:\'auto\'}">'+
 								'<table class="table table-striped table-hover dataTables-example">'+
 									'<thead>'+
 										'<tr>'+
@@ -93,9 +114,11 @@ avalon.component("fy-modal", {
 					if(this.autoClose==true) this.hide();
 				},
 				onSelect:avalon.noop,//onSelect(el)
-				show:function(sTitle,oData){
+				show:function(sTitle,aData){
 					sTitle=sTitle||this.title;
+					aData=aData||[];
 					this.title=sTitle;
+					this.data=aData;
 					this.isShow=true;
 				},
 				onClose:function(){
