@@ -430,17 +430,34 @@ avalon.closeWait=function(oTips){
   组件继承
   sComName,组件名称
   sComParentName,父组件名称
-  oConfig,配置对象
+  sTemplate,组件模板
+  oDefaults,配置对象
 */
-avalon.extendComponent=function(sComName,sComParentName,oConfig){
+avalon.extendComponent=function(sComName,sComParentName,oDefaults,sTemplate){
 	var oComponent=avalon.components[sComParentName];
 	if(!oComponent) return;//不存在组件则直接退出
-	oComponent.extend({
+	sTemplate=sTemplate||null;
+	var oConfig={//子组件配置项
 		displayName:sComName,
-		defaults:oConfig
-	});
+		parentName:sComParentName,
+		defaults:oDefaults
+	};
+	if(sTemplate) oConfig.template=sTemplate;
+	var oChild=oComponent.extend(oConfig);
+	oChild.defaults.parent=function(){
+		if(this===this.$parent) debugger;
+		if(this.$parent) return this.$parent;
+		var oParent=avalon.mix(true,{},avalon.components[sComParentName].defaults);
+		var oSelf=this;
+		avalon.each(oParent,function(k,v){
+			if(avalon.isFunction(v)&&k!="parent"){
+				//oParent[k]=v.bind(oSelf);
+			}
+		});
+		this.$parent=oParent;
+		return this.$parent;
+	}
 };
-
 
 //参数:组件名称,
 //avalon.fyComponentId={};

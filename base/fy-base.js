@@ -4,12 +4,14 @@ createDate:2016-12-14
 description:flyui的基础组件，所有组件都从这个组件派生
  */
 avalon.component("fy-base", {
-	template:"",
+	template:"<div></div>",
 	defaults: {
+		$name:"fy-base",//组件名
 		width:"600px",
 		height:"400px",
-		isShow: true,//是否显示界面
+		isShow: false,//是否显示界面
 		show:function(){
+			avalon.log("base show");
 			this.isShow=true;
 		},
 		hide:function(){
@@ -17,62 +19,72 @@ avalon.component("fy-base", {
 		}
 	}
 });
-(function(){
-	var oModal=avalon.components["fy-modal"];
-	if(oModal){
-		oModal.extend({
-			displayName:"fy-modal-grid",
-			defaults:{
-				content:(function(){
-					return  '<div ms-css="{height:@height,width:@width,overflow:\'auto\'}">'+
-								'<table class="table table-striped table-hover dataTables-example">'+
-									'<thead>'+
-										'<tr>'+
-											'<th ms-for="(key,value) in @fields">{{value}}</th>'+
-											'<th>操作</th>'+
-										'</tr>'+
-									'</thead>'+
-									'<tbody>'+
-										'<tr ms-for="($index,el) in @data">'+
-											'<td ms-for="value in el | selectBy(@selectFields)">{{value}}</td>'+
-											'<td>'+
-												'<a class="btn btn-primary" data-dismiss="modal" ms-click="@selectData(el)">选择</a>'+
-											'</td>'+
-										'</tr>'+
-									'</tbody>'+
-								'</table>'+
-							'</div>';
-				})(),
-				data:[],//grid数据源
-				fields:[{
-					id:"序号",
-					name:"名称",
-				}],//需要显示的字段
-				selectFields:[],
-				getFields:function(){//根据fields获取显示的字段
-					var aFields=[];
-					avalon.each(this.fields,function(key,value){
-						aFields.push(key);
-					})
-					this.selectFields=aFields;
-				},
-				selectData:function(el){
-					this.onSelect(el);
-					if(this.autoClose==true) this.hide();
-				},
-				onSelect:avalon.noop,//onSelect(el)
-				show:function(sTitle,oData){
-					sTitle=sTitle||this.title;
-					this.title=sTitle;
-					this.isShow=true;
-				},
-				onClose:function(){
-					alert("ddd");
-				},
-				onReady:function(){
-					this.getFields();
-				}
-			}
-		});
+
+//动画组件，所有需要动画特效的组件都可以从这里继承下去
+avalon.extendComponent("fy-animate","fy-base",{
+	$name:"fy-animate",
+	animate:{//动画特效
+		enterClass: 'animate-enter',
+		enterActiveClass: 'animate-enter-active',
+		leaveClass: 'animate-leave',
+		leaveActiveClass: 'animate-leave-active', 
+		onEnterDone:avalon.noop,
+		onLeaveDone:avalon.noop
+	},
+	show:function(){
+		avalon.log("animate show");
+		this.parent().show();
 	}
-})();
+});
+
+//fy-modal组件
+avalon.extendComponent("fy-modal","fy-animate",{
+	$name:"fy-modal",
+	content:"",
+	autoClose:false,//自动关闭
+	title:"Modal",//标题部分内容
+	buttons:{
+		onConfirm:avalon.noop,
+		onClose:avalon.noop,
+	},
+	show:function(sTitle,sContent,fnConfirm,fnClose){
+		sTitle=sTitle||this.title;
+		sContent=sContent||this.content;
+		if(avalon.isFunction(fnConfirm)) buttons.onConfirm=fnConfirm;
+		if(avalon.isFunction(fnClose)) buttons.onClose=fnClose;
+		this.title=sTitle;
+		this.content=sContent;
+		this.parent().show();
+		//this.isShow=true;
+	},
+	hide:function(){
+		var oSelf=this;
+		this.parent().hide();
+	},
+	_OnClose:function(){
+		this.parent().hide();
+		this.buttons.onConfirm();
+	},
+	_OnConfirm:function(){
+		this.parent().hide();
+		this.buttons.onClose();
+	}
+},(function(){
+		// 内容表格部分
+		var sHtml=	'<div class="fy-modal" ms-visible="@isShow">'+
+						'<div class="modal-overlay" ms-click="@hide"></div>'+
+						'<div class="modal-dialog animated" ms-class=\"@animateCss\" ms-css="{width:@width}">'+
+							'<div class="modal-header">'+
+								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
+								'<h2 class="modal-title" ms-text="@title"></h2>'+
+							'</div>'+
+							'<div class="modal-body" ms-css="{height:@height,overflow:\'auto\'}" ms-html="@content">'+
+							'</div>'+
+							'<div class="modal-footer">'+
+								'<button type="button" class="btn btn-white" ms-click="@_OnClose">关闭</button>'+
+								'<button type="button" class="btn btn-primary" ms-click="@_OnConfirm" ms-visible="@buttons.onConfirm!=avalon.noop">确定</button>'+
+							'</div>'+
+						'</div>'+
+					'</div>';
+		return sHtml;
+}).call(this));

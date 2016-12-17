@@ -40,13 +40,14 @@ avalon.component("fy-modal", {
 			onConfirm:avalon.noop,
 			onClose:avalon.noop,
 		},
-		show:function(sTitle,sContent,fnConfirm){
+		show:function(sTitle,sContent,fnConfirm,fnClose){
 			sTitle=sTitle||this.title;
 			sContent=sContent||this.content;
-			fnConfirm=fnConfirm||avalon.noop;
+			if(avalon.isFunction(fnConfirm)) buttons.onConfirm=fnConfirm;
+			if(avalon.isFunction(fnClose)) buttons.onClose=fnClose;
 			this.title=sTitle;
 			this.content=sContent;
-			this.animateCss=this.animate.show;;
+			this.animateCss=this.animate.show;
 			this.isShow=true;
 		},
 		hide:function(){
