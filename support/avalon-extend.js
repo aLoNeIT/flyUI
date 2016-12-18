@@ -434,29 +434,24 @@ avalon.closeWait=function(oTips){
   oDefaults,配置对象
 */
 avalon.extendComponent=function(sComName,sComParentName,oDefaults,sTemplate){
-	var oComponent=avalon.components[sComParentName];
-	if(!oComponent) return;//不存在组件则直接退出
+	var oParent=avalon.components[sComParentName];
+	if(!oParent) return;//不存在组件则直接退出
 	sTemplate=sTemplate||null;
+	oDefaults.$parents={};
+	avalon.each(oParent.defaults,function(k,v){
+		oDefaults.$parents[sComParentName+"_"+k]=v;
+	});
+	oDefaults.inherited=function(sPropertyName,sParentName,oParams){
+		if(avalon.isString(sPropertyName)&&avalon.isString(sParentName)&&this.$parents[sParentName + "_" +sPropertyName]) return  this.$parents[sParentName + "_" +sPropertyName];
+		else return null;
+	}
 	var oConfig={//子组件配置项
 		displayName:sComName,
 		parentName:sComParentName,
 		defaults:oDefaults
 	};
 	if(sTemplate) oConfig.template=sTemplate;
-	var oChild=oComponent.extend(oConfig);
-	oChild.defaults.parent=function(){
-		if(this===this.$parent) debugger;
-		if(this.$parent) return this.$parent;
-		var oParent=avalon.mix(true,{},avalon.components[sComParentName].defaults);
-		var oSelf=this;
-		avalon.each(oParent,function(k,v){
-			if(avalon.isFunction(v)&&k!="parent"){
-				//oParent[k]=v.bind(oSelf);
-			}
-		});
-		this.$parent=oParent;
-		return this.$parent;
-	}
+	oParent.extend(oConfig);
 };
 
 //参数:组件名称,

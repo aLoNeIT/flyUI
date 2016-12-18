@@ -33,7 +33,7 @@ avalon.extendComponent("fy-animate","fy-base",{
 	},
 	show:function(){
 		avalon.log("animate show");
-		this.parent().show();
+		this.inherited("show","fy-base").apply(this,arguments);
 	}
 });
 
@@ -54,19 +54,17 @@ avalon.extendComponent("fy-modal","fy-animate",{
 		if(avalon.isFunction(fnClose)) buttons.onClose=fnClose;
 		this.title=sTitle;
 		this.content=sContent;
-		this.parent().show();
-		//this.isShow=true;
+		this.inherited("show","fy-animate").apply(this,arguments);
 	},
 	hide:function(){
-		var oSelf=this;
-		this.parent().hide();
+		this.inherited("hide","fy-animate").apply(this,arguments);
 	},
 	_OnClose:function(){
-		this.parent().hide();
+		this.hide();
 		this.buttons.onConfirm();
 	},
 	_OnConfirm:function(){
-		this.parent().hide();
+		this.hide();
 		this.buttons.onClose();
 	}
 },(function(){
