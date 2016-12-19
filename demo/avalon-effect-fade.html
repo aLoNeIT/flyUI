@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Avalon" />
+	<meta name="keywords" content="Avalon" />
+	<title>Hello Avalon</title>
+	<script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
+</head>
+<style>
+	.animate-enter, .animate-leave{
+		width:100px;
+		height:100px;
+		background: #29b6f6;
+		opacity: 0;
+		transition: opacity 1s;
+		-moz-transition: opacity 1s; /* Firefox 4 */
+		-webkit-transition: opacity 1s;  /*Safari 和 Chrome */
+		-o-transition: opacity 1s;  /*Opera */
+	}
+	.animate-enter-active, .animate-leave{
+		opacity: 1;
+	}
+	.animate-leave-active{
+		opacity: 0;
+	}
+</style>
+<body>
+<div ms-controller='effect' >
+	<div ms-effect="{is:'animate', action:@action,onEnterDone: @enterCb,onLeaveDone: @leaveCb}">
+		{{@aaa}}
+	</div>
+	<button ms-click='@action = @action !== "leave" ? "leave": "enter"'
+		type="button">click</button>
+</div>
+	<script type="text/javascript">
+		avalon.effect('animate', {})
+		var vm=avalon.define({
+			$id: "effect",
+			aaa: "test",
+			action: 'enter',
+			enterCb: function(){
+				avalon.log('动画完成')
+			},
+			leaveCb: function(){
+				avalon.log('动画回到原点')
+			}
+		});
+	</script>
+</body>
+</html>

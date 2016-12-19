@@ -30,6 +30,7 @@ avalon.component("fy-modal", {
 		autoClose:false,//自动关闭
 		title:"Modal",//标题部分内容
 		content:"",//主要内容区
+		formdata:[],
 		animateCss:"",
 		animate:{
 			show:"fadeInUp",
@@ -43,8 +44,8 @@ avalon.component("fy-modal", {
 		show:function(sTitle,sContent,fnConfirm,fnClose){
 			sTitle=sTitle||this.title;
 			sContent=sContent||this.content;
-			if(avalon.isFunction(fnConfirm)) buttons.onConfirm=fnConfirm;
-			if(avalon.isFunction(fnClose)) buttons.onClose=fnClose;
+			if(avalon.isFunction(fnConfirm)) this.buttons.onConfirm=fnConfirm;
+			if(avalon.isFunction(fnClose)) this.buttons.onClose=fnClose;
 			this.title=sTitle;
 			this.content=sContent;
 			this.animateCss=this.animate.show;
@@ -63,11 +64,11 @@ avalon.component("fy-modal", {
 		},
 		_OnClose:function(){
 			this.hide();
-			this.buttons.onConfirm();
+			this.buttons.onClose();
 		},
 		_OnConfirm:function(){
 			this.hide();
-			this.buttons.onClose();
+			this.buttons.onConfirm();
 		}
 	}
 });
