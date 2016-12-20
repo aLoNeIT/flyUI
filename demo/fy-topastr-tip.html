@@ -8,29 +8,25 @@
 	<title>Hello Avalon</title>
 	<link href="../css/bootstrap.min.css" rel="stylesheet" />
 	<link href="../css/style.min.css" rel="stylesheet" />
-	<link href="../css/animate.css" rel="stylesheet" />
-	<link href="../css/base/fy-modal.css" rel="stylesheet" />
+	<link href="../css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+	<link href="../css/base/fy-toastr.css" rel="stylesheet" />
 </head>
 <body class="white-bg">
 <div ms-controller="vm">
-<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗</a>
-<wbr ms-widget="[{is:'fy-dialog',$id:'dialog'},@config]" />
+	<button class="btn btn-outline btn-primary" ms-click="@modalTip">弹窗tip</button>
 </div>
+<wbr ms-widget="{is:'fy-toastr-tip',$id:'tip'}" />
 </body>
-<script type="text/javascript" src="../support/avalon2.2.2.js"></script>
-<script type="text/javascript" src="../support/avalon-extend.js"></script>
-<script type="text/javascript" src="../base/fy-dialog.js"></script>
+<script type="text/javascript" src="../support/avalon2.2.3.js"></script>
+<script type="text/javascript" src="../base/fy-toastr-tip.js"></script>
 
 <script type="text/javascript">
 	avalon.ready(function(){
 		var vm = avalon.define({
 			$id:"vm",
-			open:function(){
-				var oDialog=avalon.vmodels["dialog"];
-				oDialog.show("Hello World!","this is awsome");
-			},
-			config:{
-				isShow:true,
+			modalTip:function(){
+				var oTip=avalon.vmodels["tip"];
+				oTip.show("hehehe","2333","error");
 			}
 		});
 		avalon.scan(document.body);

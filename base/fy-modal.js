@@ -91,7 +91,7 @@ avalon.component("fy-modal", {
 										'<tr ms-for="($index,el) in @data">'+
 											'<td ms-for="value in el | selectBy(@selectFields)">{{value}}</td>'+
 											'<td>'+
-												'<a class="btn btn-primary" data-dismiss="modal" ms-click="@selectData(el)">选择</a>'+
+												'<a class="btn btn-primary" ms-click="@selectData(el)">选择</a>'+
 											'</td>'+
 										'</tr>'+
 									'</tbody>'+
@@ -108,7 +108,7 @@ avalon.component("fy-modal", {
 					var aFields=[];
 					avalon.each(this.fields,function(key,value){
 						aFields.push(key);
-					})
+					});
 					this.selectFields=aFields;
 				},
 				selectData:function(el){
@@ -122,9 +122,6 @@ avalon.component("fy-modal", {
 					this.title=sTitle;
 					this.data=aData;
 					this.isShow=true;
-				},
-				onClose:function(){
-					alert("ddd");
 				},
 				onReady:function(){
 					this.getFields();
