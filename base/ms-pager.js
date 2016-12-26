@@ -101,10 +101,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        pages: [],
 	        totalPages: 15,
 	        currentPage: 1,
-	        firstText: 'First',
-	        prevText: 'Previous',
-	        nextText: 'Next',
-	        lastText: 'Last',
+	        firstText: '首页',
+	        prevText: '上一页',
+	        nextText: '下一页',
+	        lastText: '末页',
 	        onPageClick: avalon.noop,
 	        toPage: function (p) {
 	            var cur = this.currentPage
