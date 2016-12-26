@@ -316,63 +316,6 @@ avalon.filters.contains=function(oValue,aData){
 	return false;
 }
 
-// 日期类型格式成指定的字符串
-    function FormatDate(date, format) {
-        format = Replace(format, "yyyy", date.getFullYear());
-        format = Replace(format, "MM", GetFullMonth(date));
-        format = Replace(format, "dd", GetFullDate(date));
-        format = Replace(format, "HH", GetFullHour(date));
-        return format;
-    }
-    //js日期字符串转换成日期类型
-    function parseDate(dateStr) {
-        return new Date(Replace(dateStr, "-", "/"));
-    }
-    //增加月  
-    function AddMonths(date, value) {
-        date.setMonth(date.getMonth() + value);
-        return date;
-    }
-    //增加天  
-    function AddDays(date, value) {
-		var oDate=new Date(date);
-        oDate.setDate(date.getDate() + value);
-        return oDate;
-    }
-    //增加时
-    function AddHours(date, value) {
-        date.setHours(date.getHours() + value);
-        return date;
-    }
-    //返回月份(两位数)  
-    function GetFullMonth(date) {
-        var v = date.getMonth() + 1;
-        if (v > 9) return v.toString();
-        return "0" + v;
-    }
- 
-    //返回日(两位数)  
-    function GetFullDate(date) {
-        var v = date.getDate();
-        if (v > 9) return v.toString();
-        return "0" + v;
-    }
-    //返回时(两位数)
-    function GetFullHour(date) {
-        var v = date.getHours();
-        if (v > 9) return v.toString();
-        return "0" + v;
-    }
-    //比较两个时间
-    function compareDate() {
-        var mydate = AddDays(parseDate("2012-08-23"), 1);
-        var nowdate = new Date();
-        if (nowdate.getTime() < mydate.getTime()) {
-            return FormatDate(nowdate, "yyyy-MM-dd");
-        }
-        return FormatDate(mydate, "yyyy-MM-dd");
-    }
-
 /*
  *	avalon 时间日期处理函数
 */
@@ -395,8 +338,10 @@ avalon.curTime=function(){
 };
 
 avalon.unixToDate=function(unixTime, isFull, timeZone) {
-	if (typeof (timeZone) == 'number'){
+	if(avalon.isNumber(timeZone)){
 		unixTime = parseInt(unixTime) + parseInt(timeZone) * 60 * 60;
+	}else{
+		unixTime = parseInt(unixTime) - parseInt((new Date()).getTimezoneOffset()) * 60;//1482769095
 	}
 	var time = new Date(unixTime * 1000);
 	var ymdhis = "";
@@ -411,19 +356,15 @@ avalon.unixToDate=function(unixTime, isFull, timeZone) {
 	return ymdhis;
 };
 
-avalon.showWait=function(oConfig,sTitle){
-	// oConfig.isShow=false;
-	sTitle=sTitle||"正在执行";
-	oConfig.tip=avalon.mix(oConfig.tip.$model,avalon.comConfig("tip-modal","wait"),{
-		title:sTitle,
-		text:"请稍等..."
-	});
-	oConfig.showOk=false;
-	oConfig.isShow=true;
+avalon.showWait=function(sTitle,sText){
+	if(!avalon.fyAlert){
+		avalon.fyAlert=avalon.getComponent("fy-alert","fyAlert");
+	}
+	avalon.fyAlert.wait(sTitle,sText);
 };
 
 avalon.closeWait=function(oTips){
-	oTips.isShow=false;
+	if(avalon.fyAlert) avalon.fyAlert.hide();
 };
 
 /*
@@ -532,7 +473,7 @@ avalon.componentPool={};
 /*
   创建新组件
 */
-avalon.addComponent=function(sComName){
+avalon.addComponent=function(sComName,sComId){
 	var iId=0;
 	avalon.resetComponent(sComName,true);
 	if(avalon.componentPool[sComName].max==0||avalon.componentPool[sComName].components.length<avalon.componentPool[sComName].max){
@@ -551,7 +492,7 @@ avalon.addComponent=function(sComName){
 		}
 		//从组件池中获取该对象最新的id
 		var iId=avalon.componentPool[sComName].id;
-		sComId=sComName+"_"+(iId++);
+		sComId=sComId||sComName+"_"+(iId++);
 		var oDiv=document.createElement("div");
 		avalon(oDiv).attr("id",sComId);
 		oDiv.innerHTML='<wbr cache="true" ms-widget="{is:\''+sComName+'\',$id:\''+sComId+'\'}" />';
@@ -575,6 +516,11 @@ avalon.getComponent=function(sComName,uComId){
 	var oComponent=null;
 	if(avalon.isString(uComId)){//根据名字获取
 		oComponent = avalon.vmodels[uComId]||null;
+		if(!oComponent){
+			//组件未获取到，创建新组件
+			var iId=avalon.addComponent(sComName,uComId);
+			oComponent=iId>0?avalon.getComponent(sComName,iId):null;
+		}
 	}else{
 		//这里需要先检查池中是否有对应的对象资源
 		avalon.resetComponent(sComName,true);

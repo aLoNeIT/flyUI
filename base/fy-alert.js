@@ -33,7 +33,7 @@
 							"<h2>{{@tip.title}}</h2>"+
 							"<p ms-visible=\"@tip.text!=''\">{{@tip.text}}</p>"+
 							"<div class=\"sa-button-container\">"+
-								"<button type=\"button\" class=\"cancel\" ms-click=\"@onClose()\" ms-visible=\"!@autoClose\">关闭</button>"+
+								"<button type=\"button\" class=\"cancel\" ms-click=\"@onClose()\" ms-visible=\"!@autoClose&&@tip.iconType!='wait'\">关闭</button>"+
 								"<button type=\"button\" class=\"confirm\" ms-click=\"@onConfirm()\" ms-visible=\"@tip._onConfirm!=avalon.noop&&!@autoClose\">确定</button>"+
 							"</div>"+
 						"</div>"+
