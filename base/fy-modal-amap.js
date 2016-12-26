@@ -17,6 +17,7 @@
 
 avalon.component("fy-modal-amap", {
 	template: (function(){
+		//return '<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>';
 		var sHtml = '<div class="modal-dialog modal-lg" ms-visible="@isShow">'+
 						'<div class="modal-content">'+
 							'<div class="modal-header">'+
@@ -36,7 +37,7 @@ avalon.component("fy-modal-amap", {
 	defaults: {
 		$domId:"amap-content",
 		width:"100%",
-		height:"100%",
+		height:"500px",
 		isShow: false,
 		$amap: null,//高德map组件
 		$amapConfig:{
@@ -95,6 +96,19 @@ avalon.component("fy-modal-amap", {
 				});
 			});
 			this.$markerConfig.position=this.$amap.getCenter();
+			var $marker=new AMap.Marker({
+				position: this.$amap.getCenter(),
+				draggable: true,
+				cursor: 'move',
+				raiseOnDrag: true,
+				title:"fuck"
+			});
+			$marker.setMap(this.$amap);
+			AMap.event.addListener($marker,"dragend",function(e){
+				oSelf.cbProxy("onMarkerDragend",arguments);
+				oSelf.cbAddress(e.lnglat);
+			});
+			return;
 			this.$marker=new AMap.Marker(this.$markerConfig);
 			this.$marker.setMap(this.$amap);
 			AMap.event.addListener(this.$marker,"dragend",function(e){
