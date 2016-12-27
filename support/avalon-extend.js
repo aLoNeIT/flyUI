@@ -93,41 +93,99 @@ avalon.del=function(iId,sUrl,jumpUrl){
 		});
 	},"warning",function(){});
 };
+
+avalon.delex=function(sUrl,fnSuccess){
+	var oAlert=avalon.getAlert(1);
+	if(!oAlert){console.log("创建组件失败!");return;}
+	oAlert.warn("确定删除数据","数据删除后无法恢复",function(){
+		avalon.get(sUrl,function(oResult){
+			if(oResult.state==0){
+				oAlert.open({
+					title:"删除成功",
+					showtime:1000,
+					_onConfirm:fnSuccess||avalon.noop
+				});
+			}else{
+				oAlert.error("删除失败",oResult.mess);
+			}
+		});
+	});
+};
 /*
-	上传图片方法 未封装完
+	upload 上传文件
+	@param  sUrl 链接
+			oFile 文件
+			fuSuccess fnError 回调函数
 */
-avalon.upbtn=function(s){
-	var btn=s.target.getAttribute("target");
+avalon.upload=function(sUrl,uFile,fnSuccess,fnError){
+	//传input ID
+	if(avalon.isString(uFile)) oFile=document.getElementById("uFile");
+	//传文件对象
+	if(avalon.isObject(uFile)) oFile=uFile;
+	var filedata=new FormData();
+	filedata.append("file",oFile.files[0]);
+	avalon.post(sUrl,filedata,function(oResult){
+		if(oResult.state==0){
+			fnSuccess(oResult.mess);
+		}else{
+			fnError(oResult.mess);
+		}
+	});
+}
+
+/*
+	点击按钮时执行upButton,做操作点击隐藏的input.
+	上传图片的函数
+	参数:
+	el			avalon自带,self,
+	sField		 ,
+	sId			选择器名,用于获得vm,
+	oVar		vm[oVar]成功回调时用于修改对应input的值
+	sUrl			上传url,有默认值
+	成功回调和失败回调函数,可以绑定一个avalon函数,vm.success:function(){}
+*/
+function upButton(e){
+	var btn=e.target.getAttribute("target");
 	document.querySelector("#"+btn).click();
-},
-avalon.upheadpic=function(s){
-	if(s.target.value==""){
+}
+function upImage(e,sField,sId,oVar,fnSuccess,fnError,sUrl){
+	var oAlert=avalon.getAlert(1);
+	if(!oAlert){console.log("创建组件失败!");return;}
+	if(e.target.value==""){
 		return;
 	}else {
-		var btn=s.target.getAttribute("target");
-		e=document.querySelector("#"+btn);
-		e.value="上传中...";
-		e.setAttribute("disabled","");
+		sUrl=sUrl||"ajax_upload.html";
+		var btn=e.target.getAttribute("target");
+		var oDom=document.querySelector("#"+btn);
+		oDom.value="上传中...";
+		oDom.setAttribute("disabled","");
 		var isUp=true;
 		var data = new FormData();
-		data.append('staffcertimg', s.target.files[0]);
-		avalon.post("ajax_upload",data,function(oResult){
+		data.append(sField, e.target.files[0]);
+		var vm=avalon.vmodels[sId];
+		avalon.post(sUrl,data,function(oResult){
 			if(oResult.state==0){
-				vm.headpic=oResult.mess;
-				e.value="选择图片";
-				e.removeAttribute("disabled");
+				oDom.value="选择图片";
+				oDom.removeAttribute("disabled");
+				vm[oVar]=oResult.mess;
+				if(avalon.isFunction(fnSuccess)) fnSuccess(oResult); 
 			}else{
-				fyAlert(oResult.mess,"",null,"error");
-				e.value="选择图片";
-				e.removeAttribute("disabled");
+				oAlert.error(oResult.mess);
+				oDom.value="选择图片";
+				oDom.removeAttribute("disabled");
+				if(avalon.isFunction(fnError)) fnError(oResult); 
 			}
 		},function(ex){
-			fyAlert(ex,"",null,"error");
-			e.value="选择图片";
-			e.removeAttribute("disabled");
+			oAlert.error(ex);
+			oDom.value="选择图片";
+			oDom.removeAttribute("disabled");
+			if(avalon.isFunction(fnError)) fnError({
+				state:1,
+				mess:ex
+			}); 
 		});
 	}
-},
+}
 
 /*
 	判断是否字符串
