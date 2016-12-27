@@ -17,22 +17,37 @@
 
 avalon.component("fy-modal-amap", {
 	template: (function(){
-		//return '<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>';
-		var sHtml = '<div class="modal-dialog modal-lg" ms-visible="@isShow">'+
-						'<div class="modal-content">'+
-							'<div class="modal-header">'+
-								'<button type="button" class="close" data-dismiss="modal" ms-click="@hide"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'+
-								'<h4 class="modal-title">拖动箭头选择地址</h4>'+
-							'</div>'+
-							'<div class="modal-body">'+
-								'<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>'+
-							'</div>'+
-							'<div class="modal-footer">'+
-								'<button type="button" class="btn btn-primary" data-dismiss="modal" ms-click="@hide">确定</button>'+
-							'</div>'+
-						'</div>'+
+		// return '<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>';
+		var sHtml='<div ms-visible="@isShow" style="z-index:150">'+
+						// '<div class="fly-modal-overlay" ms-click="@hide"></div>'+
+						// '<div class="fly-modal-dialog" ms-css="{width:@width}">'+
+						// 	'<div class="fly-modal-header">'+
+						// 		'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
+						// 		'<h2 class="fly-modal-title">拖动箭头选择地址</h2>'+
+						// 	'</div>'+
+							'<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>'+
+						// 	'<div class="fly-modal-footer">'+
+						// 		'<button type="button" class="btn btn-primary m-r-xs" ms-click="@confirm">确定</button>'+
+						// 		'<button type="button" class="btn btn-primary" ms-click="@hide">关闭</button>'+
+						// 	'</div>'+
+						// '</div>'+
 					'</div>';
 		return sHtml;
+		// var sHtml = '<div class="modal-dialog modal-lg" ms-visible="@isShow">'+
+		// 				'<div class="modal-content">'+
+		// 					'<div class="modal-header">'+
+		// 						'<button type="button" class="close" data-dismiss="modal" ms-click="@hide"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'+
+		// 						'<h4 class="modal-title">拖动箭头选择地址</h4>'+
+		// 					'</div>'+
+		// 					'<div class="modal-body">'+
+		// 						'<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>'+
+		// 					'</div>'+
+		// 					'<div class="modal-footer">'+
+		// 						'<button type="button" class="btn btn-primary" data-dismiss="modal" ms-click="@hide">确定</button>'+
+		// 					'</div>'+
+		// 				'</div>'+
+		// 			'</div>';
+		// return sHtml;
 	}).call(this),
 	defaults: {
 		$domId:"amap-content",

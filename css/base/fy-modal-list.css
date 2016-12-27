@@ -1,4 +1,4 @@
-.fly-listbox-overlay {
+.fly-modal-overlay {
 	background-color: black;
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
 	background-color: rgba(0, 0, 0, 0.4);
@@ -9,7 +9,7 @@
 	bottom: 0;
 	z-index: 10000;
 }
-.fly-listbox-dialog {
+.fly-modal-dialog {
 	position: relative;
 	margin: 50px auto;
 	background-color: white;
@@ -20,7 +20,7 @@
 	overflow: hidden;
 	z-index: 99999;
 }
-.fly-listbox-header {
+.fly-modal-header {
 	padding: 15px 5px;
 	/*border-bottom: 1px solid #e5e5e5;*/
 	text-align: center;
@@ -45,20 +45,20 @@
 	clip: rect(0,0,0,0);
 	border: 0;
 }
-.fly-listbox-title {
+.fly-modal-title {
 	font-size: 26px;
 }
-.fly-listbox-body {
+.fly-modal-body {
 	position: relative;
 	text-align: left;
 	overflow: auto;
 }
-.fly-listbox-body ul {
+.fly-modal-body ul {
 	/*height: 300px;
 	表格的高度 超出自动滚动条 可不加*/
 	margin: 0;
 }
-.fly-listbox-footer {
+.fly-modal-footer {
 	padding: 15px;
 	text-align: right;
 	/*border-top: 1px solid #e5e5e5;*/

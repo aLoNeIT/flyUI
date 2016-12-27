@@ -6,11 +6,11 @@ avalon.component('fy-modal-list', {
 	template:(function(){
 		// 内容表格部分
 		var sHtml='<div ms-visible="@isShow">'+
-						'<div class="fly-listbox-overlay" ms-click="@hide"></div>'+
-						'<div class="fly-listbox-dialog" ms-css="{width:@width}">'+
-							'<div class="fly-listbox-header">'+
+						'<div class="fly-modal-overlay" ms-click="@hide"></div>'+
+						'<div class="fly-modal-dialog" ms-css="{width:@width}">'+
+							'<div class="fly-modal-header">'+
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
-								'<h2 class="fly-listbox-title" ms-text="@title"></h2>'+
+								'<h2 class="fly-modal-title" ms-text="@title"></h2>'+
 								'<div class="input-group">'+
 									'<input type="text" placeholder="搜索list" class="form-control" ms-duplex="@searchText | debounce(200)">'+
 									'<span class="input-group-btn">'+
@@ -18,13 +18,13 @@ avalon.component('fy-modal-list', {
 									'</span>'+
 								'</div>'+
 							'</div>'+
-							'<div class="fly-listbox-body" ms-css="{height:@height}">'+
+							'<div class="fly-modal-body" ms-css="{height:@height}">'+
 								'<ul class="list-group">'+
 									'<li class="list-group-item" ms-for="($index,value) in @data | filterBy(@search)" ms-text="value" ms-click="@selectData($event,$index,value) | stop" ms-class="getSelectedClass($index)">'+
 									'</li>'+
 								'</ul>'+
 							'</div>'+
-							'<div class="fly-listbox-footer">'+
+							'<div class="fly-modal-footer">'+
 								'<button type="button" class="btn btn-primary m-r-xs" ms-click="@confirm">确定</button>'+
 								'<button type="button" class="btn btn-primary" ms-click="@hide">关闭</button>'+
 							'</div>'+
@@ -36,7 +36,7 @@ avalon.component('fy-modal-list', {
 		height:"300px",
 		width:"300px",//list宽度
 		isShow: false,//是否显示界面
-		title:"ListBox",//标题部分内容
+		title:"listbox",//标题部分内容
 		data:[],//纯数组
 		$source:[],//原数组
 		selectedData:[],//选中的数据
