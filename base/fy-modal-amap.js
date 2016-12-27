@@ -18,19 +18,20 @@
 avalon.component("fy-modal-amap", {
 	template: (function(){
 		// return '<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>';
-		var sHtml='<div ms-visible="@isShow" style="z-index:150">'+
-						// '<div class="fly-modal-overlay" ms-click="@hide"></div>'+
-						// '<div class="fly-modal-dialog" ms-css="{width:@width}">'+
-						// 	'<div class="fly-modal-header">'+
-						// 		'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
-						// 		'<h2 class="fly-modal-title">拖动箭头选择地址</h2>'+
-						// 	'</div>'+
+		var sHtml='<div ms-visible="@isShow">'+
+		// var sHtml='<div>'+
+						'<div class="fly-modal-overlay" ms-click="@hide"></div>'+
+						'<div class="fly-modal-dialog" ms-css="{width:@width}">'+
+							'<div class="fly-modal-header">'+
+								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
+								'<h2 class="fly-modal-title">拖动箭头选择地址</h2>'+
+							'</div>'+
 							'<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>'+
-						// 	'<div class="fly-modal-footer">'+
-						// 		'<button type="button" class="btn btn-primary m-r-xs" ms-click="@confirm">确定</button>'+
-						// 		'<button type="button" class="btn btn-primary" ms-click="@hide">关闭</button>'+
-						// 	'</div>'+
-						// '</div>'+
+							'<div class="fly-modal-footer">'+
+								'<button type="button" class="btn btn-primary m-r-xs" ms-click="@confirm">确定</button>'+
+								'<button type="button" class="btn btn-primary" ms-click="@hide">关闭</button>'+
+							'</div>'+
+						'</div>'+
 					'</div>';
 		return sHtml;
 		// var sHtml = '<div class="modal-dialog modal-lg" ms-visible="@isShow">'+
@@ -76,6 +77,12 @@ avalon.component("fy-modal-amap", {
 			cursor:"move",
 			raiseOnDrag:true
 		},//标记配置
+		$init:false,
+		onConfirm:avalon.noop,
+		confirm:function(){
+			this.hide();
+			this.onConfirm();
+		}
 		cbProxy: function (sFunctionName,args) {
 			if(this.hasOwnProperty(sFunctionName)) this[sFunctionName].apply(this,args);
 		},
@@ -88,7 +95,7 @@ avalon.component("fy-modal-amap", {
 				}
 			});
 		},
-		onReady: function(){
+		_onShow: function(){
 			var oSelf=this;
 			//这里写入载入完毕后初始化的代码
 			this.$amap=new AMap.Map(this.$domId,this.$amapConfig);
@@ -144,6 +151,10 @@ avalon.component("fy-modal-amap", {
 		},
 		show:function(){
 			this.isShow=true;
+			if (this.$init==false) {
+				this._onShow();
+				this.$init=true;
+			}
 		},
 		hide:function(){
 			this.isShow=false;
