@@ -5,7 +5,7 @@
 avalon.component('fy-modal-list', {
 	template:(function(){
 		// 内容表格部分
-		var sHtml='<div ms-visible="@isShow">'+
+		var sHtml='<div class="fly-modal" ms-visible="@isShow">'+
 						'<div class="fly-modal-overlay" ms-click="@hide"></div>'+
 						'<div class="fly-modal-dialog" ms-css="{width:@width}">'+
 							'<div class="fly-modal-header">'+

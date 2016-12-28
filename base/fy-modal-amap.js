@@ -17,48 +17,31 @@
 
 avalon.component("fy-modal-amap", {
 	template: (function(){
-		// return '<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>';
-		var sHtml='<div ms-visible="@isShow">'+
-		// var sHtml='<div>'+
+		var sHtml='<div class="fly-modal" ms-visible="@isShow">'+
 						'<div class="fly-modal-overlay" ms-click="@hide"></div>'+
 						'<div class="fly-modal-dialog" ms-css="{width:@width}">'+
 							'<div class="fly-modal-header">'+
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
 								'<h2 class="fly-modal-title">拖动箭头选择地址</h2>'+
 							'</div>'+
-							'<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>'+
+							'<div ms-attr="{id:@$domId}" ms-css="{height:@height}" style="margin:auto;"></div>'+
 							'<div class="fly-modal-footer">'+
-								'<button type="button" class="btn btn-primary m-r-xs" ms-click="@confirm">确定</button>'+
-								'<button type="button" class="btn btn-primary" ms-click="@hide">关闭</button>'+
+								'<button type="button" class="btn btn-primary m-r-xs" ms-click="@confirm" ms-visible="@buttons.onConfirm!=avalon.noop">确定</button>'+
+								'<button type="button" class="btn btn-white" ms-click="@hide">关闭</button>'+
 							'</div>'+
 						'</div>'+
 					'</div>';
 		return sHtml;
-		// var sHtml = '<div class="modal-dialog modal-lg" ms-visible="@isShow">'+
-		// 				'<div class="modal-content">'+
-		// 					'<div class="modal-header">'+
-		// 						'<button type="button" class="close" data-dismiss="modal" ms-click="@hide"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'+
-		// 						'<h4 class="modal-title">拖动箭头选择地址</h4>'+
-		// 					'</div>'+
-		// 					'<div class="modal-body">'+
-		// 						'<div ms-attr="{id:@$domId}" ms-css="{width:@width,height:@height}" style="margin:auto;"></div>'+
-		// 					'</div>'+
-		// 					'<div class="modal-footer">'+
-		// 						'<button type="button" class="btn btn-primary" data-dismiss="modal" ms-click="@hide">确定</button>'+
-		// 					'</div>'+
-		// 				'</div>'+
-		// 			'</div>';
-		// return sHtml;
 	}).call(this),
 	defaults: {
 		$domId:"amap-content",
-		width:"100%",
+		width:"90%",
 		height:"500px",
 		isShow: false,
 		$amap: null,//高德map组件
 		$amapConfig:{
 			resizeEnable:true,
-			zoom:15
+			zoom:13
 		},//初始化地图组件配置
 		$geolocation:null,//地理位置
 		$geolocationConfig:{
@@ -75,19 +58,23 @@ avalon.component("fy-modal-amap", {
 		$markerConfig:{
 			draggable:true,
 			cursor:"move",
-			raiseOnDrag:true
+			raiseOnDrag:true,
+			title:"拖动箭头选择地址"
 		},//标记配置
 		$init:false,
-		onConfirm:avalon.noop,
+		buttons:{
+			onConfirm:avalon.noop
+		},
 		confirm:function(){
 			this.hide();
-			this.onConfirm();
-		}
+			this.buttons.onConfirm();
+		},
 		cbProxy: function (sFunctionName,args) {
 			if(this.hasOwnProperty(sFunctionName)) this[sFunctionName].apply(this,args);
 		},
 		cbAddress:function(position){
 			var oSelf=this;
+			this.$position=position;
 			this.$geocoder.getAddress(position,function(status,result){
 				if(status==="complete"&&result.info==="OK"){
 					oSelf.$address=result.regeocode.formattedAddress;
@@ -107,30 +94,17 @@ avalon.component("fy-modal-amap", {
 					oSelf.$position=data.position;
 					oSelf.cbProxy("onLocationComplete",arguments);
 					oSelf.cbAddress(data.position);
-					oSelf.$geocoder.getAddress(data.position,function(status,result){
-						if(status==="complete"&&result.info==="OK"){
-							oSelf.cbProxy("onGetAddress",arguments);
-						}
-					});
+					// oSelf.$geocoder.getAddress(data.position,function(status,result){
+					// 	if(status==="complete"&&result.info==="OK"){
+					// 		oSelf.cbProxy("onGetAddress",arguments);
+					// 	}
+					// });
 				});
 				AMap.event.addListener(oSelf.$geolocation,"error",function(){
 					oSelf.cbProxy("onLocationError",arguments);
 				});
 			});
 			this.$markerConfig.position=this.$amap.getCenter();
-			var $marker=new AMap.Marker({
-				position: this.$amap.getCenter(),
-				draggable: true,
-				cursor: 'move',
-				raiseOnDrag: true,
-				title:"fuck"
-			});
-			$marker.setMap(this.$amap);
-			AMap.event.addListener($marker,"dragend",function(e){
-				oSelf.cbProxy("onMarkerDragend",arguments);
-				oSelf.cbAddress(e.lnglat);
-			});
-			return;
 			this.$marker=new AMap.Marker(this.$markerConfig);
 			this.$marker.setMap(this.$amap);
 			AMap.event.addListener(this.$marker,"dragend",function(e){
@@ -149,11 +123,16 @@ avalon.component("fy-modal-amap", {
 		getAddress:function(){
 			return this.$address;
 		},
-		show:function(){
+		show:function(position){
+			// position:{lng:0,lat:0}
 			this.isShow=true;
 			if (this.$init==false) {
 				this._onShow();
 				this.$init=true;
+			};
+			if(position){
+				this.$marker.setPosition(new AMap.LngLat(position.lng,position.lat));
+				this.$amap.setCenter(new AMap.LngLat(position.lng,position.lat));
 			}
 		},
 		hide:function(){

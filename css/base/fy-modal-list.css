@@ -1,3 +1,10 @@
+.fly-modal {
+	position:absolute;
+	top:0;
+	left:0;
+	right: 0;
+	bottom: 0;
+}
 .fly-modal-overlay {
 	background-color: black;
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";

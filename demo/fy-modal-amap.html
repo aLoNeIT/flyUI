@@ -13,25 +13,51 @@
 </head>
 <body class="white-bg">
 <div ms-controller="vm">
+	<wbr ms-widget="{is:'fy-modal-amap',$id:'modalamap',onMarkerDragend:@onMarkerDragend,buttons:@buttons,onLocationComplete:@onLocationComplete,onGetAddress:@onGetAddress}" />
 	<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗</a>
-	<!-- <div id="div" style="display: none;"> -->
-	<wbr ms-widget="{is:'fy-modal-amap',$id:'modalamap',onGetAddress:'@onGetAddress'}" />
-	<!-- </div> -->
+	<!-- <br /> -->
+	地址<input type="text" name="" value="" ms-duplex="@add" />
+	lng<input type="text" name="" value="" ms-duplex="@lng" />
+	lat<input type="text" name="" value="" ms-duplex="@lat" />
+	<br />
+	当前位置<input type="text" name="" value="" ms-duplex="@addNow" />
+	lng<input type="text" name="" value="" ms-duplex="@lngNow" />
+	lat<input type="text" name="" value="" ms-duplex="@latNow" />
 </div>
 </body>
 <script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
 <script type="text/javascript" src="../support/avalon-extend.js"></script>
 <script type="text/javascript" src="../base/fy-modal-amap.js"></script>
-<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=2f7830fd27b8c699d555954768c44ba1&plugin=AMap.Geocoder"></script>
+<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=349a020603e84d4a38a416da724326cb&plugin=AMap.Geocoder"></script>
 <script type="text/javascript">
 	avalon.ready(function(){
 		var vm = avalon.define({
 			$id:"vm",
+			add:"",
+			lng:"",
+			lat:"",
+			addNow:"",
+			lngNow:"",
+			latNow:"",
 			open:function(){
-				// var oDiv=document.getElementById("div");
-				// oDiv.style.display="block";
 				var oModalAmap=avalon.vmodels["modalamap"];
-				oModalAmap.show();
+				// oModalAmap.show();
+				oModalAmap.show({lng:108.822605,lat:34.193785});
+			},
+			onMarkerDragend:function(e){
+				vm.lngNow=e.lnglat.getLng();
+				vm.latNow=e.lnglat.getLat();
+			},
+			onGetAddress:function(status,result){
+				vm.addNow=result.regeocode.formattedAddress;
+			},
+			buttons:{
+				onConfirm:function(){
+					var oModalAmap=avalon.vmodels["modalamap"];
+					vm.add=oModalAmap.$address;
+					vm.lng=oModalAmap.$position.lng;
+					vm.lat=oModalAmap.$position.lat;
+				}
 			}
 		});
 		avalon.scan(document.body);
