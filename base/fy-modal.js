@@ -30,7 +30,6 @@ avalon.component("fy-modal", {
 		autoClose:false,//自动关闭
 		title:"Modal",//标题部分内容
 		content:"",//主要内容区
-		formdata:[],
 		animateCss:"",
 		animate:{
 			show:"fadeInUp",

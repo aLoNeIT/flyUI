@@ -14,7 +14,7 @@
 <body class="white-bg">
 <div ms-controller="vm">
 <a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗</a>
-<wbr ms-widget="{is:'fy-modal',$id:'modal'}" />
+	<wbr ms-widget="{is:'fy-modal-pwdreset',$id:'pwdreset'}" />
 </div>
 </body>
 <script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
@@ -26,9 +26,9 @@
 		var vm = avalon.define({
 			$id:"vm",
 			open:function(){
-				var oModal=avalon.vmodels["modal"];
-				oModal.show("",function(){
-					console.log(oModal.pwd,oModal.pwdConfirm);
+				var oPwdReset=avalon.vmodels["pwdreset"];
+				oPwdReset.show("",function(){
+					console.log(oPwdReset.pwd,oPwdReset.pwdConfirm);
 				});
 			},
 		});

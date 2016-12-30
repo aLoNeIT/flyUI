@@ -15,8 +15,10 @@
 <div ms-controller="vm">
 <a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗</a>
 <a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@modalGrid">弹窗</a>
+<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@modalInput">弹窗3</a>
 <wbr ms-widget="{is:'fy-modal',$id:'modal',content:@scontent}" />
 <wbr ms-widget="{is:'fy-modal-grid',$id:'modalGrid',fields:@config.fields,onSelect:@config.onSelect}" />
+<wbr ms-widget="{is:'fy-modal-grid',$id:'modalInput',content:@inputContent,formdata:@formdata}" />
 </div>
 </body>
 <script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
@@ -68,6 +70,17 @@
 				onSelect:function(el){
 					avalon.log(el);
 					alert(JSON.stringify(el));
+				}
+			},
+			modalInput:function(){
+				var oModalInput=avalon.vmodels["modalInput"];
+				oModalInput.show("input-test");
+			},
+			// inputContent:"<input ms-duplex='@formdata.textInput' />click",
+			inputContent:"<button ms-click='@formdata' >click</button>",
+			formdata:{
+				textInput:function(){
+					alert("1");
 				}
 			}
 		});
