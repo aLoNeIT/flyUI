@@ -1,9 +1,9 @@
 /*
 authro:aLoNe.Adams.K
-createDate:2016-12-14
+createDate:2017-01-01
 description:flyui的带对话框的基础组件
  */
-avalon.component("fy-modal-pwdreset", {
+avalon.component("fy-modal-input", {
 	template:(function(){
 		// 内容表格部分
 		var sHtml=	'<div class="fy-modal" ms-visible="@isShow">'+
@@ -15,16 +15,15 @@ avalon.component("fy-modal-pwdreset", {
 							'</div>'+
 							'<div class="modal-body" ms-css="{height:@height,overflow:\'auto\'}">'+
 								'<div class="row">'+
-									'<div class="col-md-12 text-left">'+
-										'<label>新的密码</label>'+
-										'<input class="form-control" type="password" name="" ms-duplex="@pwd" />'+
-										'<label class="m-t">确认密码</label>'+
-										'<input class="form-control" type="password" name="" ms-duplex="@pwdConfirm" />'+
+									'<div class="col-md-12 text-left" ms-for="($index,el) in @aInput">'+
+										'<label ms-text="el.label">新的密码</label>'+
+										'<input class="form-control" ms-attr="{type:el.inputType,disabled:el.disabled}" ms-duplex="el.value" />'+
+										'<div ms-html="el.iButton"></div>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
 							'<div class="modal-footer">'+
-								'<button type="button" class="btn btn-danger pull-left" ms-click="@_OnConfirm">确认重置</button>'+
+								'<button type="button" class="btn btn-primary pull-left" ms-click="@_OnConfirm">确认</button>'+
 								'<button type="button" class="btn btn-white" ms-click="@_OnClose">关闭</button>'+
 							'</div>'+
 						'</div>'+
@@ -36,9 +35,16 @@ avalon.component("fy-modal-pwdreset", {
 		height:"auto",
 		isShow: false,//是否显示界面
 		autoClose:false,//自动关闭
-		title:"修改密码",//标题部分内容
-		pwd:"",
-		pwdConfirm:"",
+		title:"标题",//标题部分内容
+		aInput:[
+			{
+				name:"",
+				label:"label",
+				value:"",
+				inputType:"text",
+				disabled:false
+			}
+		],
 		animateCss:"",
 		animate:{
 			show:"fadeInUp",
@@ -50,7 +56,6 @@ avalon.component("fy-modal-pwdreset", {
 			onClose:avalon.noop,
 		},
 		show:function(sTitle,fnConfirm,fnClose){
-			this.pwd=this.pwdConfirm="",
 			sTitle=sTitle||this.title;
 			if(avalon.isFunction(fnConfirm)) this.buttons.onConfirm=fnConfirm;
 			if(avalon.isFunction(fnClose)) this.buttons.onClose=fnClose;
