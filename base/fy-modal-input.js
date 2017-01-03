@@ -1,7 +1,7 @@
 /*
 authro:aLoNe.Adams.K
 createDate:2017-01-01
-description:flyui的带对话框的基础组件
+description:flyui的带input框的基础组件
  */
 avalon.component("fy-modal-input", {
 	template:(function(){
@@ -17,8 +17,12 @@ avalon.component("fy-modal-input", {
 								'<div class="row">'+
 									'<div class="col-md-12 text-left" ms-for="($index,el) in @aInput">'+
 										'<label ms-text="el.label">新的密码</label>'+
-										'<input class="form-control" ms-attr="{type:el.inputType,disabled:el.disabled}" ms-duplex="el.value" />'+
-										'<div ms-html="el.iButton"></div>'+
+										'<div ms-class="el.onClick?\'input-group\':\'\'">'+
+											'<span class="input-group-btn">'+
+												'<button type="button" class="btn btn-primary" ms-click="@el.onClick(el)" ms-text="el.btnText||\'选择\'" ms-visible="@el.onClick"></button>'+
+											'</span>'+
+											'<input class="form-control" ms-attr="{type:el.type||\'text\',disabled:el.disabled||false}" ms-duplex="el.value" />'+
+										'</div>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -36,15 +40,15 @@ avalon.component("fy-modal-input", {
 		isShow: false,//是否显示界面
 		autoClose:false,//自动关闭
 		title:"标题",//标题部分内容
-		aInput:[
-			{
-				name:"",
-				label:"label",
-				value:"",
-				inputType:"text",
-				disabled:false
-			}
-		],
+		aInput:[],
+		// aInput[传入aInput
+		// {name:"",key
+		// value:"",value
+		// label:"label",label text
+		// type:"text",input type
+		// onClick:avalon.noop,传选择按钮的方法
+		// btnText:"",按钮text
+		// disabled:false}]
 		animateCss:"",
 		animate:{
 			show:"fadeInUp",

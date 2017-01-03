@@ -17,7 +17,6 @@
 	<wbr ms-widget="{is:'fy-modal-input',$id:'input',aInput:@aInput}" />
 </div>
 </body>
-<!-- <script type="text/javascript" src="../support/avalon2.2.2.js"></script> -->
 <script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
 <script type="text/javascript" src="../support/avalon-extend.js"></script>
 <script type="text/javascript" src="../base/fy-modal-input.js"></script>
@@ -29,20 +28,26 @@
 			open:function(){
 				var oInput=avalon.vmodels["input"];
 				oInput.show("",function(){
-					console.log("2");
+					var aData=[];
+					avalon.each(vm.aInput,function(index,oItem){
+						aData[oItem.name]=oItem.value;
+					});
+					console.log(aData);
+					return aData;
 				});
 			},
 			aInput:[
-				{name:"aaa",
+				{
+					name:"aaa",
 					label:"aaa",
-					 value:"",
-					 iButton:"<button type='button' class='btn btn-primary' ms-click='@chooseBtn'>选择按钮</button>"
-					},
-				{name:"bbb",label:"bbb",value:"",iButton:"",disabled:false},
-			],
-			chooseBtn:function(){
-				console.log("1");
-			}
+					value:"",
+					onClick:function(el){
+						console.log(el);
+					}
+				},
+				{name:"bbb",label:"bbb",value:"",disabled:true},
+				{name:"ccc",label:"ccc",type:"password",value:""},
+			]
 		});
 		avalon.scan(document.body);
 	});
