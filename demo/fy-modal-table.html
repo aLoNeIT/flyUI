@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Avalon" />
+	<meta name="keywords" content="Avalon" />
+	<title>Hello Avalon</title>
+	<link href="../css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../css/style.min.css" rel="stylesheet" />
+	<link href="../css/animate.css" rel="stylesheet" />
+	<link href="../css/base/fy-modal.css" rel="stylesheet" />
+</head>
+<body class="white-bg">
+	<div ms-controller="vm">
+	<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗table</a>
+	<br />
+	<br />
+	<div class="input-group">
+		<span class="input-group-btn">
+			<button type="button" class="btn btn-primary" ms-click="@open">选择</button>
+		</span>
+		<input name="" type="text" class="form-control" ms-duplex="@text" />
+	</div>
+	<wbr ms-widget="{is:'fy-modal-table',$id:'table',aTitle:@aTitle,dataTable:@dataTable,sort:@aSort}" />
+</div>
+</body>
+<script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
+<script type="text/javascript" src="../support/avalon-extend.js"></script>
+<script type="text/javascript" src="../base/fy-modal-table.js"></script>
+
+<script type="text/javascript">
+	avalon.ready(function(){
+		var vm = avalon.define({
+			$id:"vm",
+			text:"",
+			open:function(){
+				var oInput=avalon.vmodels["table"];
+				oInput.show("",function(el){
+					avalon.log(el.etel);
+					vm.text=el.etel;
+				});
+			},
+			dataTable:[
+				{"eid":4,"ecode":"012323","ename":"保洁14444","esex":0,"etel":"18718791998","emark":"阿萨德法师打","eercode":"01","edate":1480661640,"ecompany":2,"estore":1},
+				{"eid":5,"ecode":"0232321","ename":"保洁23333","esex":0,"etel":"18715612546","emark":"阿斯蒂芬","eercode":"01","edate":1480661904,"ecompany":2,"estore":1},
+				{"eid":7,"ecode":"xs23654999","ename":"测试保洁","esex":1,"etel":"18717231559","emark":"阿萨德法师打发","eercode":"01","edate":1482467051,"ecompany":2,"estore":1}
+			],
+			aTitle:["id","code","电话号码"],
+			aSort:["eid","ecode","etel"]
+		});
+		avalon.scan(document.body);
+	});
+</script>
+</html>

@@ -1,9 +1,9 @@
 /*
-authro:aLoNe.Adams.K
-createDate:2017-01-01
-description:flyui的带input框的基础组件
+authro:小风风
+createDate:2017-01-10
+description:flyui的带table的可选择对应一条的基础组件
  */
-avalon.component("fy-modal-input", {
+avalon.component("fy-modal-table", {
 	template:(function(){
 		// 内容表格部分
 		var sHtml=	'<div class="fy-modal" ms-visible="@isShow">'+
@@ -14,20 +14,24 @@ avalon.component("fy-modal-input", {
 								'<h2 class="modal-title" ms-text="@title"></h2>'+
 							'</div>'+
 							'<div class="modal-body" ms-css="{height:@height,overflow:\'auto\'}">'+
-								'<div class="row">'+
-									'<div class="col-md-12 text-left" ms-for="($index,el) in @aInput">'+
-										'<label ms-text="el.label">新的密码</label>'+
-										'<div class="m-b-sm" ms-class="el.onClick?\'input-group\':\'\'">'+
-											'<span class="input-group-btn">'+
-												'<button type="button" class="btn btn-primary" ms-click="@el.onClick(el)" ms-text="el.btnText||\'选择\'" ms-visible="@el.onClick"></button>'+
-											'</span>'+
-											'<input class="form-control" ms-attr="{type:el.type||\'text\',disabled:el.disabled||false}" ms-duplex="el.value" />'+
-										'</div>'+
-									'</div>'+
-								'</div>'+
+								'<table class="table table-striped table-hover">'+
+									'<thead>'+
+										'<tr>'+
+											'<th ms-for="el in @aTitle">{{el}}</th>'+
+										'</tr>'+
+									'</thead>'+
+									'<tbody>'+
+										'<tr ms-for="(index,el) in @dataTable">'+
+											'<td ms-for="value in el | selectBy(@sort)">{{value}}</td>'+
+											'<td>'+
+												'<a class="btn btn-primary" ms-click="@buttons.onSelect(el)">选择</a>'+
+											'</td>'+
+										'</tr>'+
+									'</tbody>'+
+								'</table>'+
 							'</div>'+
 							'<div class="modal-footer">'+
-								'<button type="button" class="btn btn-primary pull-left" ms-click="@_OnConfirm">确认</button>'+
+								// '<button type="button" class="btn btn-primary pull-left" ms-click="@_OnConfirm">确认</button>'+
 								'<button type="button" class="btn btn-white" ms-click="@_OnClose">关闭</button>'+
 							'</div>'+
 						'</div>'+
@@ -35,20 +39,15 @@ avalon.component("fy-modal-input", {
 		return sHtml;
 	}).call(this),
 	defaults: {
-		width:"400px",
+		width:"600px",
 		height:"auto",
 		isShow: false,//是否显示界面
 		autoClose:false,//自动关闭
 		title:"标题",//标题部分内容
-		aInput:[],
-		// aInput[传入aInput
-		// {name:"",key
-		// value:"",value
-		// label:"label",label text
-		// type:"text",input type
-		// onClick:avalon.noop,传选择按钮的方法
-		// btnText:"",按钮text
-		// disabled:false}]
+		//必须配置下面3项
+		aTitle:[],//table的tr
+		dataTable:[],//获得的数据,需要筛选
+		sort:[],//筛选项
 		animateCss:"",
 		animate:{
 			show:"fadeInUp",
@@ -58,9 +57,12 @@ avalon.component("fy-modal-input", {
 		buttons:{
 			onConfirm:avalon.noop,
 			onClose:avalon.noop,
+			onSelect:avalon.noop,
 		},
-		show:function(sTitle,fnConfirm,fnClose){
+		show:function(sTitle,fnSelect,fnConfirm,fnClose){
 			this.title=sTitle||this.title;
+			//点击选择按钮的方法,回传所选数据
+			if(avalon.isFunction(fnSelect)) this.buttons.onSelect=fnSelect;
 			if(avalon.isFunction(fnConfirm)) this.buttons.onConfirm=fnConfirm;
 			if(avalon.isFunction(fnClose)) this.buttons.onClose=fnClose;
 			this.animateCss=this.animate.show;

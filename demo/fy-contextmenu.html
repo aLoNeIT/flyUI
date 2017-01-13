@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Avalon" />
+	<meta name="keywords" content="Avalon" />
+	<title>Hello Avalon</title>
+	<link href="../css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../css/style.min.css" rel="stylesheet" />
+	<link href="../css/animate.css" rel="stylesheet" />
+	<link href="../css/base/fy-modal.css" rel="stylesheet" />
+</head>
+<body class="white-bg">
+<div ms-controller="vm">
+<div style="width: 200px;height: 1200px;border: 1px solid #ccc;" ms-mousedown="@open">aaaa</div>
+	<wbr ms-widget="{is:'fy-contextmenu',$id:'contentmenu',aInput:@aInput,autoClose:true}" />
+</div>
+</body>
+<script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
+<script type="text/javascript" src="../support/avalon-extend.js"></script>
+<script type="text/javascript" src="../base/fy-contextmenu.js"></script>
+
+<script type="text/javascript">
+	avalon.ready(function(){
+		var vm = avalon.define({
+			$id:"vm",
+			open:function(){
+				var oContentmenu=avalon.vmodels["contentmenu"];
+				// oContentmenu.offsetPosition={x:100,y:200};
+				oContentmenu.show("a");
+			},
+			aInput:[
+				{
+					text:"aaa",
+					onClick:function(el){
+						console.log(this.text);
+					}
+				},
+				{
+					text:"bbb",
+					onClick:function(el){
+						console.log(this.text);
+					}
+				},
+				{
+					text:"ccc",
+					onClick:function(el){
+						console.log(this.text);
+					}
+				}
+			]
+		});
+		avalon.scan(document.body);
+	});
+</script>
+</html>

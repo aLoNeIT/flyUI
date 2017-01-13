@@ -46,7 +46,7 @@ avalon.component('fy-modal-list', {
 			return oItem.indexOf(sText)>=0;
 		},
 		show:function(sTitle,aData){
-			sTitle=sTitle||this.title;
+			this.title=sTitle||this.title;
 			this.title=sTitle;
 			if(aData) this.data=aData;
 			this.isShow=true;
