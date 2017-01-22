@@ -98,6 +98,7 @@ avalon.component('fy-datepicker', {
 		isShow:true,//显示
 		year:2016,
 		month:11,
+		dateType:1,// 0:2017-01-07,1:unix时间戳. 为1时需要转换成unix时间戳
 		changeView:function(sType){
 			this.selectType=sType;
 			switch(sType){
@@ -114,6 +115,13 @@ avalon.component('fy-datepicker', {
 		selectDate:function(oItem){
 			this.selectedDate=oItem;
 			this.title=avalon.filters.formatDate(oItem.date,"yyyy年MM月");
+			// oItem.date转unix时间戳
+			// if(this.dateType==1){
+			// 	// 转时间戳函数
+			// 	this.onSelected(avalon.dateToUnix(oItem.date));
+			// }else this.onSelected(oItem.date);
+			oItem.date.unix=avalon.dateToUnix(oItem.date);
+			oItem.date.format=avalon.filters.formatDate(oItem.date);
 			this.onSelected(oItem.date);
 			if(this.autoClose==true||this.autoClose=="true") this.isShow=false;
 		},

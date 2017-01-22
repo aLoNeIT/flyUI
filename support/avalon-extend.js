@@ -378,17 +378,23 @@ avalon.filters.contains=function(oValue,aData){
  *	avalon 时间日期处理函数
 */
 avalon.dateToUnix=function(uDate){
-	var f = uDate.split(' ', 2);
-	var d = (f[0] ? f[0] : '').split('-', 3);
-	var t = (f[1] ? f[1] : '').split(':', 3);
-	return (new Date(
-		parseInt(d[0], 10) || null,
-		(parseInt(d[1], 10) || 1) - 1,
-		parseInt(d[2], 10) || null,
-		parseInt(t[0], 10) || null,
-		parseInt(t[1], 10) || null,
-		parseInt(t[2], 10) || null
-		)).getTime() / 1000;
+	if(avalon.isObject(uDate)){
+		return uDate.getTime()/1000;
+	}else if(avalon.isString(uDate)){
+		var f = uDate.split(' ', 2);
+		var d = (f[0] ? f[0] : '').split('-', 3);
+		var t = (f[1] ? f[1] : '').split(':', 3);
+		return (new Date(
+			parseInt(d[0], 10) || null,
+			(parseInt(d[1], 10) || 1) - 1,
+			parseInt(d[2], 10) || null,
+			parseInt(t[0], 10) || null,
+			parseInt(t[1], 10) || null,
+			parseInt(t[2], 10) || null
+			)).getTime() / 1000;
+	}else{
+		return (new Date()).getTime()/1000;
+	}
 };
 
 avalon.curTime=function(){

@@ -33,7 +33,11 @@
 				isShow:false,
 				autoClose:true,
 				onSelected:function(oDate){
-					vm.selectedDate=avalon.filters.formatDate(oDate,"yyyy-MM-dd");
+					// vm.selectedDate=avalon.filters.formatDate(oDate,"yyyy-MM-dd");
+					vm.selectedDate=oDate.format;
+					avalon.log(oDate);
+					avalon.log(oDate.unix);
+					avalon.log(oDate.format);
 				}
 			},
 			open:function(){
