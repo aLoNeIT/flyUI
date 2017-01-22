@@ -1,0 +1,10 @@
+.selectRow{background-color: #2cac8b;color: #fff;border-radius: 5px;}
+.inTable table td:hover{cursor: pointer;}
+/*.inTable table tr td:hover {background-color: #2cac8b; cursor: pointer;color:#fff;}*/
+.inTable{padding: 0 !important;}
+.inTable table{margin-bottom: 0}
+/*.inTable table td{border-top: 1px solid #e7eaec;border-bottom: 1px solid #e7eaec}*/
+.inTable table tr:first-child > td{border-top:none !important;}
+/*.inTable table tr:last-child > td{border-bottom:none !important;}*/
+.inTable table td{display: inline-block !important;padding:8px !important;}
+.tdcheck{margin-top:2px !important;position: absolute;}

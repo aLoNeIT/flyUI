@@ -13,28 +13,17 @@
 <body class="gray-bg" ms-controller="vm">
 	<div class="tabs-container">
 		<ul class="nav nav-tabs">
-			<li class="active">
-				<a href="#tab-3" aria-expanded="true">
-					This is tab
-					<button type="button" class="btn btn-white close m-l"><span>×</span></button>
-				</a>
-			</li>
-			<li class="">
-				<a href="#tab-4" aria-expanded="false">
-					这是选项卡
-					<button type="button" class="close m-l"><span>×</span></button>
+			<li ms-for="(index,tab) in @tabs" ms-class="index==@isActive?'active':''">
+				<a ms-click="@active(index)">
+					{{tab.title}}
+					<button type="button" class="close m-l" ms-click="@del"><span>×</span></button>
 				</a>
 			</li>
 		</ul>
 		<div class="tab-content">
-			<div id="tab-3" class="tab-pane active">
+			<div class="tab-pane" ms-for="(index,tab) in @tabs" ms-class="index==@isActive?'active':''">
 				<div class="panel-body">
-					<strong>Lorem ipsum dolor sit amet, consectetuer adipiscing</strong>
-				</div>
-			</div>
-			<div id="tab-4" class="tab-pane">
-				<div class="panel-body">
-					<strong>这是内容</strong>
+					<strong>{{tab.content}}</strong>
 				</div>
 			</div>
 		</div>
@@ -42,11 +31,29 @@
 </body>
 <script type="text/javascript" src="../support/avalon2.2.4.js"></script>
 <script type="text/javascript" src="../support/avalon-extend.js"></script>
-<!-- <script type="text/javascript" src="../base/fy-alert.js"></script> -->
+<!-- <script type="text/javascript" src="../base/fy-tabs.js"></script> -->
 <script type="text/javascript">
 	avalon.ready(function(){
 		var vm = avalon.define({
-			$id:"vm"
+			$id:"vm",
+			tabs:[
+					{
+						title:"This is tab",
+						content:"Lorem ipsum dolor sit amet, consectetuer adipiscing"
+					},{
+						title:"这是选项卡",
+						content:"这是内容"
+					}
+				],
+			// 是否选中
+			isActive:0,
+			// 选中
+			active:function(iIndex){
+				vm.isActive=iIndex;
+			},
+			del:function(){
+				avalon.log("del");
+			}
 		});
 		avalon.scan(document.body);
 	});
