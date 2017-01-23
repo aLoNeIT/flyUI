@@ -11,12 +11,13 @@
 	<link href="../css/font-awesome/css/font-awesome.css" rel="stylesheet">
 </head>
 <body class="gray-bg" ms-controller="vm">
+	<button class="btn btn-primary" ms-click="@add">添加新tab</button>
 	<div class="tabs-container">
 		<ul class="nav nav-tabs">
 			<li ms-for="(index,tab) in @tabs" ms-class="index==@isActive?'active':''">
 				<a ms-click="@active(index)">
 					{{tab.title}}
-					<button type="button" class="close m-l" ms-click="@del"><span>×</span></button>
+					<button type="button" class="close m-l" ms-click="@del(index)"><span>×</span></button>
 				</a>
 			</li>
 		</ul>
@@ -51,9 +52,19 @@
 			active:function(iIndex){
 				vm.isActive=iIndex;
 			},
-			del:function(){
-				avalon.log("del");
-			}
+			// 删除对应tab
+			del:function(iIndex){
+				avalon.Array.removeAt(vm.tabs,iIndex);
+			},
+			// 新增tab,选中新增
+			add:function(){
+				avalon.Array.merge(vm.tabs,vm.addTab);
+				vm.isActive=vm.tabs.length-1;
+			},
+			addTab:[{
+						title:"新增tab",
+						content:"新增tab 内容内容"
+					}]
 		});
 		avalon.scan(document.body);
 	});
