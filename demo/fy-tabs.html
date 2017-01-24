@@ -14,17 +14,17 @@
 	<button class="btn btn-primary" ms-click="@add">添加新tab</button>
 	<div class="tabs-container">
 		<ul class="nav nav-tabs">
-			<li ms-for="(index,tab) in @tabs" ms-class="index==@isActive?'active':''">
+			<li ms-for="(index,tab) in @tabs" ms-class="index==@currIndex?'active':''">
 				<a ms-click="@active(index)">
 					{{tab.title}}
-					<button type="button" class="close m-l" ms-click="@del(index)"><span>×</span></button>
+					<button type="button" class="close m-l" ms-click="@del($event,index)"><span>×</span></button>
 				</a>
 			</li>
 		</ul>
 		<div class="tab-content">
-			<div class="tab-pane" ms-for="(index,tab) in @tabs" ms-class="index==@isActive?'active':''">
+			<div class="tab-pane" ms-for="(index,tab) in @tabs" ms-class="index==@currIndex?'active':''">
 				<div class="panel-body">
-					<strong>{{tab.content}}</strong>
+					<div ms-html="@tab.content"></div>
 				</div>
 			</div>
 		</div>
@@ -47,23 +47,49 @@
 					}
 				],
 			// 是否选中
-			isActive:0,
+			currIndex:-1,
 			// 选中
 			active:function(iIndex){
-				vm.isActive=iIndex;
+				vm.currIndex=iIndex;
 			},
 			// 删除对应tab
-			del:function(iIndex){
+			del:function($event,iIndex){
+				// 阻止冒泡
+				$event.stopPropagation();
+				if(this.currIndex>=iIndex){
+					//before active tab
+					this.currIndex--;
+				}
 				avalon.Array.removeAt(vm.tabs,iIndex);
+				avalon.log(iIndex);
+				avalon.log(vm.tabs.length);
+				//if()
+				// 点击的不是当前选中的
+				//if(vm.currIndex==iIndex) return;
+				// 点击自己的时候,currIndex为下一个
+				// 如果点击的是最后一个currIndex为最后一个
+				return;
+				if(iIndex==vm.tabs.length){
+					vm.currIndex=vm.tabs.length-1;
+				}else{
+					vm.currIndex=iIndex;
+				}
 			},
 			// 新增tab,选中新增
 			add:function(){
 				avalon.Array.merge(vm.tabs,vm.addTab);
-				vm.isActive=vm.tabs.length-1;
+				vm.currIndex=vm.tabs.length-1;
+			},
+			getTab:function(iIndex){
+				return iIndex<this.tabs.length?this.tabs[iIndex]:null;
+			},
+			setContent:function(iIndex,sContent){
+				var oTab=this.getTab(iIndex);
+				if(oTab) oTab.content=sContent;
 			},
 			addTab:[{
 						title:"新增tab",
-						content:"新增tab 内容内容"
+						content:"新增tab 内容内容<span>hello world</span>"
 					}]
 		});
 		avalon.scan(document.body);
