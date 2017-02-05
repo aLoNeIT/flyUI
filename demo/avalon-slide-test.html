@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Avalon" />
+	<meta name="keywords" content="Avalon" />
+	<title>Hello Avalon</title>
+	<link rel="stylesheet" type="text/css" href="../css/base/fy-slide.css">
+</head>
+<body ms-controller="test">
+	<wbr ms-widget="{is:'fy-slide',height:@height,width:@width,img:@img}" />
+</body>
+<script type="text/javascript" src="../support/avalon2.2.4.js"></script>
+<script type="text/javascript" src="../base/fy-slide.js"></script>
+<script type="text/javascript">
+var vm=avalon.define({
+	$id:"test",
+	height:"1136/2px",
+	width:"640/2px",
+	img:[
+		{href:"5.html",imgurl:"img-slide/pgbg01.jpg"},
+		{href:"2.html",imgurl:"img-slide/pgbg02.jpg"},
+		{href:"3.html",imgurl:"img-slide/pgbg03.jpg"},
+		{href:"4.html",imgurl:"img-slide/pgbg04.jpg"}
+	],
+});
+</script>
+</html>

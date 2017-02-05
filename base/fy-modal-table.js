@@ -1,5 +1,5 @@
 /*
-authro:小风风
+author:小风风
 createDate:2017-01-10
 description:flyui的带table的可选择对应一条的基础组件
  */

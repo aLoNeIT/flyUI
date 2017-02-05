@@ -1,0 +1,163 @@
+@charset "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+}
+.slider_main li {
+	list-style: none;
+}
+.slider_main a {
+	color: #666;
+	text-decoration: none;
+}
+.slider_main em, i {
+	font-style: normal;
+}
+.slider_main img {
+	border: 0;
+	vertical-align: middle;
+}
+
+/*高宽的值*/
+.slider_main {
+	position: relative;
+	margin-bottom: 10px;
+	height: 540px;
+	width: 390px;
+}
+.slider_item, .slider_item_lk, .slider_list {
+	overflow: hidden;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+.slider_item {
+	background-color: #fff;
+	/*opacity: 0;*/
+	/*z-index: 0;*/
+}
+.slider_item_img {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+/*.slider_item_active{
+	opacity: 1;
+	z-index: 1;
+}*/
+.slider_indicator {
+	position: absolute;
+	z-index: 1;
+	left: 50%;
+	bottom: 20px;
+	font-size: 0;
+	padding: 4px 8px;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	background-color: hsla(0,0%,100%,.3);
+	display: block;
+}
+/*圆点*/
+.slider_indicator_btn {
+	display: inline-block;
+	margin-right: 10px;
+	width: 12px;
+	height: 12px;
+	-moz-border-radius: 100%;
+	border-radius: 100%;
+	background-color: #fff;
+}
+.slider_indicator_btn:nth-last-child(1){
+	margin-right: 0;
+}
+.slider_indicator_btn_active {
+	background-color: #db192a;
+}
+/*左右箭头*/
+.slider_control_prev {
+	left: 0;
+}
+.slider_control_next{
+	right: 0;
+}
+.slider_control_item {
+	display: none;
+	position: absolute;
+	z-index: 1;
+	top: 50%;
+	margin-top: -30px;
+	width: 30px;
+	height: 60px;
+	background-color: #333;
+	background-color: rgba(0,0,0,.1);
+	line-height: 60px;
+	text-align: center;
+}
+.slider_main:hover .slider_control_item{
+	display: block;
+}
+.slider_control_item:hover {
+	background-color: rgba(0,0,0,.5);
+}
+.slider_control_item i {
+	font-size: 20px;
+	color: #fff;
+}
+.iconfont {
+	font-family: iconfont;
+	font-style: normal;
+	-webkit-text-stroke-width: .2px;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/*动画效果*/
+.animated {
+	-webkit-animation-duration: 1s;
+	animation-duration: 1s;
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+.fadeIn {
+	-webkit-animation-name: fadeIn;
+	animation-name: fadeIn;
+}
+
+@-webkit-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+@keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+.fadeOut {
+	-webkit-animation-name: fadeOut;
+	animation-name: fadeOut;
+}

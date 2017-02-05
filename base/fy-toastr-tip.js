@@ -1,5 +1,5 @@
 /*
-	authro:小风风
+	author:小风风
 	createDate:2016-12-14
 	description:flyui tip提示框组件
 	toastr.css引入,tip弹框提示
