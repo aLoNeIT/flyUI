@@ -76,9 +76,15 @@
 				}
 			},
 			// 新增tab,选中新增
-			add:function(){
-				avalon.Array.merge(vm.tabs,vm.addTab);
+			add:function($event,sTitle,sContent){
+				var oTab={
+					title:sTitle||"新增tab",
+					content:sContent||"新增content"
+				};
+				this.tabs.push(oTab);
+				//avalon.Array.merge(vm.tabs,vm.addTab);
 				vm.currIndex=vm.tabs.length-1;
+				return oTab;
 			},
 			getTab:function(iIndex){
 				return iIndex<this.tabs.length?this.tabs[iIndex]:null;

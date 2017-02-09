@@ -13,7 +13,7 @@
 </head>
 <body class="white-bg">
 	<div ms-controller="vm">
-	<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open">弹窗table</a>
+	<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open111">弹窗table</a>
 	<br />
 	<br />
 	<div class="input-group">
@@ -23,6 +23,7 @@
 		<input name="" type="text" class="form-control" ms-duplex="@text" />
 	</div>
 	<wbr ms-widget="{is:'fy-modal-table',$id:'table',aTitle:@aTitle,dataTable:@dataTable,sort:@aSort}" />
+	<wbr ms-widget="{is:'fy-modal-table',$id:'table111',aTitle:@aTitle,dataTable:@dataTable,sort:@aSort,showBtn:false}" />
 </div>
 </body>
 <script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
@@ -40,6 +41,10 @@
 					avalon.log(el.etel);
 					vm.text=el.etel;
 				});
+			},
+			open111:function(){
+				var oInput=avalon.vmodels["table111"];
+				oInput.show("自定义标题 展示列表");
 			},
 			dataTable:[
 				{"eid":4,"ecode":"012323","ename":"保洁14444","esex":0,"etel":"18718791998","emark":"阿萨德法师打","eercode":"01","edate":1480661640,"ecompany":2,"estore":1},

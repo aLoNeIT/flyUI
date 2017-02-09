@@ -23,7 +23,7 @@ avalon.component("fy-modal-table", {
 									'<tbody>'+
 										'<tr ms-for="(index,el) in @dataTable">'+
 											'<td ms-for="value in el | selectBy(@sort)">{{value}}</td>'+
-											'<td>'+
+											'<td ms-visible="@showBtn">'+
 												'<a class="btn btn-primary" ms-click="@buttons.onSelect(el)">选择</a>'+
 											'</td>'+
 										'</tr>'+
@@ -43,6 +43,7 @@ avalon.component("fy-modal-table", {
 		height:"auto",
 		isShow: false,//是否显示界面
 		autoClose:false,//自动关闭
+		showBtn:true,//选择按钮显示,默认true
 		title:"标题",//标题部分内容
 		//必须配置下面3项
 		aTitle:[],//table的tr
