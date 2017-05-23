@@ -25,8 +25,12 @@ avalon.ajax=function(sUrl,oData,options){
 	var fnError=options.fnError||null;
 	var sType=options.sType||"json";
 	var sMethod=options.sMethod||"GET";
+	var oHeaders=options.oHeaders||{};//请求头信息
+	var sCredentials=options.sCredentials||"";//是否携带cookie，include表示携带
 	fetch(sUrl,{
 		method:sMethod,
+		headers:oHeaders,
+		credentials:sCredentials,
 		body:oData,
 	}).then(function(oResponse){
 		switch(sType){
@@ -154,7 +158,7 @@ function upImage(e,sField,sId,oVar,fnSuccess,fnError,sUrl){
 	if(e.target.value==""){
 		return;
 	}else {
-		sUrl=sUrl||"ajax_upload.html";
+		sUrl=sUrl||"/v1/common/fileupload.html";
 		var btn=e.target.getAttribute("target");
 		var oDom=document.querySelector("#"+btn);
 		oDom.value="上传中...";
@@ -209,7 +213,20 @@ avalon.getQueryString=function(name){
 	var r = window.location.search.substr(1).match(reg);
 	if(r!=null)return  unescape(r[2]); return "";
 };
-
+function getParam(name){
+	var sUrl=encodeURI(window.location.href);
+	if(sUrl.indexOf("?")<0) return;
+	var aParams=sUrl.split("?");
+	if(aParams.length<2) return;
+	var sParam=aParams[1];
+	aParams=sParam.split("&");
+	for(var i=0;i<aParams.length;i++){
+		var aTmp=aParams[i].split("=");
+		if(name==aTmp[0]){
+			return aTmp[1];
+		}
+	}
+}
 /*
  判断是否字符串
  @param uObj 待判断的变量
@@ -378,23 +395,17 @@ avalon.filters.contains=function(oValue,aData){
  *	avalon 时间日期处理函数
 */
 avalon.dateToUnix=function(uDate){
-	if(avalon.isObject(uDate)){
-		return uDate.getTime()/1000;
-	}else if(avalon.isString(uDate)){
-		var f = uDate.split(' ', 2);
-		var d = (f[0] ? f[0] : '').split('-', 3);
-		var t = (f[1] ? f[1] : '').split(':', 3);
-		return (new Date(
-			parseInt(d[0], 10) || null,
-			(parseInt(d[1], 10) || 1) - 1,
-			parseInt(d[2], 10) || null,
-			parseInt(t[0], 10) || null,
-			parseInt(t[1], 10) || null,
-			parseInt(t[2], 10) || null
-			)).getTime() / 1000;
-	}else{
-		return (new Date()).getTime()/1000;
-	}
+	var f = uDate.split(' ', 2);
+	var d = (f[0] ? f[0] : '').split('-', 3);
+	var t = (f[1] ? f[1] : '').split(':', 3);
+	return (new Date(
+		parseInt(d[0], 10) || null,
+		(parseInt(d[1], 10) || 1) - 1,
+		parseInt(d[2], 10) || null,
+		parseInt(t[0], 10) || null,
+		parseInt(t[1], 10) || null,
+		parseInt(t[2], 10) || null
+		)).getTime() / 1000;
 };
 
 avalon.curTime=function(){

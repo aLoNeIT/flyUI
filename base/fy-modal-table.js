@@ -12,6 +12,12 @@ avalon.component("fy-modal-table", {
 							'<div class="modal-header">'+
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
 								'<h2 class="modal-title" ms-text="@title"></h2>'+
+								'<div class="input-group m-t" ms-visible="@searchBtn">'+
+									'<input type="text" placeholder="搜索list" class="form-control" ms-duplex="@searchText | debounce(200)">'+
+									'<span class="input-group-btn">'+
+									'<button type="button" class="btn btn btn-primary" ms-click="@buttons.onSearch(@searchText)"> <i class="fa fa-search"></i>搜索</button>'+
+									'</span>'+
+								'</div>'+
 							'</div>'+
 							'<div class="modal-body" ms-css="{height:@height,overflow:\'auto\'}">'+
 								'<table class="table table-striped table-hover">'+
@@ -44,10 +50,12 @@ avalon.component("fy-modal-table", {
 		isShow: false,//是否显示界面
 		autoClose:false,//自动关闭
 		showBtn:true,//选择按钮显示,默认true
+		searchBtn:false,// 搜索按钮显示,传search函数时显示
 		title:"标题",//标题部分内容
 		//必须配置下面3项
 		aTitle:[],//table的tr
 		dataTable:[],//获得的数据,需要筛选
+		$source:[],//原数组
 		sort:[],//筛选项
 		animateCss:"",
 		animate:{
@@ -59,13 +67,23 @@ avalon.component("fy-modal-table", {
 			onConfirm:avalon.noop,
 			onClose:avalon.noop,
 			onSelect:avalon.noop,
+			onSearch:avalon.noop
 		},
-		show:function(sTitle,fnSelect,fnConfirm,fnClose){
+		searchText:"",//查询的文本
+		// search:function(oItem,iIndex){//查询过滤器，不过暂时无效果
+		// 	var sText=this.searchText||"";
+		// 	return oItem.indexOf(sText)>=0;
+		// },
+		show:function(sTitle,fnSelect,fnConfirm,fnClose,fnSearch){
 			this.title=sTitle||this.title;
 			//点击选择按钮的方法,回传所选数据
 			if(avalon.isFunction(fnSelect)) this.buttons.onSelect=fnSelect;
 			if(avalon.isFunction(fnConfirm)) this.buttons.onConfirm=fnConfirm;
 			if(avalon.isFunction(fnClose)) this.buttons.onClose=fnClose;
+			if(avalon.isFunction(fnSearch)){
+				this.buttons.onSearch=fnSearch;
+				this.searchBtn=true;
+			}
 			this.animateCss=this.animate.show;
 			this.isShow=true;
 		},

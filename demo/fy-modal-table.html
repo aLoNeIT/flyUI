@@ -22,11 +22,20 @@
 		</span>
 		<input name="" type="text" class="form-control" ms-duplex="@text" />
 	</div>
+	<br />
+	<br />
+	<div class="input-group">
+		<span class="input-group-btn">
+			<button type="button" class="btn btn-primary" ms-click="@open222">选择带搜索</button>
+		</span>
+		<input name="" type="text" class="form-control" ms-duplex="@text222" />
+	</div>
 	<wbr ms-widget="{is:'fy-modal-table',$id:'table',aTitle:@aTitle,dataTable:@dataTable,sort:@aSort}" />
 	<wbr ms-widget="{is:'fy-modal-table',$id:'table111',aTitle:@aTitle,dataTable:@dataTable,sort:@aSort,showBtn:false}" />
+	<wbr ms-widget="{is:'fy-modal-table',$id:'table222',aTitle:@aTitle,dataTable:@dataTable,sort:@aSort,showBtn:false}" />
 </div>
 </body>
-<script type="text/javascript" src="../support/avalon2.2.3.1.js"></script>
+<script type="text/javascript" src="../support/avalon2.2.4.js"></script>
 <script type="text/javascript" src="../support/avalon-extend.js"></script>
 <script type="text/javascript" src="../base/fy-modal-table.js"></script>
 
@@ -35,16 +44,31 @@
 		var vm = avalon.define({
 			$id:"vm",
 			text:"",
+			text222:"",
 			open:function(){
 				var oInput=avalon.vmodels["table"];
 				oInput.show("",function(el){
-					avalon.log(el.etel);
 					vm.text=el.etel;
 				});
 			},
 			open111:function(){
 				var oInput=avalon.vmodels["table111"];
-				oInput.show("自定义标题 展示列表");
+				oInput.show("自定义标题 展示列表",function(el){
+					el=vm.text;
+				});
+			},
+			open222:function(){
+				var oInput=avalon.vmodels["table222"];
+				oInput.show("点击搜索内容",function(el){
+					el=vm.text;
+				},null,null,function(searchText){
+					// 获取到搜索值
+					avalon.log(searchText);
+					// 讲获得到的值重新赋值
+					vm.dataTable=[
+						{"eid":4,"ecode":"012323","ename":"保洁14444","esex":0,"etel":"18718791998","emark":"阿萨德法师打","eercode":"01","edate":1480661640,"ecompany":2,"estore":1}
+					];
+				});
 			},
 			dataTable:[
 				{"eid":4,"ecode":"012323","ename":"保洁14444","esex":0,"etel":"18718791998","emark":"阿萨德法师打","eercode":"01","edate":1480661640,"ecompany":2,"estore":1},
