@@ -158,7 +158,12 @@ function upImage(e,sField,sId,oVar,fnSuccess,fnError,sUrl){
 	if(e.target.value==""){
 		return;
 	}else {
+		// 图片上传需要token
+		var	sAccess_token=storeEx.get("access_token");// access_token
 		sUrl=sUrl||"/v1/common/fileupload.html";
+		if(sAccess_token){
+			sUrl+="&access_token="+sAccess_token;
+		}
 		var btn=e.target.getAttribute("target");
 		var oDom=document.querySelector("#"+btn);
 		oDom.value="上传中...";
