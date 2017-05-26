@@ -1,15 +1,12 @@
 /*!
-built in 2016-12-14:14:56 version 2.2.3 by 司徒正美
-https://github.com/RubyLouvre/avalon/tree/2.2.1
+built in 2017-5-9:16:4 version 2.2.7 by 司徒正美
+https://github.com/RubyLouvre/avalon/tree/2.2.4
 
-
-fix ms-controller BUG, 上下VM相同时,不会进行合并
-为监听数组添加toJSON方法
-IE7的checked属性应该使用defaultChecked来设置
-对旧版firefox的children进行polyfill
-修正ms-if,ms-text同在一个元素时出BUG的情况 
-修正ms-visible,ms-effect同在一个元素时出BUG的情况
-修正selected属性同步问题
+修正IE下 orderBy BUG
+更改下载Promise的提示
+修复avalon.modern 在Proxy 模式下使用ms-for 循环对象时出错的BUG
+修复effect内部传参 BUG
+重构ms-validate的绑定事件的机制
 
 */(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : global.avalon = factory();
@@ -227,7 +224,7 @@ IE7的checked属性应该使用defaultChecked来设置
             Function.apply.call(method, console, arguments);
         }
     }
-    function error(e, str) {
+    function error(str, e) {
         throw (e || Error)(str);
     }
     function noop() {}
@@ -413,7 +410,7 @@ IE7的checked属性应该使用defaultChecked来设置
         inspect: inspect,
         ohasOwn: ohasOwn,
         rword: rword,
-        version: "2.2.3",
+        version: "2.2.7",
         vmodels: {},
 
         directives: directives,
@@ -463,6 +460,19 @@ IE7的checked属性应该使用defaultChecked来设置
         String.prototype.trim = function () {
             return this.replace(rtrim, '');
         };
+    }
+    if (!Object.create) {
+        Object.create = function () {
+            function F() {}
+
+            return function (o) {
+                if (arguments.length != 1) {
+                    throw new Error('Object.create implementation only accepts one parameter.');
+                }
+                F.prototype = o;
+                return new F();
+            };
+        }();
     }
     var hasDontEnumBug = !{
         'toString': null
@@ -900,7 +910,7 @@ IE7的checked属性应该使用defaultChecked来设置
         number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
         var n = !isFinite(+number) ? 0 : +number,
             prec = !isFinite(+decimals) ? 3 : Math.abs(decimals),
-            sep = thousands || ",",
+            sep = typeof thousands === 'string' ? thousands : ",",
             dec = point || ".",
             s = '';
 
@@ -1187,6 +1197,31 @@ IE7的checked属性应该使用defaultChecked来设置
     locate.SHORTMONTH = locate.MONTH;
     dateFilter.locate = locate;
 
+    /**
+    $$skipArray:是系统级通用的不可监听属性
+    $skipArray: 是当前对象特有的不可监听属性
+    
+     不同点是
+     $$skipArray被hasOwnProperty后返回false
+     $skipArray被hasOwnProperty后返回true
+     */
+    var falsy;
+    var $$skipArray = {
+        $id: falsy,
+        $render: falsy,
+        $track: falsy,
+        $element: falsy,
+        $computed: falsy,
+        $watch: falsy,
+        $fire: falsy,
+        $events: falsy,
+        $accessors: falsy,
+        $hashcode: falsy,
+        $mutations: falsy,
+        $vbthis: falsy,
+        $vbsetter: falsy
+    };
+
     /*
     https://github.com/hufyhang/orderBy/blob/master/index.js
     */
@@ -1201,20 +1236,16 @@ IE7的checked属性应该使用defaultChecked来设置
         };
         var mapping = {};
         var temp = [];
-        var index = 0;
-        for (var key in array) {
-            if (array.hasOwnProperty(key)) {
-                var val = array[key];
-                var k = criteria(val, key);
-                if (k in mapping) {
-                    mapping[k].push(key);
-                } else {
-                    mapping[k] = [key];
-                }
-
-                temp.push(k);
+        __repeat(array, Array.isArray(array), function (key) {
+            var val = array[key];
+            var k = criteria(val, key);
+            if (k in mapping) {
+                mapping[k].push(key);
+            } else {
+                mapping[k] = [key];
             }
-        }
+            temp.push(k);
+        });
 
         temp.sort();
         if (decend < 0) {
@@ -1231,13 +1262,31 @@ IE7的checked属性应该使用defaultChecked来设置
             }
         });
     }
+
+    function __repeat(array, isArray$$1, cb) {
+        if (isArray$$1) {
+            array.forEach(function (val, index) {
+                cb(index);
+            });
+        } else if (typeof array.$track === 'string') {
+            array.$track.replace(/[^☥]+/g, function (k) {
+                cb(k);
+            });
+        } else {
+            for (var i in array) {
+                if (array.hasOwnProperty(i)) {
+                    cb(i);
+                }
+            }
+        }
+    }
     function filterBy(array, search) {
         var type = avalon.type(array);
         if (type !== 'array' && type !== 'object') throw 'filterBy只能处理对象或数组';
         var args = avalon.slice(arguments, 2);
         var stype = avalon.type(search);
         if (stype === 'function') {
-            var criteria = search;
+            var criteria = search._orig || search;
         } else if (stype === 'string' || stype === 'number') {
             if (search === '') {
                 return array;
@@ -1250,20 +1299,21 @@ IE7的checked属性应该使用defaultChecked来设置
         } else {
             return array;
         }
-
-        array = convertArray(array).filter(function (el, i) {
-            return !!criteria.apply(el, [el.value, i].concat(args));
-        });
-
         var isArray$$1 = type === 'array';
         var target = isArray$$1 ? [] : {};
-        return recovery(target, array, function (el) {
-            if (isArray$$1) {
-                target.push(el.value);
-            } else {
-                target[el.key] = el.value;
+        __repeat(array, isArray$$1, function (key) {
+            var val = array[key];
+            if (criteria.apply({
+                key: key
+            }, [val, key].concat(args))) {
+                if (isArray$$1) {
+                    target.push(val);
+                } else {
+                    target[key] = val;
+                }
             }
         });
+        return target;
     }
 
     function selectBy(data, array, defaults) {
@@ -1290,7 +1340,7 @@ IE7的checked属性应该使用defaultChecked来设置
         }
         //将目标转换为数组
         if (type === 'object') {
-            input = convertArray(input);
+            input = convertArray(input, false);
         }
         var n = input.length;
         limit = Math.floor(Math.min(n, limit));
@@ -1324,19 +1374,17 @@ IE7的checked属性应该使用defaultChecked来设置
 
     //Chrome谷歌浏览器中js代码Array.sort排序的bug乱序解决办法
     //http://www.cnblogs.com/yzeng/p/3949182.html
-    function convertArray(array) {
+    function convertArray(array, isArray$$1) {
         var ret = [],
             i = 0;
-        for (var key in array) {
-            if (array.hasOwnProperty(key)) {
-                ret[i] = {
-                    oldIndex: i,
-                    value: array[key],
-                    key: key
-                };
-                i++;
-            }
-        }
+        __repeat(array, isArray$$1, function (key) {
+            ret[i] = {
+                oldIndex: i,
+                value: array[key],
+                key: key
+            };
+            i++;
+        });
         return ret;
     }
 
@@ -1626,14 +1674,14 @@ IE7的checked属性应该使用defaultChecked来设置
         }
     });
 
-    var propMap = { //不规则的属性名映射
-        'accept-charset': 'acceptCharset',
-        'char': 'ch',
-        charoff: 'chOff',
-        'class': 'className',
-        'for': 'htmlFor',
-        'http-equiv': 'httpEquiv'
-    };
+    var propMap = {}; //不规则的属性名映射
+
+
+    //防止压缩时出错
+    'accept-charset,acceptCharset|char,ch|charoff,chOff|class,className|for,htmlFor|http-equiv,httpEquiv'.replace(/[^\|]+/g, function (a) {
+        var k = a.split(',');
+        propMap[k[0]] = k[1];
+    });
     /*
     contenteditable不是布尔属性
     http://www.zhangxinxu.com/wordpress/2016/01/contenteditable-plaintext-only/
@@ -1767,9 +1815,7 @@ IE7的checked属性应该使用defaultChecked来设置
         }
     };
 
-    var cssMap = {
-        'float': 'cssFloat'
-    };
+    var cssMap = oneObject('float', 'cssFloat');
     avalon.cssNumber = oneObject('animationIterationCount,columnCount,order,flex,flexGrow,flexShrink,fillOpacity,fontWeight,lineHeight,opacity,orphans,widows,zIndex,zoom');
     var prefixes = ['', '-webkit-', '-o-', '-moz-', '-ms-'];
     /* istanbul ignore next */
@@ -2015,7 +2061,7 @@ IE7的checked属性应该使用defaultChecked来设置
 
     /* istanbul ignore if */
     if (msie < 9) {
-        cssMap['float'] = 'styleFloat';
+        avalon.shadowCopy(cssMap, oneObject('float', 'styleFloat'));
         var rnumnonpx = /^-?(?:\d*\.)?\d+(?!px)[^\d\s]+$/i;
         var rposition = /^(top|right|bottom|left)$/;
         var ralpha = /alpha\([^)]+\)/i;
@@ -2232,55 +2278,6 @@ IE7的checked属性应该使用defaultChecked来设置
         return get ? val : this;
     };
 
-    /* 
-     * 将要检测的字符串的字符串替换成??123这样的格式
-     */
-    var stringNum = 0;
-    var stringPool = {
-        map: {}
-    };
-    var rfill = /\?\?\d+/g;
-    function dig(a) {
-        var key = '??' + stringNum++;
-        stringPool.map[key] = a;
-        return key + ' ';
-    }
-    function fill(a) {
-        var val = stringPool.map[a];
-        return val;
-    }
-    function clearString(str) {
-        var array = readString(str);
-        for (var i = 0, n = array.length; i < n; i++) {
-            str = str.replace(array[i], dig);
-        }
-        return str;
-    }
-
-    function readString(str) {
-        var end,
-            s = 0;
-        var ret = [];
-        for (var i = 0, n = str.length; i < n; i++) {
-            var c = str.charAt(i);
-            if (!end) {
-                if (c === "'") {
-                    end = "'";
-                    s = i;
-                } else if (c === '"') {
-                    end = '"';
-                    s = i;
-                }
-            } else {
-                if (c === end) {
-                    ret.push(str.slice(s, i + 1));
-                    end = false;
-                }
-            }
-        }
-        return ret;
-    }
-
     var voidTag = {
         area: 1,
         base: 1,
@@ -2302,125 +2299,6 @@ IE7的checked属性应该使用defaultChecked来设置
         track: 1,
         wbr: 1
     };
-
-    var orphanTag = {
-        script: 1,
-        style: 1,
-        textarea: 1,
-        xmp: 1,
-        noscript: 1,
-        template: 1
-    };
-
-    /* 
-     *  此模块只用于文本转虚拟DOM, 
-     *  因为在真实浏览器会对我们的HTML做更多处理,
-     *  如, 添加额外属性, 改变结构
-     *  此模块就是用于模拟这些行为
-     */
-    function makeOrphan(node, nodeName, innerHTML) {
-        switch (nodeName) {
-            case 'style':
-            case 'script':
-            case 'noscript':
-            case 'template':
-            case 'xmp':
-                node.children = [{
-                    nodeName: '#text',
-                    nodeValue: innerHTML
-                }];
-                break;
-            case 'textarea':
-                var props = node.props;
-                props.type = nodeName;
-                props.value = innerHTML;
-                node.children = [{
-                    nodeName: '#text',
-                    nodeValue: innerHTML
-                }];
-                break;
-            case 'option':
-                node.children = [{
-                    nodeName: '#text',
-                    nodeValue: trimHTML(innerHTML)
-                }];
-                break;
-        }
-    }
-
-    //专门用于处理option标签里面的标签
-    var rtrimHTML = /<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi;
-    function trimHTML(v) {
-        return String(v).replace(rtrimHTML, '').trim();
-    }
-
-    //widget rule duplex validate
-
-    //如果直接将tr元素写table下面,那么浏览器将将它们(相邻的那几个),放到一个动态创建的tbody底下
-    function makeTbody(nodes) {
-        var tbody,
-            needAddTbody = false,
-            count = 0,
-            start = 0,
-            n = nodes.length;
-        for (var i = 0; i < n; i++) {
-            var node = nodes[i];
-            if (!tbody) {
-                if (node.nodeName === 'tr') {
-                    //收集tr及tr两旁的注释节点
-                    tbody = {
-                        nodeName: 'tbody',
-                        props: {},
-                        children: []
-                    };
-                    tbody.children.push(node);
-                    needAddTbody = true;
-                    if (start === 0) start = i;
-                    nodes[i] = tbody;
-                }
-            } else {
-                if (node.nodeName !== 'tr' && node.children) {
-                    tbody = false;
-                } else {
-                    tbody.children.push(node);
-                    count++;
-                    nodes[i] = 0;
-                }
-            }
-        }
-
-        if (needAddTbody) {
-            for (i = start; i < n; i++) {
-                if (nodes[i] === 0) {
-                    nodes.splice(i, 1);
-                    i--;
-                    count--;
-                    if (count === 0) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    function validateDOMNesting(parent, child) {
-
-        var parentTag = parent.nodeName;
-        var tag = child.nodeName;
-        var parentChild = nestObject[parentTag];
-        if (parentChild) {
-            if (parentTag === 'p') {
-                if (pNestChild[tag]) {
-                    avalon.warn('P element can not  add these childlren:\n' + Object.keys(pNestChild));
-                    return false;
-                }
-            } else if (!parentChild[tag]) {
-                avalon.warn(parentTag.toUpperCase() + 'element only add these children:\n' + Object.keys(parentChild) + '\nbut you add ' + tag.toUpperCase() + ' !!');
-                return false;
-            }
-        }
-        return true;
-    }
 
     function makeObject(str) {
         return oneObject(str + ',template,#document-fragment,#comment');
@@ -2457,23 +2335,15 @@ IE7的checked属性应该使用defaultChecked来设置
 
     /**
      * ------------------------------------------------------------
-     * avalon2.1.1的新式lexer
+     * avalon2.2.6的新式lexer
      * 将字符串变成一个虚拟DOM树,方便以后进一步变成模板函数
      * 此阶段只会生成VElement,VText,VComment
      * ------------------------------------------------------------
      */
-    function nomalString(str) {
-        return avalon.unescapeHTML(str.replace(rfill, fill));
-    }
-    //https://github.com/rviscomi/trunk8/blob/master/trunk8.js
-
-    var ropenTag = /^<([-A-Za-z0-9_]+)\s*([^>]*?)(\/?)>/;
-    var rendTag = /^<\/([^>]+)>/;
-    var rtagStart = /[\!\/a-z]/i; //闭标签的第一个字符,开标签的第一个英文,注释节点的!
-    var rlineSp = /\\n\s*/g;
-    var rattrs = /([^=\s]+)(?:\s*=\s*(\S+))?/;
-
+    var specalTag = { xmp: 1, style: 1, script: 1, noscript: 1, textarea: 1, '#comment': 1, template: 1 };
+    var hiddenTag = { style: 1, script: 1, noscript: 1, template: 1 };
     var rcontent = /\S/; //判定里面有没有内容
+    var rsp = /\s/;
     function fromString(str) {
         return from(str);
     }
@@ -2481,207 +2351,392 @@ IE7的checked属性应该使用defaultChecked来设置
 
     var strCache = new Cache(100);
 
-    function AST() {}
-    AST.prototype = {
-        init: function init(str) {
-            this.ret = [];
-            var stack = [];
-            stack.last = function () {
-                return stack[stack.length - 1];
-            };
-            this.stack = stack;
-            this.str = str;
-        },
-        gen: function gen() {
-            var breakIndex = 999999;
-            do {
-                this.tryGenText();
-                this.tryGenComment();
-                this.tryGenOpenTag();
-                this.tryGenCloseTag();
-                var node = this.node;
-                this.node = 0;
-                if (!node || --breakIndex === 0) {
-                    break;
-                }
-                if (node.end) {
-                    if (node.nodeName === 'table') {
-                        makeTbody(node.children);
-                    }
-                    delete node.end;
-                }
-            } while (this.str.length);
-            return this.ret;
-        },
-
-        fixPos: function fixPos(str, i) {
-            var tryCount = str.length - i;
-            while (tryCount--) {
-                if (!rtagStart.test(str.charAt(i + 1))) {
-                    i = str.indexOf('<', i + 1);
-                } else {
-                    break;
-                }
-            }
-            if (tryCount === 0) {
-                i = str.length;
-            }
-            return i;
-        },
-        tryGenText: function tryGenText() {
-            var str = this.str;
-            if (str.charAt(0) !== '<') {
-                //处理文本节点
-                var i = str.indexOf('<');
-                if (i === -1) {
-                    i = str.length;
-                } else if (!rtagStart.test(str.charAt(i + 1))) {
-                    //处理`内容2 {{ (idx1 < < <  1 ? 'red' : 'blue' ) + a }} ` 的情况 
-                    i = this.fixPos(str, i);
-                }
-                var nodeValue = str.slice(0, i).replace(rfill, fill);
-                this.str = str.slice(i);
-                this.node = {
-                    nodeName: '#text',
-                    nodeValue: nodeValue
-                };
-                if (rcontent.test(nodeValue)) {
-                    this.tryGenChildren(); //不收集空白节点
-                }
-            }
-        },
-        tryGenComment: function tryGenComment() {
-            if (!this.node) {
-                var str = this.str;
-                var i = str.indexOf('<!--'); //处理注释节点
-                /* istanbul ignore if*/
-                if (i === 0) {
-                    var l = str.indexOf('-->');
-                    if (l === -1) {
-                        avalon.error('注释节点没有闭合' + str);
-                    }
-                    var nodeValue = str.slice(4, l).replace(rfill, fill);
-                    this.str = str.slice(l + 3);
-                    this.node = {
-                        nodeName: '#comment',
-                        nodeValue: nodeValue
-                    };
-                    this.tryGenChildren();
-                }
-            }
-        },
-        tryGenOpenTag: function tryGenOpenTag() {
-            if (!this.node) {
-                var str = this.str;
-                var match = str.match(ropenTag); //处理元素节点开始部分
-                if (match) {
-                    var nodeName = match[1];
-                    var props = {};
-                    if (/^[A-Z]/.test(nodeName) && avalon.components[nodeName]) {
-                        props.is = nodeName;
-                    }
-                    nodeName = nodeName.toLowerCase();
-                    var isVoidTag = !!voidTag[nodeName] || match[3] === '\/';
-                    var node = this.node = {
-                        nodeName: nodeName,
-                        props: {},
-                        children: [],
-                        isVoidTag: isVoidTag
-                    };
-                    var attrs = match[2];
-                    if (attrs) {
-                        this.genProps(attrs, node.props);
-                    }
-                    this.tryGenChildren();
-                    str = str.slice(match[0].length);
-                    if (isVoidTag) {
-                        node.end = true;
-                    } else {
-                        this.stack.push(node);
-                        if (orphanTag[nodeName] || nodeName === 'option') {
-                            var index = str.indexOf('</' + nodeName + '>');
-                            var innerHTML = str.slice(0, index).trim();
-                            str = str.slice(index);
-                            makeOrphan(node, nodeName, nomalString(innerHTML));
-                        }
-                    }
-                    this.str = str;
-                }
-            }
-        },
-        tryGenCloseTag: function tryGenCloseTag() {
-            if (!this.node) {
-                var str = this.str;
-                var match = str.match(rendTag); //处理元素节点结束部分
-                if (match) {
-                    var nodeName = match[1].toLowerCase();
-                    var last = this.stack.last();
-                    /* istanbul ignore if*/
-                    if (!last) {
-                        avalon.error(match[0] + '前面缺少<' + nodeName + '>');
-                        /* istanbul ignore else*/
-                    } else if (last.nodeName !== nodeName) {
-                        var errMsg = last.nodeName + '没有闭合,请注意属性的引号';
-                        avalon.warn(errMsg);
-                        avalon.error(errMsg);
-                    }
-                    var node = this.stack.pop();
-                    node.end = true;
-                    this.node = node;
-                    this.str = str.slice(match[0].length);
-                }
-            }
-        },
-        tryGenChildren: function tryGenChildren() {
-            var node = this.node;
-            var p = this.stack.last();
-            if (p) {
-                validateDOMNesting(p, node);
-                p.children.push(node);
-            } else {
-                this.ret.push(node);
-            }
-        },
-        genProps: function genProps(attrs, props) {
-
-            while (attrs) {
-                var arr = rattrs.exec(attrs);
-
-                if (arr) {
-                    var name = arr[1];
-                    var value = arr[2] || '';
-                    attrs = attrs.replace(arr[0], '');
-                    if (value) {
-                        //https://github.com/RubyLouvre/avalon/issues/1844
-                        if (value.indexOf('??') === 0) {
-                            value = nomalString(value).replace(rlineSp, '').slice(1, -1);
-                        }
-                    }
-                    if (!(name in props)) {
-                        props[name] = value;
-                    }
-                } else {
-                    break;
-                }
-            }
-        }
-    };
-
-    var vdomAst = new AST();
-
     function from(str) {
         var cacheKey = str;
         var cached = strCache.get(cacheKey);
         if (cached) {
             return avalon.mix(true, [], cached);
         }
-        stringPool.map = {};
-        str = clearString(str);
 
-        vdomAst.init(str);
-        var ret = vdomAst.gen();
+        var ret = parse(str, false);
         strCache.put(cacheKey, avalon.mix(true, [], ret));
         return ret;
+    }
+
+    /**
+     * 
+     * 
+     * @param {any} string 
+     * @param {any} getOne 只返回一个节点
+     * @returns 
+     */
+    function parse(string, getOne) {
+        getOne = getOne === void 666 || getOne === true;
+        var ret = lexer(string, getOne);
+        if (getOne) {
+            return typeof ret[0] === 'string' ? ret[1] : ret[0];
+        }
+        return ret;
+    }
+
+    function lexer(string, getOne) {
+        var tokens = [];
+        var breakIndex = 9990;
+        var stack = [];
+        var origString = string;
+        var origLength = string.length;
+
+        stack.last = function () {
+            return stack[stack.length - 1];
+        };
+        var ret = [];
+
+        function addNode(node) {
+            var p = stack.last();
+            if (p && p.children) {
+                p.children.push(node);
+            } else {
+                ret.push(node);
+            }
+        }
+
+        var lastNode;
+        do {
+            if (--breakIndex === 0) {
+                break;
+            }
+            var arr = getCloseTag(string);
+
+            if (arr) {
+                //处理关闭标签
+                string = string.replace(arr[0], '');
+                var _node = stack.pop();
+                if (!_node) {
+                    throw '是不是有属性值没有用引号括起';
+                }
+                //处理下面两种特殊情况：
+                //1. option会自动移除元素节点，将它们的nodeValue组成新的文本节点
+                //2. table会将没有被thead, tbody, tfoot包起来的tr或文本节点，收集到一个新的tbody元素中
+
+                if (_node.nodeName === 'option') {
+                    _node.children = [{
+                        nodeName: '#text',
+                        nodeValue: getText(_node)
+                    }];
+                } else if (_node.nodeName === 'table') {
+                    insertTbody(_node.children);
+                }
+                lastNode = null;
+                if (getOne && ret.length === 1 && !stack.length) {
+                    return [origString.slice(0, origLength - string.length), ret[0]];
+                }
+                continue;
+            }
+
+            var arr = getOpenTag(string);
+            if (arr) {
+                string = string.replace(arr[0], '');
+                var node = arr[1];
+                addNode(node);
+                var selfClose = !!(node.isVoidTag || specalTag[node.nodeName]);
+                if (!selfClose) {
+                    //放到这里可以添加孩子
+                    stack.push(node);
+                }
+                if (getOne && selfClose && !stack.length) {
+                    return [origString.slice(0, origLength - string.length), node];
+                }
+                lastNode = node;
+                continue;
+            }
+
+            var text = '';
+            do {
+                //处理<div><<<<<<div>的情况
+                var _index = string.indexOf('<');
+                if (_index === 0) {
+                    text += string.slice(0, 1);
+                    string = string.slice(1);
+                } else {
+                    break;
+                }
+            } while (string.length);
+
+            //处理<div>{aaa}</div>,<div>xxx{aaa}xxx</div>,<div>xxx</div>{aaa}sss的情况
+            var index = string.indexOf('<'); //判定它后面是否存在标签
+            if (index === -1) {
+                text = string;
+                string = '';
+            } else {
+                var openIndex = string.indexOf(config.openTag);
+
+                if (openIndex !== -1 && openIndex < index) {
+                    if (openIndex !== 0) {
+                        text += string.slice(0, openIndex);
+                    }
+                    var dirString = string.slice(openIndex);
+                    var textDir = parseTextDir(dirString);
+                    text += textDir;
+                    string = dirString.slice(textDir.length);
+                } else {
+                    text += string.slice(0, index);
+                    string = string.slice(index);
+                }
+            }
+            var mayNode = addText(lastNode, text, addNode);
+            if (mayNode) {
+                lastNode = mayNode;
+            }
+        } while (string.length);
+        return ret;
+    }
+
+    function addText(lastNode, text, addNode) {
+        if (rcontent.test(text)) {
+            if (lastNode && lastNode.nodeName === '#text') {
+                lastNode.nodeValue += text;
+                return lastNode;
+            } else {
+                lastNode = {
+                    nodeName: '#text',
+                    nodeValue: text
+                };
+                addNode(lastNode);
+                return lastNode;
+            }
+        }
+    }
+
+    function parseTextDir(string) {
+        var closeTag = config.closeTag;
+        var openTag = config.openTag;
+        var closeTagFirst = closeTag.charAt(0);
+        var closeTagLength = closeTag.length;
+        var state = 'code',
+            quote$$1,
+            escape;
+        for (var i = openTag.length, n = string.length; i < n; i++) {
+
+            var c = string.charAt(i);
+            switch (state) {
+                case 'code':
+                    if (c === '"' || c === "'") {
+                        state = 'string';
+                        quote$$1 = c;
+                    } else if (c === closeTagFirst) {
+                        //如果遇到}
+                        if (string.substr(i, closeTagLength) === closeTag) {
+                            return string.slice(0, i + closeTagLength);
+                        }
+                    }
+                    break;
+                case 'string':
+                    if (c === '\\' && /"'/.test(string.charAt(i + 1))) {
+                        escape = !escape;
+                    }
+                    if (c === quote$$1 && !escape) {
+                        state = 'code';
+                    }
+                    break;
+            }
+        }
+        throw '找不到界定符' + closeTag;
+    }
+
+    var rtbody = /^(tbody|thead|tfoot)$/;
+
+    function insertTbody(nodes) {
+        var tbody = false;
+        for (var i = 0, n = nodes.length; i < n; i++) {
+            var node = nodes[i];
+            if (rtbody.test(node.nodeName)) {
+                tbody = false;
+                continue;
+            }
+
+            if (node.nodeName === 'tr') {
+                if (tbody) {
+                    nodes.splice(i, 1);
+                    tbody.children.push(node);
+                    n--;
+                    i--;
+                } else {
+                    tbody = {
+                        nodeName: 'tbody',
+                        props: {},
+                        children: [node]
+                    };
+                    nodes.splice(i, 1, tbody);
+                }
+            } else {
+                if (tbody) {
+                    nodes.splice(i, 1);
+                    tbody.children.push(node);
+                    n--;
+                    i--;
+                }
+            }
+        }
+    }
+
+    //<div>{{<div/>}}</div>
+    function getCloseTag(string) {
+        if (string.indexOf("</") === 0) {
+            var match = string.match(/\<\/(\w+[^\s\/\>]*)>/);
+            if (match) {
+                var tag = match[1];
+                string = string.slice(3 + tag.length);
+                return [match[0], {
+                    nodeName: tag
+                }];
+            }
+        }
+        return null;
+    }
+    var ropenTag = /\<(\w[^\s\/\>]*)/;
+
+    function getOpenTag(string) {
+        if (string.indexOf("<") === 0) {
+            var i = string.indexOf('<!--'); //处理注释节点
+            if (i === 0) {
+                var l = string.indexOf('-->');
+                if (l === -1) {
+                    thow('注释节点没有闭合 ' + string.slice(0, 100));
+                }
+                var node = {
+                    nodeName: '#comment',
+                    nodeValue: string.slice(4, l)
+                };
+                return [string.slice(0, l + 3), node];
+            }
+            var match = string.match(ropenTag); //处理元素节点
+            if (match) {
+                var leftContent = match[0],
+                    tag = match[1];
+                var node = {
+                    nodeName: tag,
+                    props: {},
+                    children: []
+                };
+
+                string = string.replace(leftContent, ''); //去掉标签名(rightContent)
+                try {
+                    var arr = getAttrs(string); //处理属性
+                } catch (e) {}
+                if (arr) {
+                    node.props = arr[1];
+                    string = string.replace(arr[0], '');
+                    leftContent += arr[0];
+                }
+
+                if (string.charAt(0) === '>') {
+                    //处理开标签的边界符
+                    leftContent += '>';
+                    string = string.slice(1);
+                    if (voidTag[node.nodeName]) {
+                        node.isVoidTag = true;
+                    }
+                } else if (string.slice(0, 2) === '/>') {
+                    //处理开标签的边界符
+                    leftContent += '/>';
+                    string = string.slice(2);
+                    node.isVoidTag = true;
+                }
+
+                if (!node.isVoidTag && specalTag[tag]) {
+                    //如果是script, style, xmp等元素
+                    var closeTag = '</' + tag + '>';
+                    var j = string.indexOf(closeTag);
+                    var nodeValue = string.slice(0, j);
+                    leftContent += nodeValue + closeTag;
+                    node.children.push({
+                        nodeName: '#text',
+                        nodeValue: nodeValue
+                    });
+                    if (tag === 'textarea') {
+                        node.props.type = tag;
+                        node.props.value = nodeValue;
+                    }
+                }
+                return [leftContent, node];
+            }
+        }
+    }
+
+    function getText(node) {
+        var ret = '';
+        node.children.forEach(function (el) {
+            if (el.nodeName === '#text') {
+                ret += el.nodeValue;
+            } else if (el.children && !hiddenTag[el.nodeName]) {
+                ret += getText(el);
+            }
+        });
+        return ret;
+    }
+
+    function getAttrs(string) {
+        var state = 'AttrName',
+            attrName = '',
+            attrValue = '',
+            quote$$1,
+            escape,
+            props = {};
+        for (var i = 0, n = string.length; i < n; i++) {
+            var c = string.charAt(i);
+            switch (state) {
+                case 'AttrName':
+                    if (c === '/' && string.charAt(i + 1) === '>' || c === '>') {
+                        if (attrName) props[attrName] = attrName;
+                        return [string.slice(0, i), props];
+                    }
+                    if (rsp.test(c)) {
+                        if (attrName) {
+                            state = 'AttrEqual';
+                        }
+                    } else if (c === '=') {
+                        if (!attrName) {
+                            throw '必须指定属性名';
+                        }
+                        state = 'AttrQuote';
+                    } else {
+                        attrName += c;
+                    }
+                    break;
+                case 'AttrEqual':
+                    if (c === '=') {
+                        state = 'AttrQuote';
+                    } else if (rcontent.test(c)) {
+                        props[attrName] = attrName;
+                        attrName = c;
+                        state = 'AttrName';
+                    }
+                    break;
+                case 'AttrQuote':
+                    if (c === '"' || c === "'") {
+                        quote$$1 = c;
+                        state = 'AttrValue';
+                        escape = false;
+                    }
+                    break;
+                case 'AttrValue':
+                    if (c === '\\' && /"'/.test(string.charAt(i + 1))) {
+                        escape = !escape;
+                    }
+                    if (c === '\n') {
+                        break;
+                    }
+                    if (c !== quote$$1) {
+                        attrValue += c;
+                    } else if (c === quote$$1 && !escape) {
+                        props[attrName] = attrValue;
+                        attrName = attrValue = '';
+                        state = 'AttrName';
+                    }
+                    break;
+            }
+        }
+        throw '必须关闭标签';
     }
 
     var rhtml = /<|&#?\w+;/;
@@ -2833,11 +2888,16 @@ IE7的checked属性应该使用defaultChecked来设置
                 setEventId(elem, keys.join(','));
                 //将令牌放进avalon-events属性中
             }
+            return fn;
         } else {
             /* istanbul ignore next */
-            avalon._nativeBind(elem, type, fn);
+            var cb = function cb(e) {
+                fn.call(elem, new avEvent(e));
+            };
+
+            avalon._nativeBind(elem, type, cb);
+            return cb;
         }
-        return fn; //兼容之前的版本
     };
 
     function setEventId(node, value) {
@@ -3191,6 +3251,59 @@ IE7的checked属性应该使用defaultChecked来设置
      * ------------------------------------------------------------
      */
 
+    var orphanTag = {
+        script: 1,
+        style: 1,
+        textarea: 1,
+        xmp: 1,
+        noscript: 1,
+        template: 1
+    };
+
+    /* 
+     *  此模块只用于文本转虚拟DOM, 
+     *  因为在真实浏览器会对我们的HTML做更多处理,
+     *  如, 添加额外属性, 改变结构
+     *  此模块就是用于模拟这些行为
+     */
+    function makeOrphan(node, nodeName, innerHTML) {
+        switch (nodeName) {
+            case 'style':
+            case 'script':
+            case 'noscript':
+            case 'template':
+            case 'xmp':
+                node.children = [{
+                    nodeName: '#text',
+                    nodeValue: innerHTML
+                }];
+                break;
+            case 'textarea':
+                var props = node.props;
+                props.type = nodeName;
+                props.value = innerHTML;
+                node.children = [{
+                    nodeName: '#text',
+                    nodeValue: innerHTML
+                }];
+                break;
+            case 'option':
+                node.children = [{
+                    nodeName: '#text',
+                    nodeValue: trimHTML(innerHTML)
+                }];
+                break;
+        }
+    }
+
+    //专门用于处理option标签里面的标签
+    var rtrimHTML = /<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi;
+    function trimHTML(v) {
+        return String(v).replace(rtrimHTML, '').trim();
+    }
+
+    //widget rule duplex validate
+
     function fromDOM(dom) {
         return [from$1(dom)];
     }
@@ -3353,7 +3466,7 @@ IE7的checked属性应该使用defaultChecked来设置
                         dom.innerHTML = template;
                     } catch (e) {
                         /* istanbul ignore next*/
-                        this.hackIE(dom, this.nodeName, template);
+                        hackIE(dom, this.nodeName, template);
                     }
                     break;
                 case 'option':
@@ -3373,18 +3486,7 @@ IE7的checked属性应该使用defaultChecked来设置
         },
 
         /* istanbul ignore next */
-        hackIE: function hackIE(dom, nodeName, template) {
-            switch (nodeName) {
-                case 'style':
-                    dom.setAttribute('type', 'text/css');
-                    dom.styleSheet.cssText = template;
-                    break;
-                case 'xmp': //IE6-8,XMP元素里面只能有文本节点,不能使用innerHTML
-                case 'noscript':
-                    dom.textContent = template;
-                    break;
-            }
-        },
+
         toHTML: function toHTML() {
             var arr = [];
             var props = this.props || {};
@@ -3408,7 +3510,18 @@ IE7的checked属性应该使用defaultChecked来设置
             return str + '</' + this.nodeName + '>';
         }
     };
-
+    function hackIE(dom, nodeName, template) {
+        switch (nodeName) {
+            case 'style':
+                dom.setAttribute('type', 'text/css');
+                dom.styleSheet.cssText = template;
+                break;
+            case 'xmp': //IE6-8,XMP元素里面只能有文本节点,不能使用innerHTML
+            case 'noscript':
+                dom.textContent = template;
+                break;
+        }
+    }
     function skipFalseAndFunction(a) {
         return a !== false && Object(a) !== a;
     }
@@ -3531,30 +3644,6 @@ IE7的checked属性应该使用defaultChecked来设置
 
     avalon.domize = function (a) {
         return avalon.vdom(a, 'toDOM');
-    };
-
-    /**
-    $$skipArray:是系统级通用的不可监听属性
-    $skipArray: 是当前对象特有的不可监听属性
-    
-     不同点是
-     $$skipArray被hasOwnProperty后返回false
-     $skipArray被hasOwnProperty后返回true
-     */
-    var falsy;
-    var $$skipArray = {
-        $id: falsy,
-        $render: falsy,
-        $track: falsy,
-        $element: falsy,
-        $watch: falsy,
-        $fire: falsy,
-        $events: falsy,
-        $accessors: falsy,
-        $hashcode: falsy,
-        $mutations: falsy,
-        $vbthis: falsy,
-        $vbsetter: falsy
     };
 
     avalon.pendingActions = [];
@@ -3704,8 +3793,61 @@ IE7的checked属性应该使用defaultChecked来设置
         }
     }
 
+    /* 
+     * 将要检测的字符串的字符串替换成??123这样的格式
+     */
+    var stringNum = 0;
+    var stringPool = {
+        map: {}
+    };
+    var rfill = /\?\?\d+/g;
+    function dig(a) {
+        var key = '??' + stringNum++;
+        stringPool.map[key] = a;
+        return key + ' ';
+    }
+    function fill(a) {
+        var val = stringPool.map[a];
+        return val;
+    }
+    function clearString(str) {
+        var array = readString(str);
+        for (var i = 0, n = array.length; i < n; i++) {
+            str = str.replace(array[i], dig);
+        }
+        return str;
+    }
+    //https://github.com/RubyLouvre/avalon/issues/1944
+    function readString(str, i, ret) {
+        var end = false,
+            s = 0,
+            i = i || 0;
+        ret = ret || [];
+        for (var n = str.length; i < n; i++) {
+            var c = str.charAt(i);
+            if (!end) {
+                if (c === "'") {
+                    end = "'";
+                    s = i;
+                } else if (c === '"') {
+                    end = '"';
+                    s = i;
+                }
+            } else {
+                if (c === end) {
+                    ret.push(str.slice(s, i + 1));
+                    end = false;
+                }
+            }
+        }
+        if (end !== false) {
+            return readString(str, s + 1, ret);
+        }
+        return ret;
+    }
+
     var keyMap = avalon.oneObject("break,case,catch,continue,debugger,default,delete,do,else,false," + "finally,for,function,if,in,instanceof,new,null,return,switch,this," + "throw,true,try,typeof,var,void,while,with," + /* 关键字*/
-    "abstract,boolean,byte,char,class,const,double,enum,export,extends," + "final,float,goto,implements,import,int,interface,long,native," + "package,private,protected,public,short,static,super,synchronized," + "throws,transient,volatile");
+    "abstract,boolean,byte,char,class,const,double,enum,export,extends," + "final,float,goto,implements,import,int,interface,long,native," + "package,private,protected,public,short,static,super,synchronized," + "throws,transient,volatile,arguments");
 
     var skipMap = avalon.mix({
         Math: 1,
@@ -3825,7 +3967,7 @@ IE7的checked属性应该使用defaultChecked来设置
      */
     function createSetter(expr, type) {
         var arr = addScope(expr, type);
-        var body = 'try{ ' + arr[0] + ' = __value__}catch(e){}';
+        var body = 'try{ ' + arr[0] + ' = __value__}catch(e){avalon.log(e, "in on dir")}';
         try {
             return new Function('__vmodel__', '__value__', body + ';');
             /* istanbul ignore next */
@@ -3861,7 +4003,7 @@ IE7的checked属性应该使用defaultChecked来设置
             this.setter = createSetter(expr, this.type);
         }
         // 缓存表达式旧值
-        this.oldValue = null;
+        this.value = NaN;
         // 表达式初始值 & 提取依赖
         if (!this.node) {
             this.value = this.get();
@@ -3906,8 +4048,7 @@ IE7的checked属性应该使用defaultChecked来设置
          * 在更新视图前保存原有的value
          */
         beforeUpdate: function beforeUpdate() {
-            var v = this.value;
-            return this.oldValue = v && v.$events ? v.$model : v;
+            return this.oldValue = getPlainObject(this.value);
         },
         update: function update(args, uuid) {
             var oldVal = this.beforeUpdate();
@@ -3960,6 +4101,28 @@ IE7的checked属性应该使用defaultChecked来设置
             }
         }
     };
+
+    function getPlainObject(v) {
+        if (v && typeof v === 'object') {
+            if (v && v.$events) {
+                return v.$model;
+            } else if (Array.isArray(v)) {
+                var ret = [];
+                for (var i = 0, n = v.length; i < n; i++) {
+                    ret.push(getPlainObject(v[i]));
+                }
+                return ret;
+            } else {
+                var _ret = {};
+                for (var _i3 in v) {
+                    _ret[_i3] = getPlainObject(v[_i3]);
+                }
+                return _ret;
+            }
+        } else {
+            return v;
+        }
+    }
 
     var protectedMenbers = {
         vm: 1,
@@ -4192,7 +4355,7 @@ IE7的checked属性应该使用defaultChecked来设置
     };
 
     /**
-     * 在末来的版本,avalon改用Proxy来创建VM,因此
+     * 在未来的版本,avalon改用Proxy来创建VM,因此
      */
 
     function IProxy(definition, dd) {
@@ -4573,11 +4736,13 @@ IE7的checked属性应该使用defaultChecked来设置
         for (var i = 0; i < keys.length; i++) {
             var _key2 = keys[i];
             if (!(_key2 in ac)) {
-                if (bindThis && typeof core[_key2] === 'function') {
-                    vm[_key2] = core[_key2].bind(vm);
+                var val = core[_key2];
+                if (bindThis && typeof val === 'function') {
+                    vm[_key2] = val.bind(vm);
+                    vm[_key2]._orig = val;
                     continue;
                 }
-                vm[_key2] = core[_key2];
+                vm[_key2] = val;
             }
         }
         vm.$track = keys.join('☥');
@@ -4780,19 +4945,19 @@ IE7的checked属性应该使用defaultChecked来设置
                             patch[i] = newVal[i];
                         }
                     } else {
-                        for (var _i3 in newVal) {
+                        for (var _i4 in newVal) {
                             //diff差异点
-                            if (newVal[_i3] !== oldVal[_i3]) {
+                            if (newVal[_i4] !== oldVal[_i4]) {
                                 hasChange = true;
                             }
-                            patch[_i3] = newVal[_i3];
+                            patch[_i4] = newVal[_i4];
                         }
                     }
 
-                    for (var _i4 in oldVal) {
-                        if (!(_i4 in patch)) {
+                    for (var _i5 in oldVal) {
+                        if (!(_i5 in patch)) {
                             hasChange = true;
-                            patch[_i4] = '';
+                            patch[_i5] = '';
                         }
                     }
                 }
@@ -5333,10 +5498,10 @@ IE7的checked属性应该使用defaultChecked来设置
 
     avalon.directive('expr', {
         update: function update(vdom, value) {
+            value = value == null || value === '' ? '\u200B' : value;
             vdom.nodeValue = value;
             //https://github.com/RubyLouvre/avalon/issues/1834
-            if (vdom.dom) if (value === '') value = '\u200B';
-            vdom.dom.data = value;
+            if (vdom.dom) vdom.dom.data = value;
         }
     });
 
@@ -5530,7 +5695,6 @@ IE7的checked属性应该使用defaultChecked来设置
             if (this.updating) {
                 return;
             }
-
             this.updating = true;
             var traceIds = createFragments(this, newVal);
 
@@ -5552,11 +5716,14 @@ IE7的checked属性应该使用defaultChecked来设置
             }
 
             if (this.userCb) {
-                this.userCb.call(this.vm, {
-                    type: 'rendered',
-                    target: this.begin.dom,
-                    signature: this.signature
-                });
+                var me = this;
+                setTimeout(function () {
+                    me.userCb.call(me.vm, {
+                        type: 'rendered',
+                        target: me.begin.dom,
+                        signature: me.signature
+                    });
+                }, 0);
             }
             delete this.updating;
         },
@@ -5596,9 +5763,11 @@ IE7的checked属性应该使用defaultChecked来设置
                 instance.fragments = fragments;
             } else {
                 avalon.each(obj, function (key, value) {
-                    var k = array ? getTraceKey(value) : key;
-                    fragments.push(new VFragment([], k, value, i++));
-                    ids.push(k);
+                    if (!(key in $$skipArray)) {
+                        var k = array ? getTraceKey(value) : key;
+                        fragments.push(new VFragment([], k, value, i++));
+                        ids.push(k);
+                    }
                 });
                 instance.fragments = fragments;
             }
@@ -5636,7 +5805,9 @@ IE7的checked属性应该使用defaultChecked来设置
                 delete fragment._dispose;
                 fragment.oldIndex = fragment.index;
                 fragment.index = index; // 相当于 c.index
+
                 resetVM(fragment.vm, instance.keyName);
+                fragment.vm[instance.valName] = c.val;
                 fragment.vm[instance.keyName] = instance.isArray ? index : fragment.key;
                 saveInCache(newCache, fragment);
             } else {
@@ -5673,7 +5844,11 @@ IE7的checked属性应该使用defaultChecked来设置
     }
 
     function resetVM(vm, a, b) {
-        vm.$accessors[a].value = NaN;
+        if (avalon.config.inProxyMode) {
+            vm.$accessors[a].value = NaN;
+        } else {
+            vm.$accessors[a].set(NaN);
+        }
     }
 
     function updateList(instance) {
@@ -5722,7 +5897,6 @@ IE7的checked属性应该使用defaultChecked来设置
         var vm = fragment.vm = platform.itemFactory(instance.vm, {
             data: data
         });
-
         if (instance.isArray) {
             vm.$watch(instance.valName, function (a) {
                 if (instance.value && instance.value.set) {
@@ -5734,6 +5908,7 @@ IE7的checked属性应该使用defaultChecked来设置
                 instance.value[fragment.key] = a;
             });
         }
+
         fragment.index = index;
         fragment.innerRender = avalon.scan(instance.fragment, vm, function () {
             var oldRoot = this.root;
@@ -5914,17 +6089,20 @@ IE7的checked属性应该使用defaultChecked来设置
     function setOption(vdom, values) {
         var props = vdom.props;
         if (!('disabled' in props)) {
-            var value = getOptionValue(vdom, props).trim();
+            var value = getOptionValue(vdom, props);
+            value = String(value || '').trim();
             props.selected = values.indexOf(value) !== -1;
+
             if (vdom.dom) {
                 vdom.dom.selected = props.selected;
+                var v = vdom.dom.selected; //必须加上这个,防止移出节点selected失效
             }
         }
     }
 
     function getOptionValue(vdom, props) {
         if (props && 'value' in props) {
-            return props.value;
+            return props.value + '';
         }
         var arr = [];
         vdom.children.forEach(function (el) {
@@ -5947,214 +6125,6 @@ IE7的checked属性应该使用defaultChecked来设置
         });
         return arr;
     }
-
-    var rchangeFilter = /\|\s*change\b/;
-    var rdebounceFilter = /\|\s*debounce(?:\(([^)]+)\))?/;
-    function duplexBeforeInit() {
-        var expr = this.expr;
-        if (rchangeFilter.test(expr)) {
-            this.isChanged = true;
-            expr = expr.replace(rchangeFilter, '');
-        }
-        var match = expr.match(rdebounceFilter);
-        if (match) {
-            expr = expr.replace(rdebounceFilter, '');
-            if (!this.isChanged) {
-                this.debounceTime = parseInt(match[1], 10) || 300;
-            }
-        }
-        this.expr = expr;
-    }
-    function duplexInit() {
-        var expr = this.expr;
-        var node = this.node;
-        var etype = node.props.type;
-        this.parseValue = parseValue;
-        //处理数据转换器
-        var parsers = this.param,
-            dtype;
-        var isChecked = false;
-        parsers = parsers ? parsers.split('-').map(function (a) {
-            if (a === 'checked') {
-                isChecked = true;
-            }
-            return a;
-        }) : [];
-        node.duplex = this;
-        if (rcheckedType.test(etype) && isChecked) {
-            //如果是radio, checkbox,判定用户使用了checked格式函数没有
-            parsers = [];
-            dtype = 'radio';
-            this.isChecked = isChecked;
-        }
-        this.parsers = parsers;
-        if (!/input|textarea|select/.test(node.nodeName)) {
-            if ('contenteditable' in node.props) {
-                dtype = 'contenteditable';
-            }
-        } else if (!dtype) {
-            dtype = node.nodeName === 'select' ? 'select' : etype === 'checkbox' ? 'checkbox' : etype === 'radio' ? 'radio' : 'input';
-        }
-        this.dtype = dtype;
-        var isChanged = false,
-            debounceTime = 0;
-        //判定是否使用了 change debounce 过滤器
-        // this.isChecked = /boolean/.test(parsers)
-        if (dtype !== 'input' && dtype !== 'contenteditable') {
-            delete this.isChange;
-            delete this.debounceTime;
-        } else if (!this.isChecked) {
-            this.isString = true;
-        }
-
-        var cb = node.props['data-duplex-changed'];
-        if (cb) {
-            var arr = addScope(cb, 'xx');
-            var body = makeHandle(arr[0]);
-            this.userCb = new Function('$event', 'var __vmodel__ = this\nreturn ' + body);
-        }
-    }
-    function duplexDiff(newVal, oldVal) {
-        if (Array.isArray(newVal)) {
-            if (newVal + '' !== this.compareVal) {
-                this.compareVal = newVal + '';
-                return true;
-            }
-        } else {
-            newVal = this.parseValue(newVal);
-            if (!this.isChecked) {
-                this.value = newVal += '';
-            }
-            if (newVal !== this.compareVal) {
-                this.compareVal = newVal;
-                return true;
-            }
-        }
-    }
-
-    function duplexValidate(node, vdom) {
-        //将当前虚拟DOM的duplex添加到它上面的表单元素的validate指令的fields数组中
-        var field = vdom.duplex;
-        var rules = vdom.rules;
-
-        if (rules && !field.validator) {
-            while (node && node.nodeType === 1) {
-                var validator = node._ms_validate_;
-                if (validator) {
-                    field.rules = rules;
-                    field.validator = validator;
-
-                    if (avalon.Array.ensure(validator.fields, field)) {
-                        validator.addField(field);
-                    }
-                    break;
-                }
-                node = node.parentNode;
-            }
-        }
-    }
-
-    var valueHijack = true;
-    try {
-        //#272 IE9-IE11, firefox
-        var setters = {};
-        var aproto = HTMLInputElement.prototype;
-        var bproto = HTMLTextAreaElement.prototype;
-        var newSetter = function newSetter(value) {
-            // jshint ignore:line
-            setters[this.tagName].call(this, value);
-            var data = this._ms_duplex_;
-            if (!this.caret && data && data.isString) {
-                data.duplexCb.call(this, { type: 'setter' });
-            }
-        };
-        var inputProto = HTMLInputElement.prototype;
-        Object.getOwnPropertyNames(inputProto); //故意引发IE6-8等浏览器报错
-        setters['INPUT'] = Object.getOwnPropertyDescriptor(aproto, 'value').set;
-
-        Object.defineProperty(aproto, 'value', {
-            set: newSetter
-        });
-        setters['TEXTAREA'] = Object.getOwnPropertyDescriptor(bproto, 'value').set;
-        Object.defineProperty(bproto, 'value', {
-            set: newSetter
-        });
-        valueHijack = false;
-    } catch (e) {
-        //在chrome 43中 ms-duplex终于不需要使用定时器实现双向绑定了
-        // http://updates.html5rocks.com/2015/04/DOM-attributes-now-on-the-prototype
-        // https://docs.google.com/document/d/1jwA8mtClwxI-QJuHT7872Z0pxpZz8PBkf2bGAbsUtqs/edit?pli=1
-    }
-
-    function parseValue(val) {
-        for (var i = 0, k; k = this.parsers[i++];) {
-            var fn = avalon.parsers[k];
-            if (fn) {
-                val = fn.call(this, val);
-            }
-        }
-        return val;
-    }
-
-    var updateView = {
-        input: function input() {
-            //处理单个value值处理
-            this.node.props.value = this.value + '';
-            this.dom.value = this.value;
-        },
-        updateChecked: function updateChecked(vdom, checked) {
-            if (vdom.dom) {
-                vdom.dom.defaultChecked = vdom.dom.checked = checked;
-            }
-        },
-        radio: function radio() {
-            //处理单个checked属性
-            var node = this.node;
-            var nodeValue = node.props.value;
-            var checked;
-            if (this.isChecked) {
-                checked = !!this.value;
-            } else {
-                checked = this.value + '' === nodeValue;
-            }
-            node.props.checked = checked;
-            updateView.updateChecked(node, checked);
-        },
-        checkbox: function checkbox() {
-            //处理多个checked属性
-            var node = this.node;
-            var props = node.props;
-            var value = props.value + '';
-            var values = [].concat(this.value);
-            var checked = values.some(function (el) {
-                return el + '' === value;
-            });
-
-            props.defaultChecked = props.checked = checked;
-            updateView.updateChecked(node, checked);
-        },
-        select: function select() {
-            //处理子级的selected属性
-            var a = Array.isArray(this.value) ? this.value.map(String) : this.value + '';
-            lookupOption(this.node, a);
-        },
-        contenteditable: function contenteditable() {
-            //处理单个innerHTML 
-
-            var vnodes = fromString(this.value);
-            var fragment = createFragment();
-            for (var i = 0, el; el = vnodes[i++];) {
-                var child = avalon.vdom(el, 'toDOM');
-                fragment.appendChild(child);
-            }
-            avalon.clearHTML(this.dom).appendChild(fragment);
-            var list = this.node.children;
-            list.length = 0;
-            Array.prototype.push.apply(list, vnodes);
-
-            this.duplexCb.call(this.dom);
-        }
-    };
 
     var updateDataActions = {
         input: function input(prop) {
@@ -6265,10 +6235,211 @@ IE7的checked属性应该使用defaultChecked来设置
                     updateDataActions[field.dtype].call(field);
                 }, left);
             }
+        } else if (field.isChanged) {
+            setTimeout(function () {
+                //https://github.com/RubyLouvre/avalon/issues/1908
+                updateDataActions[field.dtype].call(field);
+            }, 4);
         } else {
             updateDataActions[field.dtype].call(field);
         }
     }
+
+    var rchangeFilter = /\|\s*change\b/;
+    var rdebounceFilter = /\|\s*debounce(?:\(([^)]+)\))?/;
+    function duplexBeforeInit() {
+        var expr = this.expr;
+        if (rchangeFilter.test(expr)) {
+            this.isChanged = true;
+            expr = expr.replace(rchangeFilter, '');
+        }
+        var match = expr.match(rdebounceFilter);
+        if (match) {
+            expr = expr.replace(rdebounceFilter, '');
+            if (!this.isChanged) {
+                this.debounceTime = parseInt(match[1], 10) || 300;
+            }
+        }
+        this.expr = expr;
+    }
+    function duplexInit() {
+        var expr = this.expr;
+        var node = this.node;
+        var etype = node.props.type;
+        this.parseValue = parseValue;
+        //处理数据转换器
+        var parsers = this.param,
+            dtype;
+        var isChecked = false;
+        parsers = parsers ? parsers.split('-').map(function (a) {
+            if (a === 'checked') {
+                isChecked = true;
+            }
+            return a;
+        }) : [];
+        node.duplex = this;
+        if (rcheckedType.test(etype) && isChecked) {
+            //如果是radio, checkbox,判定用户使用了checked格式函数没有
+            parsers = [];
+            dtype = 'radio';
+            this.isChecked = isChecked;
+        }
+        this.parsers = parsers;
+        if (!/input|textarea|select/.test(node.nodeName)) {
+            if ('contenteditable' in node.props) {
+                dtype = 'contenteditable';
+            }
+        } else if (!dtype) {
+            dtype = node.nodeName === 'select' ? 'select' : etype === 'checkbox' ? 'checkbox' : etype === 'radio' ? 'radio' : 'input';
+        }
+        this.dtype = dtype;
+
+        //判定是否使用了 change debounce 过滤器
+        // this.isChecked = /boolean/.test(parsers)
+        if (dtype !== 'input' && dtype !== 'contenteditable') {
+            delete this.isChanged;
+            delete this.debounceTime;
+        } else if (!this.isChecked) {
+            this.isString = true;
+        }
+
+        var cb = node.props['data-duplex-changed'];
+        if (cb) {
+            var arr = addScope(cb, 'xx');
+            var body = makeHandle(arr[0]);
+            this.userCb = new Function('$event', 'var __vmodel__ = this\nreturn ' + body);
+        }
+    }
+    function duplexDiff(newVal, oldVal) {
+        if (Array.isArray(newVal)) {
+            if (newVal + '' !== this.compareVal) {
+                this.compareVal = newVal + '';
+                return true;
+            }
+        } else {
+            newVal = this.parseValue(newVal);
+            if (!this.isChecked) {
+                this.value = newVal += '';
+            }
+            if (newVal !== this.compareVal) {
+                this.compareVal = newVal;
+                return true;
+            }
+        }
+    }
+
+    function duplexBind(vdom, addEvent) {
+        var dom = vdom.dom;
+        this.dom = dom;
+        this.vdom = vdom;
+        this.duplexCb = updateDataHandle;
+        dom._ms_duplex_ = this;
+        //绑定事件
+        addEvent(dom, this);
+    }
+
+    var valueHijack = true;
+    try {
+        //#272 IE9-IE11, firefox
+        var setters = {};
+        var aproto = HTMLInputElement.prototype;
+        var bproto = HTMLTextAreaElement.prototype;
+        var newSetter = function newSetter(value) {
+            // jshint ignore:line
+            setters[this.tagName].call(this, value);
+            var data = this._ms_duplex_;
+            if (!this.caret && data && data.isString) {
+                data.duplexCb.call(this, { type: 'setter' });
+            }
+        };
+        var inputProto = HTMLInputElement.prototype;
+        Object.getOwnPropertyNames(inputProto); //故意引发IE6-8等浏览器报错
+        setters['INPUT'] = Object.getOwnPropertyDescriptor(aproto, 'value').set;
+
+        Object.defineProperty(aproto, 'value', {
+            set: newSetter
+        });
+        setters['TEXTAREA'] = Object.getOwnPropertyDescriptor(bproto, 'value').set;
+        Object.defineProperty(bproto, 'value', {
+            set: newSetter
+        });
+        valueHijack = false;
+    } catch (e) {
+        //在chrome 43中 ms-duplex终于不需要使用定时器实现双向绑定了
+        // http://updates.html5rocks.com/2015/04/DOM-attributes-now-on-the-prototype
+        // https://docs.google.com/document/d/1jwA8mtClwxI-QJuHT7872Z0pxpZz8PBkf2bGAbsUtqs/edit?pli=1
+    }
+
+    function parseValue(val) {
+        for (var i = 0, k; k = this.parsers[i++];) {
+            var fn = avalon.parsers[k];
+            if (fn) {
+                val = fn.call(this, val);
+            }
+        }
+        return val;
+    }
+
+    var updateView = {
+        input: function input() {
+            //处理单个value值处理
+            var vdom = this.node;
+            var value = this.value + '';
+            vdom.dom.value = vdom.props.value = value;
+        },
+        updateChecked: function updateChecked(vdom, checked) {
+            if (vdom.dom) {
+                vdom.dom.defaultChecked = vdom.dom.checked = checked;
+            }
+        },
+        radio: function radio() {
+            //处理单个checked属性
+            var node = this.node;
+            var nodeValue = node.props.value;
+            var checked;
+            if (this.isChecked) {
+                checked = !!this.value;
+            } else {
+                checked = this.value + '' === nodeValue;
+            }
+            node.props.checked = checked;
+            updateView.updateChecked(node, checked);
+        },
+        checkbox: function checkbox() {
+            //处理多个checked属性
+            var node = this.node;
+            var props = node.props;
+            var value = props.value + '';
+            var values = [].concat(this.value);
+            var checked = values.some(function (el) {
+                return el + '' === value;
+            });
+
+            props.defaultChecked = props.checked = checked;
+            updateView.updateChecked(node, checked);
+        },
+        select: function select() {
+            //处理子级的selected属性
+            var a = Array.isArray(this.value) ? this.value.map(String) : this.value + '';
+            lookupOption(this.node, a);
+        },
+        contenteditable: function contenteditable() {
+            //处理单个innerHTML 
+
+            var vnodes = fromString(this.value);
+            var fragment = createFragment();
+            for (var i = 0, el; el = vnodes[i++];) {
+                var child = avalon.vdom(el, 'toDOM');
+                fragment.appendChild(child);
+            }
+            avalon.clearHTML(this.dom).appendChild(fragment);
+            var list = this.node.children;
+            list.length = 0;
+            Array.prototype.push.apply(list, vnodes);
+
+            this.duplexCb.call(this.dom);
+        }
+    };
 
     /* 
      * 通过绑定事件同步vmodel
@@ -6477,15 +6648,8 @@ IE7的checked属性应该使用defaultChecked来设置
         init: duplexInit,
         diff: duplexDiff,
         update: function update(vdom, value) {
-            var dom = vdom.dom;
             if (!this.dom) {
-                this.dom = dom;
-                this.duplexCb = updateDataHandle;
-                dom._ms_duplex_ = this;
-                //绑定事件
-                updateDataEvents(dom, this);
-                //添加验证
-                duplexValidate(dom, vdom);
+                duplexBind.call(this, vdom, updateDataEvents);
             }
             //如果不支持input.value的Object.defineProperty的属性支持,
             //需要通过轮询同步, chrome 42及以下版本需要这个hack
@@ -6533,9 +6697,6 @@ IE7的checked属性应该使用defaultChecked来设置
             if (isObject(rules)) {
                 var vdom = this.node;
                 vdom.rules = platform.toJson(rules);
-                if (vdom.duplex) {
-                    vdom.duplex.rules = vdom.rules;
-                }
                 return true;
             }
         }
@@ -6691,55 +6852,57 @@ IE7的checked属性应该使用defaultChecked来设置
                 //一个是vmValidator，它是用户VM上的那个原始子对象，也是一个VM
                 //一个是validator，它是vmValidator.$model， 这是为了防止IE6－8添加子属性时添加的hack
                 //也可以称之为safeValidate
-                vdom.vmValidator = validator;
-                validator = platform.toJson(validator);
-
                 vdom.validator = validator;
+                validator = platform.toJson(validator);
+                validator.vdom = vdom;
+                validator.dom = vdom.dom;
+
                 for (var name in valiDir.defaults) {
                     if (!validator.hasOwnProperty(name)) {
                         validator[name] = valiDir.defaults[name];
                     }
                 }
                 validator.fields = validator.fields || [];
+                vdom.vmValidator = validator;
                 return true;
             }
         },
         update: function update(vdom) {
+
+            var vmValidator = vdom.vmValidator;
             var validator = vdom.validator;
             var dom = vdom.dom;
-            validator.dom = dom;
-            dom._ms_validate_ = validator;
+            dom._ms_validate_ = vmValidator;
 
+            collectFeild(vdom.children, vmValidator.fields, vmValidator);
+            var type = window.netscape ? 'keypress' : 'focusin';
+            avalon.bind(document, type, findValidator);
             //为了方便用户手动执行验证，我们需要为原始vmValidate上添加一个onManual方法
-            var v = vdom.vmValidator;
+            function onManual() {
+                var v = this;
+                v && valiDir.validateAll.call(v, v.onValidateAll);
+            }
+
             try {
-                v.onManual = onManual;
-            } catch (e) {}
+                var fn = vmValidator.onManual = onManual.bind(vmValidator);
+                validator.onManual = fn;
+            } catch (e) {
+                avalon.warn('要想使用onManual方法，必须在validate对象预定义一个空的onManual函数');
+            }
             delete vdom.vmValidator;
 
             dom.setAttribute('novalidate', 'novalidate');
-            function onManual() {
-                valiDir.validateAll.call(validator, validator.onValidateAll);
-            }
+
             /* istanbul ignore if */
-            if (validator.validateAllInSubmit) {
-                avalon.bind(dom, 'submit', function (e) {
-                    e.preventDefault();
-                    onManual();
-                });
-            }
-            /* istanbul ignore if */
-            if (typeof validator.onInit === 'function') {
-                //vmodels是不包括vmodel的
-                validator.onInit.call(dom, {
-                    type: 'init',
-                    target: dom,
-                    validator: validator
-                });
+            if (vmValidator.validateAllInSubmit) {
+                avalon.bind(dom, 'submit', validateAllInSubmitFn);
             }
         },
         validateAll: function validateAll(callback) {
             var validator = this;
+            var vdom = this.vdom;
+            var fields = validator.fields = [];
+            collectFeild(vdom.children, fields, validator);
             var fn = typeof callback === 'function' ? callback : validator.onValidateAll;
             var promises = validator.fields.filter(function (field) {
                 var el = field.dom;
@@ -6751,11 +6914,9 @@ IE7的checked属性应该使用defaultChecked来设置
             return Promise.all(promises).then(function (array) {
                 var reasons = array.concat.apply([], array);
                 if (validator.deduplicateInValidateAll) {
-
                     reasons = reasons.filter(function (reason) {
                         var el = reason.element;
                         var uuid = el.uniqueID || (el.uniqueID = setTimeout('1'));
-
                         if (uniq[uuid]) {
                             return false;
                         } else {
@@ -6763,44 +6924,23 @@ IE7的checked属性应该使用defaultChecked来设置
                         }
                     });
                 }
-                fn.call(validator.dom, reasons); //这里只放置未通过验证的组件
+                fn.call(vdom.dom, reasons); //这里只放置未通过验证的组件
             });
         },
-        addField: function addField(field) {
-            var validator = this;
-            var node = field.dom;
-            /* istanbul ignore if */
-            if (validator.validateInKeyup && !field.isChanged && !field.debounceTime) {
-                avalon.bind(node, 'keyup', function (e) {
-                    validator.validate(field, 0, e);
-                });
-            }
-            /* istanbul ignore if */
-            if (validator.validateInBlur) {
-                avalon.bind(node, 'blur', function (e) {
-                    validator.validate(field, 0, e);
-                });
-            }
-            /* istanbul ignore if */
-            if (validator.resetInFocus) {
-                avalon.bind(node, 'focus', function (e) {
-                    validator.onReset.call(node, e, field);
-                });
-            }
-        },
+
         validate: function validate(field, isValidateAll, event) {
+
             var promises = [];
             var value = field.value;
             var elem = field.dom;
-
             /* istanbul ignore if */
             if (typeof Promise !== 'function') {
                 //avalon-promise不支持phantomjs
-                avalon.wain('please npm install es6-promise or bluebird');
+                avalon.warn('浏览器不支持原生Promise,请下载并<script src=url>引入\nhttps://github.com/RubyLouvre/avalon/blob/master/test/promise.js');
             }
             /* istanbul ignore if */
             if (elem.disabled) return;
-            var rules = field.rules;
+            var rules = field.vdom.rules;
             var ngs = [],
                 isOk = true;
             if (!(rules.norequired && value === '')) {
@@ -6853,6 +6993,80 @@ IE7的checked属性应该使用defaultChecked来设置
         }
     });
 
+    //https://github.com/RubyLouvre/avalon/issues/1977
+    function getValidate(dom) {
+        while (dom.tagName !== 'FORM') {
+            dom = dom.parentNode;
+        }
+        return dom._ms_validate_;
+    }
+
+    function validateAllInSubmitFn(e) {
+        e.preventDefault();
+        var v = getValidate(e.target);
+        if (v && v.onManual) {
+            v.onManual();
+        }
+    }
+
+    function collectFeild(nodes, fields, validator) {
+        for (var i = 0, vdom; vdom = nodes[i++];) {
+            var duplex = vdom.rules && vdom.duplex;
+            if (duplex) {
+                fields.push(duplex);
+                bindValidateEvent(duplex, validator);
+            } else if (vdom.children) {
+                collectFeild(vdom.children, fields, validator);
+            } else if (Array.isArray(vdom)) {
+                collectFeild(vdom, fields, validator);
+            }
+        }
+    }
+
+    function findValidator(e) {
+        var dom = e.target;
+        var duplex = dom._ms_duplex_;
+        var vdom = (duplex || {}).vdom;
+        if (duplex && vdom.rules && !duplex.validator) {
+            var msValidator = getValidate(dom);
+            if (msValidator && avalon.Array.ensure(msValidator.fields, duplex)) {
+                bindValidateEvent(duplex, msValidator);
+            }
+        }
+    }
+
+    function singleValidate(e) {
+        var dom = e.target;
+        var duplex = dom._ms_duplex_;
+        var msValidator = getValidate(e.target);
+        msValidator && msValidator.validate(duplex, 0, e);
+    }
+
+    function bindValidateEvent(field, validator) {
+
+        var node = field.dom;
+        if (field.validator) {
+            return;
+        }
+        field.validator = validator;
+        /* istanbul ignore if */
+        if (validator.validateInKeyup && !field.isChanged && !field.debounceTime) {
+            avalon.bind(node, 'keyup', singleValidate);
+        }
+        /* istanbul ignore if */
+        if (validator.validateInBlur) {
+            avalon.bind(node, 'blur', singleValidate);
+        }
+        /* istanbul ignore if */
+        if (validator.resetInFocus) {
+            avalon.bind(node, 'focus', function (e) {
+                var dom = e.target;
+                var field = dom._ms_duplex_;
+                var validator = getValidate(e.target);
+                validator && validator.onReset.call(dom, e, field);
+            });
+        }
+    }
     var rformat = /\\?{{([^{}]+)\}}/gm;
 
     function getMessage() {
@@ -6863,7 +7077,6 @@ IE7的checked属性应该使用defaultChecked来设置
     }
     valiDir.defaults = {
         validate: valiDir.validate,
-        addField: valiDir.addField, //供内部使用,收集此元素底下的所有ms-duplex的域对象
         onError: avalon.noop,
         onSuccess: avalon.noop,
         onComplete: avalon.noop,
@@ -7257,7 +7470,7 @@ IE7的checked属性应该使用defaultChecked来设置
                 var temp = templateCaches && templateCaches[$id];
                 if (temp) {
                     avalon.log('前端再次渲染后端传过来的模板');
-                    var node = fromString(tmpl)[0];
+                    var node = fromString(temp)[0];
                     for (var i in node) {
                         vdom[i] = node[i];
                     }
@@ -7403,8 +7616,8 @@ IE7的checked属性应该使用defaultChecked来设置
                 el.dispose();
             }
             //防止其他地方的this.innerRender && this.innerRender.dispose报错
-            for (var _i5 in this) {
-                if (_i5 !== 'dispose') delete this[_i5];
+            for (var _i6 in this) {
+                if (_i6 !== 'dispose') delete this[_i6];
             }
         },
 
@@ -7551,19 +7764,23 @@ IE7的checked属性应该使用defaultChecked来设置
                 avalon.Array.ensure(componentQueue, this);
                 return;
             }
-            this.readyState = 1;
+
             //如果是非空元素，比如说xmp, ms-*, template
             var id = value.id || value.$id;
             var hasCache = avalon.vmodels[id];
             var fromCache = false;
-
+            // this.readyState = 1
             if (hasCache) {
                 comVm = hasCache;
                 this.comVm = comVm;
                 replaceRoot(this, comVm.$render);
                 fromCache = true;
             } else {
+                if (typeof component === 'function') {
+                    component = new component(value);
+                }
                 var comVm = createComponentVm(component, value, is);
+                this.readyState = 1;
                 fireComponentHook(comVm, vdom, 'Init');
                 this.comVm = comVm;
 
@@ -7652,6 +7869,7 @@ IE7的checked属性应该使用defaultChecked来设置
                 case 0:
                     if (this.reInit) {
                         this.init();
+                        this.readyState++;
                     }
                     break;
                 case 1:
@@ -7820,9 +8038,7 @@ IE7的checked属性应该使用defaultChecked来设置
         if (child.soleSlot) {
             obj.soleSlot = child.soleSlot;
         }
-        if (child.template) {
-            obj.template = child.template;
-        }
+        obj.template = child.template || this.template;
         return avalon.component(name, obj);
     }
 
