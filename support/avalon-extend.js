@@ -1,3 +1,8 @@
+/**
+ * 用于弹出层置顶
+ * @type {number}
+ */
+avalon.zIndex=10000;
 avalon.readyon = function (callback) {
 	///兼容FF,Google
 	if (document.addEventListener) {
@@ -64,10 +69,12 @@ avalon.get=function(sUrl,fnSuccess,fnError){
 };
 
 avalon.put=function(sUrl,oData,fnSuccess,fnError){
+	if(avalon.isObject(oData)) oData=JSON.stringify(oData);
 	var options={
 		sMethod:"put",
 		fnSuccess:fnSuccess,
-		fnError:fnError
+		fnError:fnError,
+		oHeaders:{"Content-Type":"application/json"}
 	};
 	avalon.ajax(sUrl,oData,options);
 };
@@ -121,21 +128,22 @@ avalon.delex=function(sUrl,fnSuccess){
 			oFile 文件
 			fuSuccess fnError 回调函数
 */
-avalon.upload=function(sUrl,uFile,fnSuccess,fnError){
-	//传input ID
-	if(avalon.isString(uFile)) oFile=document.getElementById("uFile");
-	//传文件对象
-	if(avalon.isObject(uFile)) oFile=uFile;
-	var filedata=new FormData();
-	filedata.append("file",oFile.files[0]);
-	avalon.post(sUrl,filedata,function(oResult){
-		if(oResult.state==0){
-			fnSuccess(oResult.mess);
-		}else{
-			fnError(oResult.mess);
-		}
+avalon.upload=function(sUrl,oDom,sField,oFile,fnSuccess,fnError){
+	var oData=new FormData();
+	oData.append(sField,oFile);
+	var sName=oDom.value;
+	oDom.value="上传中...";
+	oDom.setAttribute("disabled","");
+	avalon.post(sUrl,oData,function(oResult){
+		oDom.value=sName;
+		oDom.removeAttribute("disabled");
+		if(avalon.isFunction(fnSuccess)) fnSuccess(oResult);
+	},function(sError){
+		oDom.value=sName;
+		oDom.removeAttribute("disabled");
+		if(avalon.isFunction(fnError)) fnError(sError);
 	});
-}
+};
 
 /*
 	点击按钮时执行upButton,做操作点击隐藏的input.
@@ -148,22 +156,18 @@ avalon.upload=function(sUrl,uFile,fnSuccess,fnError){
 	sUrl			上传url,有默认值
 	成功回调和失败回调函数,可以绑定一个avalon函数,vm.success:function(){}
 */
-function upButton(e){
+avalon.upButton=function(e){
 	var btn=e.target.getAttribute("target");
 	document.querySelector("#"+btn).click();
 }
-function upImage(e,sField,sId,oVar,fnSuccess,fnError,sUrl){
+avalon.upImage=function(e,sField,sId,oVar,fnSuccess,fnError,sUrl){
 	var oAlert=avalon.getAlert(1);
 	if(!oAlert){console.log("创建组件失败!");return;}
 	if(e.target.value==""){
 		return;
 	}else {
-		// 图片上传需要token
-		var	sAccess_token=storeEx.get("access_token");// access_token
-		sUrl=sUrl||"/v1/common/fileupload.html";
-		if(sAccess_token){
-			sUrl+="&access_token="+sAccess_token;
-		}
+		var access_token=storeEx.get("access_token"),
+		sUrl=sUrl||"./index/fileupload.html?access_token="+access_token;
 		var btn=e.target.getAttribute("target");
 		var oDom=document.querySelector("#"+btn);
 		oDom.value="上传中...";
@@ -172,7 +176,7 @@ function upImage(e,sField,sId,oVar,fnSuccess,fnError,sUrl){
 		var data = new FormData();
 		data.append(sField, e.target.files[0]);
 		var vm=avalon.vmodels[sId];
-		avalon.post(sUrl,data,function(oResult){
+		avalon.postEx(sUrl,data,function(oResult){
 			if(oResult.state==0){
 				oDom.value="选择图片";
 				oDom.removeAttribute("disabled");
@@ -197,6 +201,45 @@ function upImage(e,sField,sId,oVar,fnSuccess,fnError,sUrl){
 }
 
 /*
+	初始化图片预览
+	依赖:blueimp-gallery
+*/
+avalon.imgPreview=function(sUrl){
+	// var sUrl=$("#"+$(this).attr("target")).val();
+	fyImgPreview(sUrl);
+}
+/*
+	图片预览
+	uUrl，图片的路径
+*/
+function fyImgPreview(uUrl){
+	//先判断当前页面是否存在必要的dom元素
+	if($(".lightBoxGallery").length==0){
+		//创建元素
+		var oBody=$("<div class=\"lightBoxGallery\">"
+			+"<div id=\"blueimp-gallery\" class=\"blueimp-gallery\">"
+			+"<div class=\"slides\"></div><h3 class=\"title\"></h3><a class=\"prev\">‹</a>"
+			+"<a class=\"next\">›</a><a class=\"close\">×</a><a class=\"play-pause\"></a>"
+			+"<ol class=\"indicator\"></ol>"
+			+"</div></div>");
+		$("body").append(oBody);
+	}
+	var aUrl=null;
+	if(Object.prototype.toString.call(uUrl) === "[object Array]"){
+		aUrl=uUrl;
+	}else{
+		aUrl=[uUrl];
+	}
+	var oGallery = blueimp.Gallery(aUrl);
+	oGallery.slide(0, 500);
+}
+/*
+	返回上一页
+*/
+avalon.backurl=function(){
+	history.back();
+}
+/*
 	判断是否字符串
 	@param uObj 待判断的变量
 	@return     返回判断结果
@@ -218,19 +261,32 @@ avalon.getQueryString=function(name){
 	var r = window.location.search.substr(1).match(reg);
 	if(r!=null)return  unescape(r[2]); return "";
 };
-function getParam(name){
+avalon.params=[];
+avalon.currUrl="";//当前url
+/**
+ * 获取当前页面链接参数
+ * @param sName  参数名
+ * @returns {*}
+ */
+avalon.getParam=function(sName){
 	var sUrl=encodeURI(window.location.href);
-	if(sUrl.indexOf("?")<0) return;
-	var aParams=sUrl.split("?");
-	if(aParams.length<2) return;
-	var sParam=aParams[1];
-	aParams=sParam.split("&");
-	for(var i=0;i<aParams.length;i++){
-		var aTmp=aParams[i].split("=");
-		if(name==aTmp[0]){
-			return aTmp[1];
+	if(avalon.currUrl!=sUrl){
+		avalon.params=[];
+		avalon.currUrl=sUrl;
+	}
+	if(avalon.params.length==0){
+		//不存在参数，则重新获取
+		if(sUrl.indexOf("?")<0) return;
+		var aParams=sUrl.split("?");
+		if(aParams.length<2) return;
+		var sParam=aParams[1];
+		aParams=sParam.split("&");
+		for(var i=0;i<aParams.length;i++){
+			var aTmp=aParams[i].split("=");
+			avalon.params[aTmp[0]]=aTmp[1];
 		}
 	}
+	return avalon.params[sName];
 }
 /*
  判断是否字符串
@@ -275,7 +331,7 @@ avalon.url=function(sUrl,uParam,sHost){
 			if(sParam=="") sParam=k+"="+v;
 			else sParam+="&"+k+"="+v;
 		});
-	}else sParam=uParam;
+	}
 	return sHost+sUrl+(avalon.config.suffix?avalon.config.suffix:".html")+(sParam==""?"":"?"+sParam);
 };
 /*
@@ -343,6 +399,44 @@ avalon.keyTable=function(iDict){
 	return oVm;
 };
 
+avalon.keyValue=function(str,pattern){
+	pattern=pattern||"-";
+	if(str.indexOf(pattern)>=0){
+		var result=str.split("-");
+		return result[0];
+	}else return str;
+};
+
+avalon.keyShow=function(str,pattern){
+	pattern=pattern||"-";
+	if(str.indexOf('-')>=0){
+		var result=str.split("-");
+		if(result.length>1) return result[1];
+		else return result[0];
+	}else return str;
+}
+
+avalon.formatDateTime=function(oDate,sFormat){
+	var o = {
+		"M+" : oDate.getMonth()+1,                 //月份
+		"d+" : oDate.getDate(),                    //日
+		"h+" : oDate.getHours(),                   //小时
+		"m+" : oDate.getMinutes(),                 //分
+		"s+" : oDate.getSeconds(),                 //秒
+		"q+" : Math.floor((oDate.getMonth()+3)/3), //季度
+		"S"  : oDate.getMilliseconds()             //毫秒
+	};
+	if(/(y+)/.test(sFormat)) {
+		sFormat=sFormat.replace(RegExp.$1, (oDate.getFullYear()+"").substr(4 - RegExp.$1.length));
+	}
+	for(var k in o) {
+		if(new RegExp("("+ k +")").test(sFormat)){
+			sFormat = sFormat.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+		}
+	}
+	return sFormat;
+};
+
 /*
 *日期格式化
 */
@@ -360,7 +454,7 @@ avalon.filters.addDays=function(oDate,iDay){
 	return dtResult;
 };
 avalon.filters.formatDate=function(oDate,sFormat){
-	sFormat=sFormat||"yyyy-MM-dd";
+	sFormat=sFormat||"yyyy-MM-dd HH:mm:ss";
 	sFormat = avalon.filters.replace(sFormat, "yyyy", oDate.getFullYear());
 	sFormat = avalon.filters.replace(sFormat, "MM", avalon.filters.getFullMonth(oDate));
 	sFormat = avalon.filters.replace(sFormat, "dd", avalon.filters.getFullDate(oDate));
@@ -437,14 +531,14 @@ avalon.unixToDate=function(unixTime, isFull, timeZone) {
 };
 
 avalon.showWait=function(sTitle,sText){
-	if(!avalon.fyAlert){
-		avalon.fyAlert=avalon.getComponent("fy-alert","fyAlert");
+	if(!avalon.fyWait){
+		avalon.fyWait=avalon.getAlert("fy-alert","fyWait");
 	}
-	avalon.fyAlert.wait(sTitle,sText);
+	avalon.fyWait.wait(sTitle,sText);
 };
 
-avalon.closeWait=function(oTips){
-	if(avalon.fyAlert) avalon.fyAlert.hide();
+avalon.closeWait=function(){
+	if(avalon.fyWait) avalon.fyWait.hide();
 };
 
 /*

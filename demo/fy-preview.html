@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="Avalon" />
+	<meta name="keywords" content="Avalon" />
+	<title>Hello Avalon</title>
+	<link href="../css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../css/style.min.css" rel="stylesheet" />
+	<link href="../css/animate.css" rel="stylesheet" />
+	<link href="../css/base/fy-modal.css" rel="stylesheet" />
+</head>
+<body class="white-bg">
+<div ms-controller="vm">
+	<div class="col-xs-3">
+		<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open($event)">图片预览</a>
+		<input type="text" name="" value="./img-slide/pgbg01.jpg" />
+	</div>
+	<br />
+	预览：
+	<br />
+	<a><img width="160" height="160" src="./img-preview/1.png" ms-click="@open($event)" /></a>
+	<a><img width="160" height="160" src="./img-preview/2.jpeg" ms-click="@open($event)" /></a>
+	<a><img width="160" height="160" src="./img-preview/3.jpg" ms-click="@open($event)" /></a>
+	<a><img width="160" height="160" src="./img-preview/4.png" ms-click="@open($event)" /></a>
+	<wbr ms-widget="{is:'fy-preview',$id:'preview'}" />
+</div>
+</body>
+<script type="text/javascript" src="../support/avalon2.2.2.js"></script>
+<script type="text/javascript" src="../support/avalon-extend.js"></script>
+<script type="text/javascript" src="../base/fy-preview.js"></script>
+
+<script type="text/javascript">
+	avalon.ready(function(){
+		var vm = avalon.define({
+			$id:"vm",
+			open:function($event){
+				avalon.log($event.target);
+				var oPreview=avalon.vmodels["preview"];
+				oPreview.show($event.target.src);
+			}
+		});
+		avalon.scan(document.body);
+	});
+</script>
+</html>
