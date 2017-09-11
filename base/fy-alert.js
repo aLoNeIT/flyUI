@@ -9,7 +9,7 @@
 	template: (function(){
 		var content="<div>"+
 						"<div class=\"sweet-overlay\" ms-visible=\"@isShow\"></div>"+
-						"<div class=\"sweet-alert showSweetAlert animated\" ms-class=\"@animateCss\" ms-visible=\"@isShow\">"+
+						"<div class=\"sweet-alert showSweetAlert animated\" ms-class=\"@animateCss\" ms-visible=\"@isShow\" ms-css=\"{zIndex:@zIndex}\">"+
 							"<div class=\"sa-icon sa-error\" ms-visible=\"@tip.iconType=='error'\">"+
 								"<span class=\"sa-x-mark\">"+
 									"<span class=\"sa-line sa-left\"></span>"+
@@ -33,7 +33,7 @@
 							"<h2>{{@tip.title}}</h2>"+
 							"<p ms-visible=\"@tip.text!=''\">{{@tip.text}}</p>"+
 							"<div class=\"sa-button-container\">"+
-								"<button type=\"button\" class=\"cancel\" ms-click=\"@onClose()\" ms-visible=\"!@autoClose&&@tip.iconType!='wait'\">关闭</button>"+
+								"<button type=\"button\" class=\"cancel\" ms-click=\"@onClose()\" ms-visible=\"(!@autoClose&&@tip.iconType!='wait')&&((@tip._onConfirm!=avalon.noop&&@tip._onClose==avalon.noop)||(@tip._onConfirm==avalon.noop&&@tip._onClose==avalon.noop))\">关闭</button>"+
 								"<button type=\"button\" class=\"confirm\" ms-click=\"@onConfirm()\" ms-visible=\"@tip._onConfirm!=avalon.noop&&!@autoClose\">确定</button>"+
 							"</div>"+
 						"</div>"+
@@ -44,6 +44,7 @@
 		// 控制modal-tip的显示
 		isShow:false,
 		autoClose:false,
+		zIndex:10000,
 		tip:{
 			title:"执行成功",
 			text:"请稍等......",
@@ -73,6 +74,7 @@
 			}
 		},
 		show:function(sTitle,sText,fnConfirm,fnClose,iShowTime){//显示success
+			this.zIndex=avalon.zIndex++;
 			iShowTime=iShowTime||0;
 			this.clearTimeout();
 			this.tip={
@@ -111,6 +113,7 @@
 			}
 		},
 		wait:function(sTitle,sText,fnConfirm,fnClose,iShowTime){
+			this.zIndex=avalon.zIndex++;
 			iShowTime=iShowTime||0;
 			this.clearTimeout();
 			this.tip={
@@ -128,6 +131,7 @@
 			}
 		},
 		warn:function(sTitle,sText,fnConfirm,fnClose,iShowTime){
+			this.zIndex=avalon.zIndex++;
 			iShowTime=iShowTime||0;
 			this.clearTimeout();
 			this.tip={
@@ -145,6 +149,7 @@
 			}
 		},
 		error:function(sTitle,sText,fnConfirm,fnClose,iShowTime){
+			this.zIndex=avalon.zIndex++;
 			iShowTime=iShowTime||0;
 			this.clearTimeout();
 			this.tip={
@@ -169,6 +174,7 @@
 			_onConfirm:avalon.noop,
 		},
 		open:function(oOption){
+			this.zIndex=avalon.zIndex++;
 			this.clearTimeout();
 			this.tip=avalon.mix(this.$tip,oOption);
 			this.animateCss=this.animate.show;
