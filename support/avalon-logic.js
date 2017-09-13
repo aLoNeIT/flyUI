@@ -32,11 +32,11 @@ avalon.request=function(oOptions){
 			if(fnSuccess) fnSuccess(oResult);
 			if(bShowWait) avalon.closeWait();
 		}
-	}
+	};
 	oOptions.fnError=function(ex){
 		if(bShowWait) avalon.closeWait();
 		logicAlert.error("请求异常",ex);
-	}
+	};
 	// 获取token
 	var	sAccess_token=storeEx.get("access_token");// access_token
 	var	sRefresh_token=storeEx.get("refresh_token");// refresh_token
@@ -44,14 +44,16 @@ avalon.request=function(oOptions){
 	if(!sAccess_token){
 		//var oAlert=avalon.getAlert();
 		if(!sRefresh_token){
-			logicAlert.error("验证令牌已失效！","返回登陆",function(){
-				window.location.href=sUrlJump;
+			logicAlert.error("授权失效","验证令牌已失效",function(){
+				if(top=self)
+					window.location.href=sUrlJump;
+				else top.location.href=sUrlJump;
 			});
 		}else{
 			// 传refresh_token
 			var sUrlRefreshApi=storeEx.get("refresh_api_url");
 			if(!sUrlRefreshApi){
-				logicAlert.error("验证令牌已失效！","返回登陆",function(){
+				logicAlert.error("授权失效","验证令牌已失效",function(){
 					window.location.href=sUrlJump;
 				});
 				return;
@@ -78,18 +80,21 @@ avalon.request=function(oOptions){
 		}
 		avalon.ajax(sUrl,oData,oOptions);
 	}
-}
+};
 // post get delete put
 avalon.postEx=function(sUrl,oData,fnSuccess,fnError){
+	//if(avalon.is)
 	var oOptions={
 		sUrl:sUrl,
 		oData:oData,
 		sMethod:"post",
 		fnSuccess:fnSuccess,
 		fnError:fnError
-	}
+		//oHeaders:{"Content-Type":"application/json"}
+	};
+	if(avalon.isString(oData)) oOptions.oHeaders={"Content-Type":"application/json"};
 	avalon.request(oOptions);
-}
+};
 avalon.getEx=function(sUrl,fnSuccess,fnError,bShowWait){
 	var oOptions={
 		sUrl:sUrl,
@@ -97,9 +102,9 @@ avalon.getEx=function(sUrl,fnSuccess,fnError,bShowWait){
 		fnSuccess:fnSuccess,
 		fnError:fnError,
 		bShowWait:(bShowWait!=false)
-	}
+	};
 	avalon.request(oOptions);
-}
+};
 avalon.putEx=function(sUrl,oData,fnSuccess,fnError){
 	if(avalon.isObject(oData)) oData=JSON.stringify(oData);
 	var oOptions={
@@ -109,18 +114,18 @@ avalon.putEx=function(sUrl,oData,fnSuccess,fnError){
 		fnSuccess:fnSuccess,
 		fnError:fnError,
 		oHeaders:{"Content-Type":"application/json"}
-	}
+	};
 	avalon.request(oOptions);
-}
+};
 avalon.deleteEx=function(sUrl,fnSuccess,fnError){
 	var oOptions={
 		sUrl:sUrl,
 		sMethod:"delete",
 		fnSuccess:fnSuccess,
 		fnError:fnError
-	}
+	};
 	avalon.request(oOptions);
-}
+};
 // 删除函数应用
 avalon.delEx=function(sUrl,fnSuccess){
 	//var oAlert=avalon.getAlert(1);
@@ -176,13 +181,23 @@ avalon.saveToken=function(oData,sUrlRefreshApi){
 	storeEx.set("login_url",login_url);
 	return oData.access_token;
 };
-
-avalon.getToken=function(){
+/**
+ * 获取本地保存的token
+ * @param fnCallback 获取到有效token后会通过回调函数传递
+ * @returns {*}
+ */
+avalon.getToken=function(fnCallback){
 	var sToken=storeEx.get("access_token");
 	if(!sToken){
-		logicAlert.error("access_token获取失败","请重新登陆",function(){
-			window.location.href=storeEx.get("login_url");
+		logicAlert.error("授权失效","验证令牌已失效",function(){
+			if(top==self)
+				window.location.href=storeEx.get("login_url");
+			else top.location.href=storeEx.get("login_url");
 		});
+		return false;
+	}
+	if(avalon.isFunction(fnCallback)){
+		fnCallback.call(this,sToken);
 	}
 	return sToken;
 };
@@ -191,7 +206,7 @@ avalon.getToken=function(){
 avalon.upbtn=function($event){
 	var sFile=avalon($event.target).attr("target");
 	document.querySelector("#"+sFile).click();
-},
+};
 avalon.upimg=function(sUrl,oDom,sField,oFile,fnSuccess,fnError){
 	var sToken=storeEx.get("access_token");
 	if(!sToken){
@@ -205,11 +220,20 @@ avalon.upimg=function(sUrl,oDom,sField,oFile,fnSuccess,fnError){
 		else sUrl+="&access_token="+sToken;
 		avalon.upload(sUrl,oDom,sField,oFile,fnSuccess,fnError);
 	}
-}
-
-avalon.getSelected=function(oData,sField){
-	if(!oData||!sField||!oData||!oData[sField]){
-		logicAlert.error("操作失败","请选择有效数据");
+};
+/**
+ * 获取选中的主键数据
+ * @param oData 数据源
+ * @param sField    字段名
+ * @param fnCallback    回调函数，将获取到的有效数据回调
+ * @returns {*}
+ */
+avalon.getSelected=function(oData,sField,fnCallback){
+	if(!oData||!sField||(avalon.isArray(oData)&&oData.length==0)||!oData[sField]){
+		logicAlert.warn("操作失败","请选择有效数据");
 		return false;
-	}else return oData[sField];
+	}else {
+		if(avalon.isFunction(fnCallback)) fnCallback.call(this,oData[sField]);
+		return oData[sField];
+	}
 };
