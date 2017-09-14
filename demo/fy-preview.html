@@ -13,17 +13,19 @@
 </head>
 <body class="white-bg">
 <div ms-controller="vm">
-	<div class="col-xs-3">
-		<a href="javascript:void(0);" class="btn btn-outline btn-primary" ms-click="@open($event)">图片预览</a>
-		<input type="text" name="" value="./img-slide/pgbg01.jpg" />
+	<div class="input-group col-xs-3">
+		<span class="input-group-btn">
+			<button data="view" type="button" class="btn btn-white" title="预览" ms-click="@openInput(@img)">预览</button>
+		</span>
+		<input type="text" name="img" id="view" class="form-control" readonly="" ms-duplex="@img"/>
 	</div>
 	<br />
-	预览：
+	点击图片预览大图
 	<br />
-	<a><img width="160" height="160" src="./img-preview/1.png" ms-click="@open($event)" /></a>
-	<a><img width="160" height="160" src="./img-preview/2.jpeg" ms-click="@open($event)" /></a>
-	<a><img width="160" height="160" src="./img-preview/3.jpg" ms-click="@open($event)" /></a>
-	<a><img width="160" height="160" src="./img-preview/4.png" ms-click="@open($event)" /></a>
+	<a><img width="160" height="160" title="1" src="./img-preview/1.png" ms-click="@open($event)" /></a>
+	<a><img width="160" height="160" title="2" src="./img-preview/2.jpeg" ms-click="@open($event)" /></a>
+	<a><img width="160" height="160" title="3" src="./img-preview/3.jpg" ms-click="@open($event)" /></a>
+	<a><img width="160" height="160" title="4" src="./img-preview/4.png" ms-click="@open($event)" /></a>
 	<wbr ms-widget="{is:'fy-preview',$id:'preview'}" />
 </div>
 </body>
@@ -35,10 +37,15 @@
 	avalon.ready(function(){
 		var vm = avalon.define({
 			$id:"vm",
+			img:"./img-preview/1.png",
 			open:function($event){
 				avalon.log($event.target);
 				var oPreview=avalon.vmodels["preview"];
-				oPreview.show($event.target.src);
+				oPreview.show($event.target);
+			},
+			openInput:function(oImg){
+				var oPreview=avalon.vmodels["preview"];
+				oPreview.show(oImg);
 			}
 		});
 		avalon.scan(document.body);

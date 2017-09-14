@@ -52,11 +52,17 @@
 	text-align: left;
 }
 .fy-modal .modal-dialog-img img{
+	margin: auto;
 	width: auto;
 	height: auto;
 	max-width: 100%;
 	max-height: 100%;
 	opacity: 1;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 }
 .fy-modal .modal-header {
 	padding: 15px 5px;
