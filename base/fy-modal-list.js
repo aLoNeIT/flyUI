@@ -7,12 +7,12 @@ avalon.component('fy-modal-list', {
 		// 内容表格部分
 		var sHtml='<div class="fly-modal" ms-visible="@isShow">'+
 						'<div class="fly-modal-overlay" ms-click="@hide"></div>'+
-						'<div class="fly-modal-dialog" ms-css="{width:@width}">'+
+						'<div class="fly-modal-dialog modal-lg animated" ms-class=\"@animateCss\" ms-css="{width:@width}">'+
 							'<div class="fly-modal-header">'+
 								'<button type="button" class="close" ms-click="@hide"><span>×</span><span class="sr-only">Close</span></button>'+
 								'<h2 class="fly-modal-title" ms-text="@title"></h2>'+
 								'<div class="input-group">'+
-									'<input type="text" placeholder="搜索list" class="form-control" ms-duplex="@searchText | debounce(200)">'+
+									'<input type="text" placeholder="搜索列表" class="form-control" ms-duplex="@searchText | debounce(200)">'+
 									'<span class="input-group-btn">'+
 									'<button type="button" class="btn btn btn-primary"> <i class="fa fa-search"></i>搜索</button>'+
 									'</span>'+
@@ -20,7 +20,10 @@ avalon.component('fy-modal-list', {
 							'</div>'+
 							'<div class="fly-modal-body" ms-css="{height:@height}">'+
 								'<ul class="list-group">'+
-									'<li class="list-group-item" ms-for="($index,value) in @data | filterBy(@search)" ms-text="value" ms-click="@selectData($event,$index,value) | stop" ms-class="getSelectedClass($index)">'+
+									'<li class="list-group-item" ms-for="($index,value) in @data | filterBy(@search)" ' +
+										'ms-text="value" ms-click="@selectData($event,$index,value) | stop" ' +
+										'ms-dblclick="@selectData($event,$index,value,true) | stop" '+
+										'ms-class="getSelectedClass($index)">'+
 									'</li>'+
 								'</ul>'+
 							'</div>'+
@@ -34,6 +37,7 @@ avalon.component('fy-modal-list', {
 	}).call(this),
 	defaults: {
 		height:"300px",
+		autoHeight:false,
 		width:"300px",//list宽度
 		isShow: false,//是否显示界面
 		title:"listbox",//标题部分内容
@@ -41,18 +45,46 @@ avalon.component('fy-modal-list', {
 		$source:[],//原数组
 		selectedData:[],//选中的数据
 		searchText:"",//查询的文本
+		animateCss:"",
+		animate:{
+			show:"fadeInUp",
+			hide:"fadeOutDown",
+			time:500
+		},
 		search:function(oItem,iIndex){//查询过滤器，不过暂时无效果
 			var sText=this.searchText||"";
 			return oItem.indexOf(sText)>=0;
 		},
+		reset:function(){
+			this.title="listbox";
+			this.data=[];
+			this.$source=[];
+			this.searchText="";
+			this.selectedData=[];
+		},
 		show:function(sTitle,aData){
+			this.reset();
 			this.title=sTitle||this.title;
 			this.title=sTitle;
 			if(aData) this.data=aData;
+			this.animateCss=this.animate.show;
 			this.isShow=true;
+			if(this.autoHeight===true){
+				//自动计算高度，上下预留20px;
+				this.height=(avalon(document.body).outerHeight()-270)+"px";
+			}
 		},
 		hide:function(){
-			this.isShow=false;
+			var oSelf=this;
+			this.animateCss=this.animate.hide;
+			this.data=[];
+			if(this.animate.time>0){
+				setTimeout(function(){
+					oSelf.isShow=false;
+				},this.animate.time);
+			}else{
+				this.isShow=false;
+			}
 		},
 		confirm:function(){
 			var uData=null;
@@ -63,23 +95,31 @@ avalon.component('fy-modal-list', {
 					uData.push(oItem.value);
 				});
 			}else{
-				uData=this.selectedData.length>0?this.selectedData[0].$model:"";
+				uData=this.selectedData.length>0?this.selectedData[0].value:"";
 			}
 			this.onSelected(uData);
 			this.hide();
 		},
 		// currRow:-1,//选中行
 		getSelectedClass:function(iIndex){
-			//if(oSelectedData[iIndex]) return ["selectRow"];
-			//else return [""];
-			// if(this.selectedData.length>iIndex) return "selectRow";
-			for(var i=0;i<this.selectedData.length;i++){
-				if(iIndex==this.selectedData[i].index) return "selectRow";
+			var sCss="";
+			if(this.multiSelect){
+				//多选
+				avalon.each(this.selectedData,function($index,oItem){
+					if(iIndex==oItem.index){
+						sCss="selectedRow";
+						return false;
+					}
+				});
+			}else{
+				if(this.selectedData.length>0&&iIndex==this.selectedData[0].index)
+					sCss="selectedRow";
 			}
-			return "";
+			return sCss;
 		},
-		multiSelect:true,//多选
-		selectData:function($event,iIndex,sValue){
+		multiSelect:false,//多选
+		selectData:function($event,iIndex,sValue,bDbclick){
+			bDbclick=bDbclick===true;
 			if(this.multiSelect){
 				var bFind=false;
 				for(var i=0;i<this.selectedData.length;i++){
@@ -96,8 +136,12 @@ avalon.component('fy-modal-list', {
 					});
 				}
 			}else{
-				this.selectedData=[iIndex];	
+				this.selectedData=[{
+					index:iIndex,
+					value:sValue
+				}];
 			}
+			if(bDbclick) this.confirm();
 		},
 		onSelected:avalon.noop,
 		onReady:function(){

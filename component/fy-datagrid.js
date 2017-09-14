@@ -30,8 +30,8 @@ avalon.component("fy-datagrid", {
 														+'</tr>'
 													+'</thead>'
 													+'<tbody>'
-														+'<tr ms-for="($key,el) in @data" ms-click="@selectRow(el)" ms-dblclick="@doubleClick(el)" ms-class="@selectCss(el)">'
-															+'<td ms-for="(key,value) in el | selectBy(@selectedField)">{{@procValue(key,value,el)}}</td>'
+														+'<tr ms-for="($index,el) in @data" ms-click="@selectRow(el)" ms-dblclick="@doubleClick(el)" ms-class="@selectCss(el)">'
+															+'<td ms-for="(key,value) in el | selectGridData(el)" ms-html="@procValue(key,value,el)"></td>'
 														+'</tr>'
 													+'</tbody>'
 												+'</table>'
@@ -88,18 +88,34 @@ avalon.component("fy-datagrid", {
 		filterFields:{},
 		showFilter:false,
 		onFilter:avalon.noop,
-		selectedField:[],
+		$selectedField:[],
 		selectDataBy:function(el){//过滤需要显示的字段
-			if(this.selectedField.length!=0){
+			if(this.$selectedField.length==0){
+				//在$selectedField内保存需要展示的字段
+				var oSelf=this;
+				avalon.each(this.fields, function ($index, oItem) {
+					if (oItem.showwidth && oItem.showwidth > 0)
+						oSelf.$selectedField.push(oItem.fieldname);
+				});
+			}
+			var result = {};
+			var i=0;
+			for(;i<this.$selectedField.length;i++){
+				result[this.$selectedField[i]]=el[this.$selectedField[i]];
+			}
+			return result;
+			/*
+			if(this.selectedField!=null){
 				return this.selectedField;
 			}else{
-				var result = [];
+				var result = {};
 				avalon.each(this.fields, function ($index, oItem) {
-					if (oItem.showwidth && oItem.showwidth > 0) result.push(oItem.fieldname);
+					if (oItem.showwidth && oItem.showwidth > 0) result[oItem.fieldname]=el[oItem.fieldname];
 				});
 				this.selectedField = result;
 				return result;
 			}
+			*/
 		},
 		data:[],
 		/* 数据范例
@@ -211,12 +227,6 @@ avalon.component("fy-datagrid", {
 			this.$watch("data",function(){
 				oSelf.selectedRow=[];
 			});
-			//处理需要显示的字段
-			var result = [];
-			avalon.each(this.fields, function ($index, oItem) {
-				if (oItem.showwidth && oItem.showwidth > 0) result.push(oItem.fieldname);
-			});
-			this.selectedField = result;
 		}
 	}
 });
