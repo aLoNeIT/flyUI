@@ -135,7 +135,7 @@ avalon.component("fy-form", {
 				key=key.replace(oSelf.$prefix,"");
 				//不进行验证,虚拟节点，无输入框
 				if(oField.virtual
-					||oField.noinput
+					||(oField.noinput&&value=="")
 					||(oField.pk&&oField.auto)//自增主键
 				) return true;
 				//检查必填
@@ -377,10 +377,10 @@ avalon.component("fy-form", {
 								else sHtml+='<span class="form-control" ms-text="@data[\'fakefield_'+item.fieldname+'\']"></span>';
 							}else{
 								//有单位时候的样式
-									sHtml+='<div class="input-group">'
-											+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\']"></span>'
-											+'<span class="input-group-addon">'+item.unit+'</span>'
-										+'</div>';
+								sHtml+='<div class="input-group">'
+										+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\']"></span>'
+										+'<span class="input-group-addon">'+item.unit+'</span>'
+									+'</div>';
 							}
 						}
 						else{
@@ -448,9 +448,7 @@ avalon.component("fy-form", {
 					case 2://浮点型
 					case 6://字符串
 						if(item.select==""){
-							if(item.keyid>0//外键关联数据
-								||(item.extend&&item.extend.action)
-							){
+							if(item.keyid>0){
 								var inputId="input_"+(Math.random()+"").substr(3,6);
 								sHtml+='<div class="input-group">'
 											+'<span class="input-group-btn">'
@@ -459,7 +457,15 @@ avalon.component("fy-form", {
 											+'<input type="text" class="form-control" readonly="" ms-attr="{id:\''+inputId+'\'}" ms-duplex="@data[\'fakefield_'+item.fieldname+'\']" />'
 											+'<input type="hidden" class="form-control" readonly="" ms-duplex="@data[\''+item.fieldname+'\']" />'
 										+'</div>';
-							}else{
+							}else if(item.extend&&item.extend.action){
+								sHtml+='<div class="input-group">'
+											+'<span class="input-group-btn">'
+												+'<input type="button" value="选择" ms-click="@openAction($event,\''+item.fieldname+'\')" class="btn btn-primary" ms-attr="{placeholder:\''+item.tooltip+'\'}"/>'
+											+'</span>'
+											+'<input type="text" class="form-control" readonly="" ms-duplex="@data[\''+item.fieldname+'\']" />'
+										+'</div>';
+							}
+							else{
 								if(item.unit==""){
 									sHtml+='<input '+(item.readonly?'readonly="true"':'')+' type="text" class="form-control" ms-duplex="@data[\''+item.fieldname+'\']"/>';
 								}else{//有单位时候的样式
@@ -548,6 +554,16 @@ avalon.component("fy-form", {
 			}else{
 				//获取第三方数据
 				alert("暂不支持dict相关方法!<keyid:"+oField.keyid+">");
+			}
+		},
+		openAction:function($event,fieldName){
+			var oField=this.fields[fieldName];
+			if(oField.extend&&oField.extend.action){
+				//优先执行用户自定义数据
+				oField.extend.action.call(this,$event,oField);
+			}else{
+				//获取第三方数据
+				alert("未配置有效的Action节点!");
 			}
 		},
 		openDatePicker:function($event,fieldName){//打开日期选择界面

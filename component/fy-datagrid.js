@@ -197,7 +197,7 @@ avalon.component("fy-datagrid", {
 		procValue:function(key,value,el){//使用特殊方法处理字段内容
 			var oItem=this.fields[key];
 			if(!oItem||!oItem.process) return value;
-			else if(oItem.process) return oItem.process(value);
+			else if(oItem.process) return oItem.process(value,el);
 		},
 		onBack:avalon.noop,//后退
 		back:function(){
