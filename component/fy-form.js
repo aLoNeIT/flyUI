@@ -399,25 +399,30 @@ avalon.component("fy-form", {
 						}
 						break;
 					case 7:
-						sHtml+='<div class="switch" style="margin-top: 6px;">'
-									+'<div class="onoffswitch">'
-										+'<input type="checkbox" class="onoffswitch-checkbox" ms-attr="{checked:@getSwitchState(\''+item.fieldname+'\')}">'
-										+'<label class="onoffswitch-label" >'
-											+'<span class="onoffswitch-inner"></span>'
-											+'<span class="onoffswitch-switch"></span>'
-										+'</label>'
-									+'</div>'
-								+'</div>';
+						if(item.select==""){
+							sHtml+='<div class="switch" style="margin-top: 6px;">'
+										+'<div class="onoffswitch">'
+											+'<input type="checkbox" class="onoffswitch-checkbox" ms-attr="{checked:@getSwitchState(\''+item.fieldname+'\')}">'
+											+'<label class="onoffswitch-label" >'
+												+'<span class="onoffswitch-inner"></span>'
+												+'<span class="onoffswitch-switch"></span>'
+											+'</label>'
+										+'</div>'
+									+'</div>';
+						}else{
+							sHtml+='<div style="padding:10px 0px;" ms-html="@getBooleanSelect(@data[\''+item.fieldname+'\'],\''+item.select+'\')"></div>';
+							//sHtml+='<span class="form-control" ms-text="@getBooleanSelect(@data[\''+item.fieldname+'\'],\''+item.select+'\')"></span>';
+						}
 						break;
 					case 8:
 						sHtml+='<textarea readonly="true" ms-text="@data[\''+item.fieldname+'\']" class="form-control" ></textarea>';
 						break;
-					case 9:
-						sHtml+='<div class="input-group">'
+					case 9: //图像，要考虑多张图的情况
+						sHtml+='<div class="input-group" ms-for="($index,$value) in @getSplitResult(@data[\''+item.fieldname+'\'],\',\')">'
 									+'<span class="input-group-btn">'
-										+'<button target="'+fileId+'" type="button" class="btn btn-white" title="预览图片" ms-click="@previewImage($event,\''+item.fieldname+'\')">预览图片</button>'
+										+'<button target="'+fileId+'" type="button" class="btn btn-white" title="预览图片" ms-click="@previewImage($event,$value)">预览图片</button>'
 									+'</span>'
-									+'<input type="text" class="form-control" readonly="" ms-text="@data[\''+item.fieldname+'\']" />'
+									+'<input type="text" class="form-control" readonly="" ms-attr="{value:$value}" />'
 								+'</div>';
 						break;
 				}
@@ -540,6 +545,16 @@ avalon.component("fy-form", {
 		},
 		getSwitchState:function(fieldName){//switch状态
 			return this.data[fieldName]?true:false;
+		},
+		getSplitResult:function(value,sp){ //获取分隔符分割的结果
+			value=value||"";
+			if(avalon.isString(value)) return value.split(sp);
+			else return [value];
+		},
+		getBooleanSelect:function(value,select){//获取真假值对应的select文本
+			var aSelect=select.split(";");
+			if(1===value||true===value) return '<span class="label label-info">'+aSelect[1]+'</span>';
+			else return '<span class="label label-danger">'+aSelect[0]+'</span>';
 		},
 		changeState:function($event,fieldName){
 			var oField=this.fields[fieldName];
