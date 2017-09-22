@@ -160,6 +160,7 @@ avalon.component("fy-filter", {
 			var result=this.procFields(fields);
 			this.fields=result.fields;
 			this.data=result.data;
+			avalon.log(fields);
 			this.isShow=!(JSON.stringify(this.fields.$model)=="{}");
 		},
 		getNameHtml:function(key,item){//获取字段名的html
@@ -173,7 +174,7 @@ avalon.component("fy-filter", {
 				|| (item.type == 10 ) //二进制文件上传
 				)
 				return "col-sm-6";
-			else return "col-sm-3 m-t-xs";
+			else return "col-lg-3 col-md-4 col-sm-6 col-xs-12 m-t-xs";
 		},
 		getFieldHtml:function(key,item){
 			//开始处理字段

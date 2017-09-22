@@ -29,6 +29,7 @@ avalon.component("fy-form", {
 														+'<div class="col-sm-offset-2">'
 															+'<button type="button" class="btn btn-primary" ms-click="@confirm" ms-visible="!@readOnly">确认</button>'
 															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back">返回</button>'
+															+'<button class="btn btn-primary m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</button>'
 														+'</div>'
 														+'<div ms-html="@getWidgetHtml()"></div>'
 													+'</form>'
@@ -38,6 +39,10 @@ avalon.component("fy-form", {
 									+'</div>'
 								+'</div>'
 							+'</div>'
+						+'</div>'
+						+'<div id="blueimp-gallery" class="blueimp-gallery">'
+							+'<div class="slides"></div><h3 class="title"></h3><a class="prev">‹</a><a class="next">›</a>'
+							+'<a class="close">×</a><a class="play-pause"></a><ol class="indicator"></ol>'
 						+'</div>'
 						+'<wbr ms-widget="{is:\'fy-datepicker\',$id:@$datePickerId,autoClose:true}" />'
 					+'</div>';
@@ -76,6 +81,12 @@ avalon.component("fy-form", {
 			*/
 			fakefield:"",
 			virtual:false//虚拟字段
+		},
+		buttons:[],
+		buttonClick:function(el){
+			if(avalon.isFunction(el.onClick)){
+				el.onClick.call(this,el);
+			}
 		},
 		fields:{},
 		/* fields范例
@@ -414,10 +425,9 @@ avalon.component("fy-form", {
 						break;
 					case 9:
 						sHtml+='<div class="input-group">'
-									+'<span class="input-group-btn">'
-										+'<button target="'+fileId+'" type="button" class="btn btn-white" title="预览图片" ms-click="@previewImage($event,\''+item.fieldname+'\')">预览图片</button>'
-									+'</span>'
-									+'<input type="text" class="form-control" readonly="" ms-text="@data[\''+item.fieldname+'\']" />'
+									+'<a ms-attr="{href:@data[\''+item.fieldname+'\'],title:@data[\''+item.fieldname+'\']}" data-gallery="">'
+									+'<img ms-attr="{src:@data[\''+item.fieldname+'\']}" style="max-height:100px;" />'
+									+'</a>'
 								+'</div>';
 						break;
 				}
@@ -516,7 +526,9 @@ avalon.component("fy-form", {
 			oFile.click();
 		},
 		previewImage:function($event,fieldName){
-			this.$alert.warn("开发中");
+			// this.$alert.warn("开发中");
+			var oGallery = blueimp.Gallery([this.data[fieldName]]);
+			oGallery.slide(0, 500);
 		},
 		changeFile:function($event,fieldName){
 			if($event.target.value=="") return;
