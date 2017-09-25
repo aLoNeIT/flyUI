@@ -29,7 +29,6 @@ avalon.component("fy-form", {
 														+'<div class="col-sm-offset-2">'
 															+'<button type="button" class="btn btn-primary" ms-click="@confirm" ms-visible="!@readOnly">确认</button>'
 															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back">返回</button>'
-															+'<button class="btn btn-primary m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</button>'
 														+'</div>'
 														+'<div ms-html="@getWidgetHtml()"></div>'
 													+'</form>'
@@ -39,10 +38,6 @@ avalon.component("fy-form", {
 									+'</div>'
 								+'</div>'
 							+'</div>'
-						+'</div>'
-						+'<div id="blueimp-gallery" class="blueimp-gallery">'
-							+'<div class="slides"></div><h3 class="title"></h3><a class="prev">‹</a><a class="next">›</a>'
-							+'<a class="close">×</a><a class="play-pause"></a><ol class="indicator"></ol>'
 						+'</div>'
 						+'<wbr ms-widget="{is:\'fy-datepicker\',$id:@$datePickerId,autoClose:true}" />'
 					+'</div>';
@@ -81,12 +76,6 @@ avalon.component("fy-form", {
 			*/
 			fakefield:"",
 			virtual:false//虚拟字段
-		},
-		buttons:[],
-		buttonClick:function(el){
-			if(avalon.isFunction(el.onClick)){
-				el.onClick.call(this,el);
-			}
 		},
 		fields:{},
 		/* fields范例
@@ -146,7 +135,7 @@ avalon.component("fy-form", {
 				key=key.replace(oSelf.$prefix,"");
 				//不进行验证,虚拟节点，无输入框
 				if(oField.virtual
-					||oField.noinput
+					||(oField.noinput&&value=="")
 					||(oField.pk&&oField.auto)//自增主键
 				) return true;
 				//检查必填
@@ -388,10 +377,10 @@ avalon.component("fy-form", {
 								else sHtml+='<span class="form-control" ms-text="@data[\'fakefield_'+item.fieldname+'\']"></span>';
 							}else{
 								//有单位时候的样式
-									sHtml+='<div class="input-group">'
-											+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\']"></span>'
-											+'<span class="input-group-addon">'+item.unit+'</span>'
-										+'</div>';
+								sHtml+='<div class="input-group">'
+										+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\']"></span>'
+										+'<span class="input-group-addon">'+item.unit+'</span>'
+									+'</div>';
 							}
 						}
 						else{
@@ -410,24 +399,30 @@ avalon.component("fy-form", {
 						}
 						break;
 					case 7:
-						sHtml+='<div class="switch" style="margin-top: 6px;">'
-									+'<div class="onoffswitch">'
-										+'<input type="checkbox" class="onoffswitch-checkbox" ms-attr="{checked:@getSwitchState(\''+item.fieldname+'\')}">'
-										+'<label class="onoffswitch-label" >'
-											+'<span class="onoffswitch-inner"></span>'
-											+'<span class="onoffswitch-switch"></span>'
-										+'</label>'
-									+'</div>'
-								+'</div>';
+						if(item.select==""){
+							sHtml+='<div class="switch" style="margin-top: 6px;">'
+										+'<div class="onoffswitch">'
+											+'<input type="checkbox" class="onoffswitch-checkbox" ms-attr="{checked:@getSwitchState(\''+item.fieldname+'\')}">'
+											+'<label class="onoffswitch-label" >'
+												+'<span class="onoffswitch-inner"></span>'
+												+'<span class="onoffswitch-switch"></span>'
+											+'</label>'
+										+'</div>'
+									+'</div>';
+						}else{
+							sHtml+='<div style="padding:10px 0px;" ms-html="@getBooleanSelect(@data[\''+item.fieldname+'\'],\''+item.select+'\')"></div>';
+							//sHtml+='<span class="form-control" ms-text="@getBooleanSelect(@data[\''+item.fieldname+'\'],\''+item.select+'\')"></span>';
+						}
 						break;
 					case 8:
 						sHtml+='<textarea readonly="true" ms-text="@data[\''+item.fieldname+'\']" class="form-control" ></textarea>';
 						break;
-					case 9:
-						sHtml+='<div class="input-group">'
-									+'<a ms-attr="{href:@data[\''+item.fieldname+'\'],title:@data[\''+item.fieldname+'\']}" data-gallery="">'
-									+'<img ms-attr="{src:@data[\''+item.fieldname+'\']}" style="max-height:100px;" />'
-									+'</a>'
+					case 9: //图像，要考虑多张图的情况
+						sHtml+='<div class="input-group" ms-for="($index,$value) in @getSplitResult(@data[\''+item.fieldname+'\'],\',\')">'
+									+'<span class="input-group-btn">'
+										+'<button target="'+fileId+'" type="button" class="btn btn-white" title="预览图片" ms-click="@previewImage($event,$value)">预览图片</button>'
+									+'</span>'
+									+'<input type="text" class="form-control" readonly="" ms-attr="{value:$value}" />'
 								+'</div>';
 						break;
 				}
@@ -458,9 +453,7 @@ avalon.component("fy-form", {
 					case 2://浮点型
 					case 6://字符串
 						if(item.select==""){
-							if(item.keyid>0//外键关联数据
-								||(item.extend&&item.extend.action)
-							){
+							if(item.keyid>0){
 								var inputId="input_"+(Math.random()+"").substr(3,6);
 								sHtml+='<div class="input-group">'
 											+'<span class="input-group-btn">'
@@ -469,7 +462,15 @@ avalon.component("fy-form", {
 											+'<input type="text" class="form-control" readonly="" ms-attr="{id:\''+inputId+'\'}" ms-duplex="@data[\'fakefield_'+item.fieldname+'\']" />'
 											+'<input type="hidden" class="form-control" readonly="" ms-duplex="@data[\''+item.fieldname+'\']" />'
 										+'</div>';
-							}else{
+							}else if(item.extend&&item.extend.action){
+								sHtml+='<div class="input-group">'
+											+'<span class="input-group-btn">'
+												+'<input type="button" value="选择" ms-click="@openAction($event,\''+item.fieldname+'\')" class="btn btn-primary" ms-attr="{placeholder:\''+item.tooltip+'\'}"/>'
+											+'</span>'
+											+'<input type="text" class="form-control" readonly="" ms-duplex="@data[\''+item.fieldname+'\']" />'
+										+'</div>';
+							}
+							else{
 								if(item.unit==""){
 									sHtml+='<input '+(item.readonly?'readonly="true"':'')+' type="text" class="form-control" ms-duplex="@data[\''+item.fieldname+'\']"/>';
 								}else{//有单位时候的样式
@@ -526,9 +527,7 @@ avalon.component("fy-form", {
 			oFile.click();
 		},
 		previewImage:function($event,fieldName){
-			// this.$alert.warn("开发中");
-			var oGallery = blueimp.Gallery([this.data[fieldName]]);
-			oGallery.slide(0, 500);
+			this.$alert.warn("开发中");
 		},
 		changeFile:function($event,fieldName){
 			if($event.target.value=="") return;
@@ -547,6 +546,16 @@ avalon.component("fy-form", {
 		getSwitchState:function(fieldName){//switch状态
 			return this.data[fieldName]?true:false;
 		},
+		getSplitResult:function(value,sp){ //获取分隔符分割的结果
+			value=value||"";
+			if(avalon.isString(value)) return value.split(sp);
+			else return [value];
+		},
+		getBooleanSelect:function(value,select){//获取真假值对应的select文本
+			var aSelect=select.split(";");
+			if(1===value||true===value) return '<span class="label label-info">'+aSelect[1]+'</span>';
+			else return '<span class="label label-danger">'+aSelect[0]+'</span>';
+		},
 		changeState:function($event,fieldName){
 			var oField=this.fields[fieldName];
 			if(!oField.readonly)
@@ -560,6 +569,16 @@ avalon.component("fy-form", {
 			}else{
 				//获取第三方数据
 				alert("暂不支持dict相关方法!<keyid:"+oField.keyid+">");
+			}
+		},
+		openAction:function($event,fieldName){
+			var oField=this.fields[fieldName];
+			if(oField.extend&&oField.extend.action){
+				//优先执行用户自定义数据
+				oField.extend.action.call(this,$event,oField);
+			}else{
+				//获取第三方数据
+				alert("未配置有效的Action节点!");
 			}
 		},
 		openDatePicker:function($event,fieldName){//打开日期选择界面
