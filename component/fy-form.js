@@ -28,7 +28,7 @@ avalon.component("fy-form", {
 														+'<div class="hr-line-dashed"></div>'
 														+'<div class="col-sm-offset-2">'
 															+'<button type="button" class="btn btn-primary" ms-click="@confirm" ms-visible="!@readOnly">确认</button>'
-															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back">返回</button>'
+															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back" ms-visible="@backbtn">返回</button>'
 														+'</div>'
 														+'<div ms-html="@getWidgetHtml()"></div>'
 													+'</form>'
@@ -257,6 +257,7 @@ avalon.component("fy-form", {
 			};
 		},
 		readOnly:false,
+		backbtn:true,
 		read:function(fields,readUrl){ //只读界面
 			this.readOnly=true;
 			this.updateUrl=readUrl;
@@ -332,8 +333,8 @@ avalon.component("fy-form", {
 		},
 		onData:avalon.noop, //处理数据的回掉 onData()
 		back:function(){
-			location.href=document.referrer;
-			//history.back();
+			if(self==top) location.href=document.referrer;
+			else history.back();
 		},
 		getWidgetHtml:function(){
 			var sHtml='<wbr ms-widget="{is:\'fy-alert\',$id:\''+this.$alertId+'\'}" />';
