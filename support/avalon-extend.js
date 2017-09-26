@@ -36,7 +36,7 @@ avalon.ajax=function(sUrl,oData,options){
 		method:sMethod,
 		headers:oHeaders,
 		credentials:sCredentials,
-		body:oData,
+		body:oData
 	}).then(function(oResponse){
 		switch(sType){
 			case "text":
@@ -56,6 +56,7 @@ avalon.post=function(sUrl,oData,fnSuccess,fnError){
 		fnSuccess:fnSuccess,
 		fnError:fnError
 	};
+	if(avalon.isString(oData)) options.oHeaders={"Content-Type":"application/json"};
 	avalon.ajax(sUrl,oData,options);
 };
 
@@ -69,13 +70,12 @@ avalon.get=function(sUrl,fnSuccess,fnError){
 };
 
 avalon.put=function(sUrl,oData,fnSuccess,fnError){
-	if(avalon.isObject(oData)) oData=JSON.stringify(oData);
 	var options={
 		sMethod:"put",
 		fnSuccess:fnSuccess,
-		fnError:fnError,
-		oHeaders:{"Content-Type":"application/json"}
+		fnError:fnError
 	};
+	if(avalon.isString(oData)) options.oHeaders={"Content-Type":"application/json"};
 	avalon.ajax(sUrl,oData,options);
 };
 
@@ -314,6 +314,18 @@ avalon.comConfig=function(sName,sProperty){
 	else return null;
 };
 
+//对象转url参数
+avalon.param=function(obj){
+	if(avalon.isObject(obj)){
+		var arr=[];
+		for(var i in obj){
+			var str=i+"="+obj[i];
+			arr.push(str);
+		}
+		var sUrl=arr.join("&");
+		return sUrl;
+	}
+}
 /*
 	生成url
 	@param  sUrl    网址
@@ -444,7 +456,7 @@ avalon.filters.unixdate = function(iSecond,sFormat){
 	sFormat = sFormat || "yyyy-MM-dd";
 	return avalon.filters.date(iSecond*1000,sFormat);
 }
-avalon.filters.unixdate1=function(iSecond,sFormat){
+avalon.filters.unixdateEx=function(iSecond,sFormat){
 	sFormat=sFormat||"yyyy-MM-dd HH:mm:ss";
 	return avalon.filters.date(iSecond*1000,sFormat);
 };
@@ -512,6 +524,7 @@ avalon.curTime=function(){
 };
 
 avalon.unixToDate=function(unixTime, isFull, timeZone) {
+	isFull=isFull!==false;
 	if(avalon.isNumber(timeZone)){
 		unixTime = parseInt(unixTime) + parseInt(timeZone) * 60 * 60;
 	}else{
