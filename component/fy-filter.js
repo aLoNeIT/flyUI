@@ -36,7 +36,7 @@ avalon.component("fy-filter", {
 			pk:false,
 			auto:true,
 			unit:"",//单位
-			keyid:0,
+			keyid:0,//大于0时拆分 如:0101-北京 为 0101 用作传参id
 			keytable:"",
 			keyfield:"",
 			keyshow:"",
@@ -46,7 +46,8 @@ avalon.component("fy-filter", {
 			noinput:false,//不需要输入框
 			inputwidth:0,
 			select:"",
-			tooltip:""//placeholder提示语
+			tooltip:"",//placeholder提示语
+			fakefield:""
 		},
 		fields:{},
 		/* fields范例
@@ -109,7 +110,18 @@ avalon.component("fy-filter", {
 		},
 		seachClick:function($event){
 			if(avalon.isFunction(this.onFilter)){
-				this.onFilter(this.data.$model);
+				var oField={},
+					oData={},
+					oSelf=this;
+				avalon.each(this.data,function(key,value){
+					if(key.indexOf("fakeField_")==0) return true;
+					oField=oSelf.fields[key];
+					if(oField.keyid>0&&value!=""){//拆分字符串 前半部分id
+						oData[key]=avalon.keyValue(value);
+					}else
+						oData[key]=value;
+				});
+				this.onFilter(oData);
 			}
 		},
 		onFilter:avalon.noop,
