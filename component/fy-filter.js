@@ -118,8 +118,9 @@ avalon.component("fy-filter", {
 					oField=oSelf.fields[key];
 					if(oField.keyid>0&&value!=""){//拆分字符串 前半部分id
 						oData[key]=avalon.keyValue(value);
-					}else
+					}else if(value!=""||value!=0){
 						oData[key]=value;
+					}
 				});
 				this.onFilter(oData);
 			}

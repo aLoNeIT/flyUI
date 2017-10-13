@@ -145,7 +145,7 @@ avalon.delEx=function(sUrl,fnSuccess){
 	});
 };
 // 密码重置为123456
-avalon.restPwd=function(sUrl,fnSuccess){
+avalon.resetPwd=function(sUrl,fnSuccess){
 	fnSuccess=fnSuccess||avalon.noop;
 	//var oAlert=avalon.getAlert(2);
 	//if(!oAlert){console.log("创建组件失败!");return;}
@@ -181,23 +181,17 @@ avalon.saveToken=function(oData,sUrlRefreshApi){
 	storeEx.set("login_url",login_url);
 	return oData.access_token;
 };
-/**
- * 获取本地保存的token
- * @param fnCallback 获取到有效token后会通过回调函数传递
- * @returns {*}
- */
-avalon.getToken=function(fnCallback){
+
+avalon.getToken=function(){
 	var sToken=storeEx.get("access_token");
 	if(!sToken){
 		logicAlert.error("授权失效","验证令牌已失效",function(){
+			debugger;
 			if(top==self)
 				window.location.href=storeEx.get("login_url");
 			else top.location.href=storeEx.get("login_url");
 		});
 		return false;
-	}
-	if(avalon.isFunction(fnCallback)){
-		fnCallback.call(this,sToken);
 	}
 	return sToken;
 };
@@ -206,7 +200,7 @@ avalon.getToken=function(fnCallback){
 avalon.upbtn=function($event){
 	var sFile=avalon($event.target).attr("target");
 	document.querySelector("#"+sFile).click();
-};
+},
 avalon.upimg=function(sUrl,oDom,sField,oFile,fnSuccess,fnError){
 	var sToken=storeEx.get("access_token");
 	if(!sToken){
@@ -220,20 +214,11 @@ avalon.upimg=function(sUrl,oDom,sField,oFile,fnSuccess,fnError){
 		else sUrl+="&access_token="+sToken;
 		avalon.upload(sUrl,oDom,sField,oFile,fnSuccess,fnError);
 	}
-};
-/**
- * 获取选中的主键数据
- * @param oData 数据源
- * @param sField    字段名
- * @param fnCallback    回调函数，将获取到的有效数据回调
- * @returns {*}
- */
-avalon.getSelected=function(oData,sField,fnCallback){
+}
+
+avalon.getSelected=function(oData,sField){
 	if(!oData||!sField||(avalon.isArray(oData)&&oData.length==0)||!oData[sField]){
 		logicAlert.warn("操作失败","请选择有效数据");
 		return false;
-	}else {
-		if(avalon.isFunction(fnCallback)) fnCallback.call(this,oData[sField]);
-		return oData[sField];
-	}
+	}else return oData[sField];
 };
