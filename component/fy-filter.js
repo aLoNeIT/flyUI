@@ -173,7 +173,7 @@ avalon.component("fy-filter", {
 			var result=this.procFields(fields);
 			this.fields=result.fields;
 			this.data=result.data;
-			avalon.log(fields);
+			// avalon.log(fields);
 			this.isShow=!(JSON.stringify(this.fields.$model)=="{}");
 		},
 		getNameHtml:function(key,item){//获取字段名的html
