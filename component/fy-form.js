@@ -68,6 +68,7 @@ avalon.component("fy-form", {
 			inputwidth:0,
 			select:"",
 			tooltip:"",//placeholder提示语
+			regex:"",
 			/*
 			fakefield:{ //伪造字段，用于合成数据,存在这个字段，会将值写入fakefield_fieldname
 				key:"field1",
@@ -172,6 +173,14 @@ avalon.component("fy-form", {
 						}
 					}
 				}
+				//如果存在正则校验，则进行正则校验
+				if(oField.regex!=""){
+					var pattern=new RegExp(oField.regex);
+					if(!pattern.test(value)){
+						sResult=oField.name+"的数据不符合要求!";
+						return false;
+					}
+				}
 				//处理无误，将数据写入
 				if(oField.keyid>0&&value!=""){
 					//oData.append(key,avalon.keyValue(value));
@@ -236,7 +245,11 @@ avalon.component("fy-form", {
 						uValue=avalon.formatDateTime(new Date(),"yyyy-MM-dd HH:mm:ss");
 						break;
 					case 6:
-						uValue="";
+						if(oItem.select=="") uValue="";
+						else{
+							var oOptions=oItem.select.split(";");
+							if(oOptions.length>0) uValue=avalon.keyValue(oOptions[0]);
+						}
 						break;
 					case 7:
 						uValue=1;
@@ -315,12 +328,17 @@ avalon.component("fy-form", {
 				}else{//查询成功，显示界面
 					avalon.each(oSelf.fields,function(key,oItem){
 						if(oItem.fakefield!==""){
-							var sKey="",sValue="";
+							var sKey="",sValue="",sName="";
 							if(oItem.fakefield.key){
 								if(oResult.table[oItem.fakefield.key]) sKey=oResult.table[oItem.fakefield.key];
 							}
 							if(oItem.fakefield.value){
 								if(oResult.table[oItem.fakefield.value]) sValue=oResult.table[oItem.fakefield.value];
+							}
+							if(oItem.fakefield.name){
+								if(oResult.table[oItem.fakefield.name]) sName=oResult.table[oItem.fakefield.name];
+								oResult.table["fakefield_"+oItem.fieldname]=sKey+"-"+sName;
+								return;
 							}
 							oResult.table["fakefield_"+oItem.fieldname]=sKey+"-"+sValue;
 						}
@@ -513,6 +531,17 @@ avalon.component("fy-form", {
 									+'<span class="input-group-btn">'
 										+'<input target="'+fileId+'" type="button" value="选择图片" ms-click="@chooseImage($event,\''+item.fieldname+'\')" class="btn btn-primary" id="'+buttonId+'" />'
 										+'<button target="'+fileId+'" type="button" class="btn btn-white" title="预览图片" ms-click="@previewImage($event,\''+item.fieldname+'\')">预览图片</button>'
+										+'<input target="'+buttonId+'" type="file" id="'+fileId+'" style="display:none" ms-change="@changeFile($event,\''+item.fieldname+'\')" />'
+									+'</span>'
+									+'<input type="text" class="form-control" readonly="" ms-duplex="@data[\''+item.fieldname+'\']" />'
+								+'</div>';
+						break;
+					case 10://上传文件
+						var fileId="file_"+(Math.random()+"").substr(3,6);
+						var buttonId="btn_"+(Math.random()+"").substr(3,6);
+						sHtml+='<div class="input-group">'
+									+'<span class="input-group-btn">'
+										+'<input target="'+fileId+'" type="button" value="选择文件" ms-click="@chooseImage($event,\''+item.fieldname+'\')" class="btn btn-primary" id="'+buttonId+'" />'
 										+'<input target="'+buttonId+'" type="file" id="'+fileId+'" style="display:none" ms-change="@changeFile($event,\''+item.fieldname+'\')" />'
 									+'</span>'
 									+'<input type="text" class="form-control" readonly="" ms-duplex="@data[\''+item.fieldname+'\']" />'
