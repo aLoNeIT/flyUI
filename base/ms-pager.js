@@ -1,26 +1,26 @@
 /*!
  * 分页 by 司徒正美
  * avalon的分页组件
- *     getHref: 生成页面的href
- *     getTitle: 生成页面的title
- *     showPages: 5 显示页码的个数
- *     totalPages: 15, 总数量 
- *     currentPage: 1, 当前面
- *     firstText: 'First',
- *     prevText: 'Previous',
- *     nextText: 'Next',
- *     lastText: 'Last',
- *     onPageClick: 点击页码的回调
- *      
- *      使用
- *      兼容IE6-8
- *      ```
- *      <wbr ms-widget="[{is:'ms-pager'}, @config]"/>
- *      ```
- *      只支持现代浏览器(IE9+)
- *      ```
- *      <ms-pager ms-widget="@config"></ms-pager>
- *      ```
+ *	 getHref: 生成页面的href
+ *	 getTitle: 生成页面的title
+ *	 showPages: 5 显示页码的个数
+ *	 totalPages: 15, 总数量 
+ *	 currentPage: 1, 当前面
+ *	 firstText: 'First',
+ *	 prevText: 'Previous',
+ *	 nextText: 'Next',
+ *	 lastText: 'Last',
+ *	 onPageClick: 点击页码的回调
+ *	  
+ *	  使用
+ *	  兼容IE6-8
+ *	  ```
+ *	  <wbr ms-widget="[{is:'ms-pager'}, @config]"/>
+ *	  ```
+ *	  只支持现代浏览器(IE9+)
+ *	  ```
+ *	  <ms-pager ms-widget="@config"></ms-pager>
+ *	  ```
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -83,80 +83,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	var avalon = __webpack_require__(96)
 	__webpack_require__(97)
 	avalon.component('ms-pager', {
-	    template: __webpack_require__(99),
-	    defaults: {
-	        getHref: function (a) {
-	            return "javascript:void(0);"
+		template: __webpack_require__(99),
+		defaults: {
+			getHref: function (a) {
+				return "javascript:void(0);"
 				//return "javascript:location.hash=#page-"+this.toPage(a)+";";
 				//return '#page-' + this.toPage(a)
-	        },
-	        getTitle: function (title) {
-	            return title
-	        },
-	        isDisabled: function (name, page) {
-	            return this.$buttons[name] = (this.currentPage === page)
-	        },
-	        $buttons: {},
-	        showPages: 5,
-	        pages: [],
-	        totalPages: 15,
-	        currentPage: 1,
-	        firstText: '首页',
-	        prevText: '上一页',
-	        nextText: '下一页',
-	        lastText: '末页',
-	        onPageClick: avalon.noop,
-	        toPage: function (p) {
-	            var cur = this.currentPage
-	            var max = this.totalPages
-	            switch (p) {
-	                case 'first':
-	                    return 1
-	                case 'prev':
-	                    return Math.max(cur - 1, 0)
-	                case 'next':
-	                    return Math.min(cur + 1, max)
-	                case 'last':
-	                    return max
-	                default:
-	                    return p
-	            }
-	        }, 
+			},
+			getTitle: function (title) {
+				return title
+			},
+			isDisabled: function (name, page) {
+				return this.$buttons[name] = (this.currentPage === page)
+			},
+			$buttons: {},
+			showPages: 5,
+			pages: [],
+			totalPages: 15,
+			currentPage: 1,
+			firstText: '首页',
+			prevText: '上一页',
+			nextText: '下一页',
+			lastText: '末页',
+			onPageClick: avalon.noop,
+			toPage: function (p) {
+				var cur = this.currentPage
+				var max = this.totalPages
+				switch (p) {
+					case 'first':
+						return 1
+					case 'prev':
+						return Math.max(cur - 1, 0)
+					case 'next':
+						return Math.min(cur + 1, max)
+					case 'last':
+						return max
+					default:
+						return p
+				}
+			}, 
 
-	        cbProxy: function (e, p) {
-	            if (this.$buttons[p] || p === this.currentPage) {
-	                e.preventDefault()
-	                return //disabled, active不会触发
-	            }
-	            var cur = this.toPage(p)
-	            this.render(cur)
-	            return this.onPageClick(e, p)
-	        },
-	        render: function(cur){
-	            //var obj = getPages.call(this, cur)
-	            var obj = this.getPages(cur)
+			cbProxy: function (e, p) {
+				if (this.$buttons[p] || p === this.currentPage) {
+					e.preventDefault()
+					return //disabled, active不会触发
+				}
+				var cur = this.toPage(p)
+				this.render(cur)
+				return this.onPageClick(e, p)
+			},
+			render: function(cur){
+				//var obj = getPages.call(this, cur)
+				var obj = this.getPages(cur)
 				this.pages = obj.pages
-	            this.currentPage = obj.currentPage
-	        },
-	        rpage: /(?:#|\?)page\-(\d+)/,
-	        onInit: function () {
-	            var cur = this.currentPage
-	            var match = this.rpage && location.href.match(this.rpage)
-	            if (match && match[1]) {
-	                var cur = ~~match[1]
-	                if (cur < 0 || cur > this.totalPages) {
-	                    cur = 1
-	                }
-	            }
-	            var that = this
-	            this.$watch('totalPages', function(){
+				this.currentPage = obj.currentPage
+			},
+			rpage: /(?:#|\?)page\-(\d+)/,
+			onInit: function () {
+				var cur = this.currentPage
+				var match = this.rpage && location.href.match(this.rpage)
+				if (match && match[1]) {
+					var cur = ~~match[1]
+					if (cur < 0 || cur > this.totalPages) {
+						cur = 1
+					}
+				}
+				var that = this
+				this.$watch('totalPages', function(){
 
-	                //setTimeout(function(){
-	                    that.render(that.currentPage)
-	                //},4)
-	            })
-	            this.render(cur)
-	        },
+					//setTimeout(function(){
+						that.render(that.currentPage)
+					//},4)
+				})
+				this.render(cur)
+			},
 			getPages:function(currentPage){
 				var pages=[];
 				var half=Math.floor(this.showPage/2);
@@ -182,7 +182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 				return {currentPage: currentPage, pages: pages};
 			}
-	    }
+		}
 	})
 	//https://github.com/brantwills/Angular-Paging
 

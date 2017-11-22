@@ -19,7 +19,7 @@ body {
   background: #222;
   color: #fff;
   -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
+	  -ms-text-size-adjust: 100%;
 }
 a {
   color: orange;
@@ -39,13 +39,13 @@ h2,
 
 @media (min-width: 481px) {
   .navigation {
-    list-style: none;
-    padding: 0;
+	list-style: none;
+	padding: 0;
   }
   .navigation li {
-    display: inline-block;
+	display: inline-block;
   }
   .navigation li:not(:first-child):before {
-    content: '| ';
+	content: '| ';
   }
 }

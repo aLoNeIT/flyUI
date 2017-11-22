@@ -30,39 +30,8 @@
 	z-index: 99999;
 }
 .fy-modal .modal-dialog-img {
-	position: relative;
-	margin: auto;
-	background-color: rgba(255, 255, 255, 0);
-	text-align: center;
-	overflow: hidden;
-	z-index: 99999;
-	width: 100%;
-}
-.fy-modal .modal-dialog-img .modal-header{
-	border-bottom: 0;
-	width: 100%;
-	position: absolute;
-	padding: 15px;
-	margin: 0 40px 0 0;
-}
-.fy-modal .modal-dialog-img .modal-header h2{
-	color: #fff;
-	text-shadow: 0 0 2px #000;
-	opacity: .9;
-	text-align: left;
-}
-.fy-modal .modal-dialog-img img{
-	margin: auto;
-	width: auto;
-	height: auto;
-	max-width: 100%;
-	max-height: 100%;
-	opacity: 1;
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
+    position: relative;
+    z-index: 99999;
 }
 .fy-modal .modal-header {
 	padding: 15px 5px;

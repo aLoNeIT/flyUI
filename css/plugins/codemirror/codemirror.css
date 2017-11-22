@@ -301,7 +301,7 @@ div.CodeMirror-cursors {
 @media print {
   /* Hide the cursor when printing */
   .CodeMirror div.CodeMirror-cursors {
-    visibility: hidden;
+	visibility: hidden;
   }
 }
 

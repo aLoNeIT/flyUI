@@ -157,7 +157,7 @@
 				text:sText||"",
 				iconType:"error",
 				_onClose:fnClose||avalon.noop,
-				_onConfirm:fnConfirm||avalon.noop,
+				_onConfirm:fnConfirm||avalon.noop
 			};
 			this.animateCss=this.animate.show;
 			this.isShow=true;
@@ -171,7 +171,7 @@
 			text:"请稍等......",
 			iconType:"success",
 			_onClose:avalon.noop,
-			_onConfirm:avalon.noop,
+			_onConfirm:avalon.noop
 		},
 		open:function(oOption){
 			this.zIndex=avalon.zIndex++;

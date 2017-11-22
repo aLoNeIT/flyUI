@@ -6,6 +6,7 @@
   .pagination > li {
 	display: inline; }
 	.pagination > li > a,
+	.pagination > li > input,
 	.pagination > li > span {
 	  position: relative;
 	  float: left;
@@ -16,6 +17,10 @@
 	  background-color: #fff;
 	  border: 1px solid #ddd;
 	  margin-left: -1px; }
+	.pagination > li > input{
+		width:48px;
+		z-index:1;
+	}
 	.pagination > li:first-child > a,
 	.pagination > li:first-child > span {
 	  margin-left: 0;

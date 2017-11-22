@@ -29,8 +29,8 @@
   height: 9px;
   margin: 6px 3px 0 3px;
   -webkit-box-sizing: content-box;
-     -moz-box-sizing: content-box;
-          box-sizing: content-box;
+	 -moz-box-sizing: content-box;
+		  box-sizing: content-box;
   border: 1px solid transparent;
   background: #ccc;
   background: rgba(255, 255, 255, 0.25) center no-repeat;
@@ -49,10 +49,10 @@
   display: block;
   /* Fix z-index issues (controls behind slide element) on Android: */
   -webkit-transform: translateZ(0);
-     -moz-transform: translateZ(0);
-      -ms-transform: translateZ(0);
-       -o-transform: translateZ(0);
-          transform: translateZ(0);
+	 -moz-transform: translateZ(0);
+	  -ms-transform: translateZ(0);
+	   -o-transform: translateZ(0);
+		  transform: translateZ(0);
 }
 .blueimp-gallery-single > .indicator {
   display: none;
@@ -60,9 +60,9 @@
 .blueimp-gallery > .indicator {
   -webkit-user-select: none;
    -khtml-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+	 -moz-user-select: none;
+	  -ms-user-select: none;
+		  user-select: none;
 }
 
 /* IE7 fixes */

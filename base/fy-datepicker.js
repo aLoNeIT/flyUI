@@ -32,6 +32,7 @@ avalon.component('fy-datepicker', {
 										'</tr>'+
 									'</tfoot>'+
 								'</table>'+
+								//'<div>时间:<input type="text" style="width:30px;" />时<input type="text" style="width:30px;" />分<input type="text" style="width:30px;" />秒</div>'+
 							'</div>'+
 							'<div ms-visible="@selectType==\'months\'" class="datepicker-months" style="display: block;">'+
 								'<table class="table-condensed">'+
@@ -95,7 +96,7 @@ avalon.component('fy-datepicker', {
 		years:[],
 		selectedDate:{},
 		autoClose:false,//点击选中后自动关闭
-		isShow:true,//显示
+		isShow:false,//显示
 		year:2016,
 		month:11,
 		changeView:function(sType){
@@ -202,19 +203,25 @@ avalon.component('fy-datepicker', {
 		css:{//容器样式
 			left:"8px",
 			top:"32px",
-			zIndex:10
+			zIndex:10,
+			position:"fixed"
 		},
 		show:function(oOptions){//打开界面
 			oOptions=oOptions||{left:"8px",top:"32px"};
 			if(oOptions.dom){//传递过来了dom，则根据dom样式定位
+				var oRect=avalon(oOptions.dom).offset();
 				this.css=avalon.mix(this.css.$model,{
-					left:oOptions.dom.offsetLeft+"px",
-					top:(oOptions.dom.offsetTop+document.body.scrollTop+oOptions.dom.offsetHeight+8)+"px"
+					left:(oRect.left+8)+"px",
+					top:(oRect.top-document.body.scrollTop+avalon(oOptions.dom).innerHeight())+"px"
 				});
 			}else{
 				var iLeft=oOptions.left||8;
 				var iTop=oOptions.top||32;
 				this.css=avalon.mix(this.css.$model,{left:iLeft+"px",top:iTop+"px"});
+			}
+			if(oOptions.onSelected){
+				//如果传递了回调，则使用本次传递的回调
+				this.onSelected=oOptions.onSelected;
 			}
 			this.isShow=true;
 		},
@@ -222,6 +229,5 @@ avalon.component('fy-datepicker', {
 			this.isShow=false;
 		},
 		onSelected:avalon.noop,//onSelect(oDate)
-		onOk:avalon.noop
 	}
 });

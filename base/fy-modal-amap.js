@@ -26,7 +26,7 @@ avalon.component("fy-modal-amap", {
 	defaults: {
 		$domId:"amap-content",
 		width:"90%",
-		height:"500px",
+		height:"450px",
 		isShow: false,
 		$amap: null,//高德map组件
 		$amapConfig:{

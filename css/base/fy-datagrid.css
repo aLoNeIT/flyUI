@@ -1,0 +1,10 @@
+.selectRow{
+	background-color: #c3e5ff;
+	z-index: 3000;
+}
+.table-hover > tbody > tr:hover {
+	background-color: #c3e5ff;
+}
+.margin-t{
+	margin-top: -4px;
+}

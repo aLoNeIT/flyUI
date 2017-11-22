@@ -7,10 +7,10 @@
 }
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   @font-face {
-    font-family: 'footable';
-    src: url('fonts/footable.svg#footable') format('svg');
-    font-weight: normal;
-    font-style: normal;
+	font-family: 'footable';
+	src: url('fonts/footable.svg#footable') format('svg');
+	font-weight: normal;
+	font-style: normal;
   }
 }
 .footable {

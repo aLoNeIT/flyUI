@@ -566,8 +566,8 @@ body.canvas-menu.mini-navbar nav.navbar-static-side {
 }
 @media (max-width: 768px) {
   .top-navigation .navbar-header {
-    display: block;
-    float: none;
+	display: block;
+	float: none;
   }
 }
 .menu-visible-lg,
@@ -576,20 +576,20 @@ body.canvas-menu.mini-navbar nav.navbar-static-side {
 }
 @media (min-width: 1200px) {
   .menu-visible-lg {
-    display: block !important;
+	display: block !important;
   }
 }
 @media (min-width: 992px) {
   .menu-visible-md {
-    display: block !important;
+	display: block !important;
   }
 }
 @media (max-width: 767px) {
   .menu-visible-md {
-    display: block !important;
+	display: block !important;
   }
   .menu-visible-lg {
-    display: block !important;
+	display: block !important;
   }
 }
 .btn {
@@ -1618,11 +1618,11 @@ div.dt-button-info {
 }
 @media (max-width: 768px) {
   .html5buttons {
-    float: none;
-    margin-top: 10px;
+	float: none;
+	margin-top: 10px;
   }
   .dataTables_length {
-    float: none;
+	float: none;
   }
 }
 /* CIRCLE */
@@ -2609,12 +2609,12 @@ a.forum-item-title:hover {
 }
 @media (max-width: 992px) {
   .forum-info {
-    margin: 15px 0 10px 0;
-    /* Comment this is you want to show forum info in small devices */
-    display: none;
+	margin: 15px 0 10px 0;
+	/* Comment this is you want to show forum info in small devices */
+	display: none;
   }
   .forum-desc {
-    float: none !important;
+	float: none !important;
   }
 }
 /* New Timeline style */
@@ -2667,17 +2667,17 @@ a.forum-item-title:hover {
 }
 @media only screen and (min-width: 1170px) {
   #vertical-timeline.center-orientation {
-    margin-top: 3em;
-    margin-bottom: 3em;
+	margin-top: 3em;
+	margin-bottom: 3em;
   }
   #vertical-timeline.center-orientation:before {
-    left: 50%;
-    margin-left: -2px;
+	left: 50%;
+	margin-left: -2px;
   }
 }
 @media only screen and (max-width: 1170px) {
   .center-orientation.dark-timeline .vertical-timeline-content:before {
-    border-color: transparent #f5f5f5 transparent transparent;
+	border-color: transparent #f5f5f5 transparent transparent;
   }
 }
 .vertical-timeline-block {
@@ -2697,13 +2697,13 @@ a.forum-item-title:hover {
 }
 @media only screen and (min-width: 1170px) {
   .center-orientation .vertical-timeline-block {
-    margin: 4em 0;
+	margin: 4em 0;
   }
   .center-orientation .vertical-timeline-block:first-child {
-    margin-top: 0;
+	margin-top: 0;
   }
   .center-orientation .vertical-timeline-block:last-child {
-    margin-bottom: 0;
+	margin-bottom: 0;
   }
 }
 .vertical-timeline-icon {
@@ -2729,20 +2729,20 @@ a.forum-item-title:hover {
 }
 @media only screen and (min-width: 1170px) {
   .center-orientation .vertical-timeline-icon {
-    width: 50px;
-    height: 50px;
-    left: 50%;
-    margin-left: -25px;
-    -webkit-transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    font-size: 19px;
+	width: 50px;
+	height: 50px;
+	left: 50%;
+	margin-left: -25px;
+	-webkit-transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	font-size: 19px;
   }
   .center-orientation .vertical-timeline-icon i {
-    margin-left: -12px;
-    margin-top: -10px;
+	margin-left: -12px;
+	margin-top: -10px;
   }
   .center-orientation .cssanimations .vertical-timeline-icon.is-hidden {
-    visibility: hidden;
+	visibility: hidden;
   }
 }
 .vertical-timeline-content {
@@ -2785,54 +2785,54 @@ a.forum-item-title:hover {
 }
 @media only screen and (min-width: 768px) {
   .vertical-timeline-content h2 {
-    font-size: 18px;
+	font-size: 18px;
   }
   .vertical-timeline-content p {
-    font-size: 13px;
+	font-size: 13px;
   }
 }
 @media only screen and (min-width: 1170px) {
   .center-orientation .vertical-timeline-content {
-    margin-left: 0;
-    padding: 1.6em;
-    width: 45%;
+	margin-left: 0;
+	padding: 1.6em;
+	width: 45%;
   }
   .center-orientation .vertical-timeline-content::before {
-    top: 24px;
-    left: 100%;
-    border-color: transparent;
-    border-left-color: white;
+	top: 24px;
+	left: 100%;
+	border-color: transparent;
+	border-left-color: white;
   }
   .center-orientation .vertical-timeline-content .btn {
-    float: left;
+	float: left;
   }
   .center-orientation .vertical-timeline-content .vertical-date {
-    position: absolute;
-    width: 100%;
-    left: 122%;
-    top: 2px;
-    font-size: 14px;
+	position: absolute;
+	width: 100%;
+	left: 122%;
+	top: 2px;
+	font-size: 14px;
   }
   .center-orientation .vertical-timeline-block:nth-child(even) .vertical-timeline-content {
-    float: right;
+	float: right;
   }
   .center-orientation .vertical-timeline-block:nth-child(even) .vertical-timeline-content::before {
-    top: 24px;
-    left: auto;
-    right: 100%;
-    border-color: transparent;
-    border-right-color: white;
+	top: 24px;
+	left: auto;
+	right: 100%;
+	border-color: transparent;
+	border-right-color: white;
   }
   .center-orientation .vertical-timeline-block:nth-child(even) .vertical-timeline-content .btn {
-    float: right;
+	float: right;
   }
   .center-orientation .vertical-timeline-block:nth-child(even) .vertical-timeline-content .vertical-date {
-    left: auto;
-    right: 122%;
-    text-align: right;
+	left: auto;
+	right: 122%;
+	text-align: right;
   }
   .center-orientation .cssanimations .vertical-timeline-content.is-hidden {
-    visibility: hidden;
+	visibility: hidden;
   }
 }
 /* Tabs */
@@ -2967,11 +2967,11 @@ a.forum-item-title:hover {
 }
 @media (max-width: 767px) {
   .tabs-container .nav-tabs > li {
-    float: none !important;
+	float: none !important;
   }
   .tabs-container .nav-tabs > li.active > a {
-    border-bottom: 1px solid #e7eaec !important;
-    margin: 0;
+	border-bottom: 1px solid #e7eaec !important;
+	margin: 0;
   }
 }
 /* jsvectormap */
@@ -3457,9 +3457,9 @@ video {
 }
 @media (min-width: 768px) {
   #page-wrapper {
-    position: inherit;
-    margin: 0 0 0 240px;
-    min-height: 2002px;
+	position: inherit;
+	margin: 0 0 0 240px;
+	min-height: 2002px;
   }
 }
 .title-action {
@@ -5011,7 +5011,7 @@ dd.project-people {
 @media (max-width: 992px) {
   .chat-users,
   .chat-statistic {
-    margin-left: 0;
+	margin-left: 0;
   }
 }
 .chat-view .ibox-content {
@@ -5636,7 +5636,7 @@ body.body-small .vote-icon {
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-rotating-plane"></div>
+ *	<div class="sk-spinner sk-spinner-rotating-plane"></div>
  *
  */
 .sk-spinner-rotating-plane.sk-spinner {
@@ -5649,39 +5649,39 @@ body.body-small .vote-icon {
 }
 @-webkit-keyframes sk-rotatePlane {
   0% {
-    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
-    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+	-webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+	transform: perspective(120px) rotateX(0deg) rotateY(0deg);
   }
   50% {
-    -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
-    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+	-webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+	transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
   }
   100% {
-    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
-    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+	-webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+	transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
   }
 }
 @keyframes sk-rotatePlane {
   0% {
-    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
-    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+	-webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+	transform: perspective(120px) rotateX(0deg) rotateY(0deg);
   }
   50% {
-    -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
-    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+	-webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+	transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
   }
   100% {
-    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
-    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+	-webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+	transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-double-bounce">
- *      <div class="sk-double-bounce1"></div>
- *      <div class="sk-double-bounce2"></div>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-double-bounce">
+ *	  <div class="sk-double-bounce1"></div>
+ *	  <div class="sk-double-bounce2"></div>
+ *	</div>
  *
  */
 .sk-spinner-double-bounce.sk-spinner {
@@ -5710,35 +5710,35 @@ body.body-small .vote-icon {
 @-webkit-keyframes sk-doubleBounce {
   0%,
   100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   50% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+	-webkit-transform: scale(1);
+	transform: scale(1);
   }
 }
 @keyframes sk-doubleBounce {
   0%,
   100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   50% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+	-webkit-transform: scale(1);
+	transform: scale(1);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-wave">
- *      <div class="sk-rect1"></div>
- *      <div class="sk-rect2"></div>
- *      <div class="sk-rect3"></div>
- *      <div class="sk-rect4"></div>
- *      <div class="sk-rect5"></div>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-wave">
+ *	  <div class="sk-rect1"></div>
+ *	  <div class="sk-rect2"></div>
+ *	  <div class="sk-rect3"></div>
+ *	  <div class="sk-rect4"></div>
+ *	  <div class="sk-rect5"></div>
+ *	</div>
  *
  */
 .sk-spinner-wave.sk-spinner {
@@ -5776,33 +5776,33 @@ body.body-small .vote-icon {
   0%,
   40%,
   100% {
-    -webkit-transform: scaleY(0.4);
-    transform: scaleY(0.4);
+	-webkit-transform: scaleY(0.4);
+	transform: scaleY(0.4);
   }
   20% {
-    -webkit-transform: scaleY(1);
-    transform: scaleY(1);
+	-webkit-transform: scaleY(1);
+	transform: scaleY(1);
   }
 }
 @keyframes sk-waveStretchDelay {
   0%,
   40%,
   100% {
-    -webkit-transform: scaleY(0.4);
-    transform: scaleY(0.4);
+	-webkit-transform: scaleY(0.4);
+	transform: scaleY(0.4);
   }
   20% {
-    -webkit-transform: scaleY(1);
-    transform: scaleY(1);
+	-webkit-transform: scaleY(1);
+	transform: scaleY(1);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-wandering-cubes">
- *      <div class="sk-cube1"></div>
- *      <div class="sk-cube2"></div>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-wandering-cubes">
+ *	  <div class="sk-cube1"></div>
+ *	  <div class="sk-cube2"></div>
+ *	</div>
  *
  */
 .sk-spinner-wandering-cubes.sk-spinner {
@@ -5828,54 +5828,54 @@ body.body-small .vote-icon {
 }
 @-webkit-keyframes sk-wanderingCubeMove {
   25% {
-    -webkit-transform: translateX(42px) rotate(-90deg) scale(0.5);
-    transform: translateX(42px) rotate(-90deg) scale(0.5);
+	-webkit-transform: translateX(42px) rotate(-90deg) scale(0.5);
+	transform: translateX(42px) rotate(-90deg) scale(0.5);
   }
   50% {
-    /* Hack to make FF rotate in the right direction */
-    -webkit-transform: translateX(42px) translateY(42px) rotate(-179deg);
-    transform: translateX(42px) translateY(42px) rotate(-179deg);
+	/* Hack to make FF rotate in the right direction */
+	-webkit-transform: translateX(42px) translateY(42px) rotate(-179deg);
+	transform: translateX(42px) translateY(42px) rotate(-179deg);
   }
   50.1% {
-    -webkit-transform: translateX(42px) translateY(42px) rotate(-180deg);
-    transform: translateX(42px) translateY(42px) rotate(-180deg);
+	-webkit-transform: translateX(42px) translateY(42px) rotate(-180deg);
+	transform: translateX(42px) translateY(42px) rotate(-180deg);
   }
   75% {
-    -webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
-    transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
+	-webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
+	transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
   }
   100% {
-    -webkit-transform: rotate(-360deg);
-    transform: rotate(-360deg);
+	-webkit-transform: rotate(-360deg);
+	transform: rotate(-360deg);
   }
 }
 @keyframes sk-wanderingCubeMove {
   25% {
-    -webkit-transform: translateX(42px) rotate(-90deg) scale(0.5);
-    transform: translateX(42px) rotate(-90deg) scale(0.5);
+	-webkit-transform: translateX(42px) rotate(-90deg) scale(0.5);
+	transform: translateX(42px) rotate(-90deg) scale(0.5);
   }
   50% {
-    /* Hack to make FF rotate in the right direction */
-    -webkit-transform: translateX(42px) translateY(42px) rotate(-179deg);
-    transform: translateX(42px) translateY(42px) rotate(-179deg);
+	/* Hack to make FF rotate in the right direction */
+	-webkit-transform: translateX(42px) translateY(42px) rotate(-179deg);
+	transform: translateX(42px) translateY(42px) rotate(-179deg);
   }
   50.1% {
-    -webkit-transform: translateX(42px) translateY(42px) rotate(-180deg);
-    transform: translateX(42px) translateY(42px) rotate(-180deg);
+	-webkit-transform: translateX(42px) translateY(42px) rotate(-180deg);
+	transform: translateX(42px) translateY(42px) rotate(-180deg);
   }
   75% {
-    -webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
-    transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
+	-webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
+	transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
   }
   100% {
-    -webkit-transform: rotate(-360deg);
-    transform: rotate(-360deg);
+	-webkit-transform: rotate(-360deg);
+	transform: rotate(-360deg);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-pulse"></div>
+ *	<div class="sk-spinner sk-spinner-pulse"></div>
  *
  */
 .sk-spinner-pulse.sk-spinner {
@@ -5889,33 +5889,33 @@ body.body-small .vote-icon {
 }
 @-webkit-keyframes sk-pulseScaleOut {
   0% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    opacity: 0;
+	-webkit-transform: scale(1);
+	transform: scale(1);
+	opacity: 0;
   }
 }
 @keyframes sk-pulseScaleOut {
   0% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    opacity: 0;
+	-webkit-transform: scale(1);
+	transform: scale(1);
+	opacity: 0;
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-chasing-dots">
- *      <div class="sk-dot1"></div>
- *      <div class="sk-dot2"></div>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-chasing-dots">
+ *	  <div class="sk-dot1"></div>
+ *	  <div class="sk-dot2"></div>
+ *	</div>
  *
  */
 .sk-spinner-chasing-dots.sk-spinner {
@@ -5947,46 +5947,46 @@ body.body-small .vote-icon {
 }
 @-webkit-keyframes sk-chasingDotsRotate {
   100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
+	-webkit-transform: rotate(360deg);
+	transform: rotate(360deg);
   }
 }
 @keyframes sk-chasingDotsRotate {
   100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
+	-webkit-transform: rotate(360deg);
+	transform: rotate(360deg);
   }
 }
 @-webkit-keyframes sk-chasingDotsBounce {
   0%,
   100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   50% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+	-webkit-transform: scale(1);
+	transform: scale(1);
   }
 }
 @keyframes sk-chasingDotsBounce {
   0%,
   100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   50% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+	-webkit-transform: scale(1);
+	transform: scale(1);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-three-bounce">
- *      <div class="sk-bounce1"></div>
- *      <div class="sk-bounce2"></div>
- *      <div class="sk-bounce3"></div>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-three-bounce">
+ *	  <div class="sk-bounce1"></div>
+ *	  <div class="sk-bounce2"></div>
+ *	  <div class="sk-bounce3"></div>
+ *	</div>
  *
  */
 .sk-spinner-three-bounce.sk-spinner {
@@ -6018,43 +6018,43 @@ body.body-small .vote-icon {
   0%,
   80%,
   100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   40% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+	-webkit-transform: scale(1);
+	transform: scale(1);
   }
 }
 @keyframes sk-threeBounceDelay {
   0%,
   80%,
   100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   40% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+	-webkit-transform: scale(1);
+	transform: scale(1);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-circle">
- *      <div class="sk-circle1 sk-circle"></div>
- *      <div class="sk-circle2 sk-circle"></div>
- *      <div class="sk-circle3 sk-circle"></div>
- *      <div class="sk-circle4 sk-circle"></div>
- *      <div class="sk-circle5 sk-circle"></div>
- *      <div class="sk-circle6 sk-circle"></div>
- *      <div class="sk-circle7 sk-circle"></div>
- *      <div class="sk-circle8 sk-circle"></div>
- *      <div class="sk-circle9 sk-circle"></div>
- *      <div class="sk-circle10 sk-circle"></div>
- *      <div class="sk-circle11 sk-circle"></div>
- *      <div class="sk-circle12 sk-circle"></div>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-circle">
+ *	  <div class="sk-circle1 sk-circle"></div>
+ *	  <div class="sk-circle2 sk-circle"></div>
+ *	  <div class="sk-circle3 sk-circle"></div>
+ *	  <div class="sk-circle4 sk-circle"></div>
+ *	  <div class="sk-circle5 sk-circle"></div>
+ *	  <div class="sk-circle6 sk-circle"></div>
+ *	  <div class="sk-circle7 sk-circle"></div>
+ *	  <div class="sk-circle8 sk-circle"></div>
+ *	  <div class="sk-circle9 sk-circle"></div>
+ *	  <div class="sk-circle10 sk-circle"></div>
+ *	  <div class="sk-circle11 sk-circle"></div>
+ *	  <div class="sk-circle12 sk-circle"></div>
+ *	</div>
  *
  */
 .sk-spinner-circle.sk-spinner {
@@ -6187,40 +6187,40 @@ body.body-small .vote-icon {
   0%,
   80%,
   100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   40% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+	-webkit-transform: scale(1);
+	transform: scale(1);
   }
 }
 @keyframes sk-circleBounceDelay {
   0%,
   80%,
   100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+	-webkit-transform: scale(0);
+	transform: scale(0);
   }
   40% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+	-webkit-transform: scale(1);
+	transform: scale(1);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-cube-grid">
- *      <div class="sk-cube"></div>
- *      <div class="sk-cube"></div>
- *      <div class="sk-cube"></div>
- *      <div class="sk-cube"></div>
- *      <div class="sk-cube"></div>
- *      <div class="sk-cube"></div>
- *      <div class="sk-cube"></div>
- *      <div class="sk-cube"></div>
- *      <div class="sk-cube"></div>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-cube-grid">
+ *	  <div class="sk-cube"></div>
+ *	  <div class="sk-cube"></div>
+ *	  <div class="sk-cube"></div>
+ *	  <div class="sk-cube"></div>
+ *	  <div class="sk-cube"></div>
+ *	  <div class="sk-cube"></div>
+ *	  <div class="sk-cube"></div>
+ *	  <div class="sk-cube"></div>
+ *	  <div class="sk-cube"></div>
+ *	</div>
  *
  */
 .sk-spinner-cube-grid {
@@ -6284,32 +6284,32 @@ body.body-small .vote-icon {
   0%,
   70%,
   100% {
-    -webkit-transform: scale3D(1, 1, 1);
-    transform: scale3D(1, 1, 1);
+	-webkit-transform: scale3D(1, 1, 1);
+	transform: scale3D(1, 1, 1);
   }
   35% {
-    -webkit-transform: scale3D(0, 0, 1);
-    transform: scale3D(0, 0, 1);
+	-webkit-transform: scale3D(0, 0, 1);
+	transform: scale3D(0, 0, 1);
   }
 }
 @keyframes sk-cubeGridScaleDelay {
   0%,
   70%,
   100% {
-    -webkit-transform: scale3D(1, 1, 1);
-    transform: scale3D(1, 1, 1);
+	-webkit-transform: scale3D(1, 1, 1);
+	transform: scale3D(1, 1, 1);
   }
   35% {
-    -webkit-transform: scale3D(0, 0, 1);
-    transform: scale3D(0, 0, 1);
+	-webkit-transform: scale3D(0, 0, 1);
+	transform: scale3D(0, 0, 1);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-wordpress">
- *      <span class="sk-inner-circle"></span>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-wordpress">
+ *	  <span class="sk-inner-circle"></span>
+ *	</div>
  *
  */
 .sk-spinner-wordpress.sk-spinner {
@@ -6334,41 +6334,41 @@ body.body-small .vote-icon {
 }
 @-webkit-keyframes sk-innerCircle {
   0% {
-    -webkit-transform: rotate(0);
-    transform: rotate(0);
+	-webkit-transform: rotate(0);
+	transform: rotate(0);
   }
   100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
+	-webkit-transform: rotate(360deg);
+	transform: rotate(360deg);
   }
 }
 @keyframes sk-innerCircle {
   0% {
-    -webkit-transform: rotate(0);
-    transform: rotate(0);
+	-webkit-transform: rotate(0);
+	transform: rotate(0);
   }
   100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
+	-webkit-transform: rotate(360deg);
+	transform: rotate(360deg);
   }
 }
 /*
  *  Usage:
  *
- *    <div class="sk-spinner sk-spinner-fading-circle">
- *      <div class="sk-circle1 sk-circle"></div>
- *      <div class="sk-circle2 sk-circle"></div>
- *      <div class="sk-circle3 sk-circle"></div>
- *      <div class="sk-circle4 sk-circle"></div>
- *      <div class="sk-circle5 sk-circle"></div>
- *      <div class="sk-circle6 sk-circle"></div>
- *      <div class="sk-circle7 sk-circle"></div>
- *      <div class="sk-circle8 sk-circle"></div>
- *      <div class="sk-circle9 sk-circle"></div>
- *      <div class="sk-circle10 sk-circle"></div>
- *      <div class="sk-circle11 sk-circle"></div>
- *      <div class="sk-circle12 sk-circle"></div>
- *    </div>
+ *	<div class="sk-spinner sk-spinner-fading-circle">
+ *	  <div class="sk-circle1 sk-circle"></div>
+ *	  <div class="sk-circle2 sk-circle"></div>
+ *	  <div class="sk-circle3 sk-circle"></div>
+ *	  <div class="sk-circle4 sk-circle"></div>
+ *	  <div class="sk-circle5 sk-circle"></div>
+ *	  <div class="sk-circle6 sk-circle"></div>
+ *	  <div class="sk-circle7 sk-circle"></div>
+ *	  <div class="sk-circle8 sk-circle"></div>
+ *	  <div class="sk-circle9 sk-circle"></div>
+ *	  <div class="sk-circle10 sk-circle"></div>
+ *	  <div class="sk-circle11 sk-circle"></div>
+ *	  <div class="sk-circle12 sk-circle"></div>
+ *	</div>
  *
  */
 .sk-spinner-fading-circle.sk-spinner {
@@ -6501,20 +6501,20 @@ body.body-small .vote-icon {
   0%,
   39%,
   100% {
-    opacity: 0;
+	opacity: 0;
   }
   40% {
-    opacity: 1;
+	opacity: 1;
   }
 }
 @keyframes sk-circleFadeDelay {
   0%,
   39%,
   100% {
-    opacity: 0;
+	opacity: 0;
   }
   40% {
-    opacity: 1;
+	opacity: 1;
   }
 }
 /*
@@ -7026,110 +7026,110 @@ body.landing-page {
 }
 @media (min-width: 768px) {
   .landing-page {
-    /* Navbar positioning foo */
-    /* The navbar becomes detached from the top, so we round the corners */
-    /* Bump up size of carousel content */
+	/* Navbar positioning foo */
+	/* The navbar becomes detached from the top, so we round the corners */
+	/* Bump up size of carousel content */
   }
   .landing-page .navbar-wrapper {
-    margin-top: 20px;
+	margin-top: 20px;
   }
   .landing-page .navbar-wrapper .container {
-    padding-right: 15px;
-    padding-left: 15px;
+	padding-right: 15px;
+	padding-left: 15px;
   }
   .landing-page .navbar-wrapper .navbar {
-    padding-right: 0;
-    padding-left: 0;
+	padding-right: 0;
+	padding-left: 0;
   }
   .landing-page .navbar-wrapper .navbar {
-    border-radius: 4px;
+	border-radius: 4px;
   }
   .landing-page .carousel-caption p {
-    margin-bottom: 20px;
-    font-size: 14px;
-    line-height: 1.4;
+	margin-bottom: 20px;
+	font-size: 14px;
+	line-height: 1.4;
   }
   .landing-page .featurette-heading {
-    font-size: 50px;
+	font-size: 50px;
   }
 }
 @media (max-width: 992px) {
   .landing-page .carousel-image {
-    display: none;
+	display: none;
   }
 }
 @media (max-width: 768px) {
   .landing-page .carousel-caption,
   .landing-page .carousel-caption.blank {
-    left: 5%;
-    top: 80px;
+	left: 5%;
+	top: 80px;
   }
   .landing-page .carousel-caption h1 {
-    font-size: 28px;
+	font-size: 28px;
   }
   .landing-page .navbar.navbar-scroll .navbar-brand {
-    margin-top: 6px;
+	margin-top: 6px;
   }
   .landing-page .navbar-default {
-    background-color: #fff;
-    border-color: #fff;
-    padding: 15px 0;
+	background-color: #fff;
+	border-color: #fff;
+	padding: 15px 0;
   }
   .landing-page .navbar-default .navbar-nav > .active > a:focus {
-    background: transparent;
-    color: inherit;
+	background: transparent;
+	color: inherit;
   }
   .landing-page .navbar-default .nav li a {
-    color: #676a6c;
+	color: #676a6c;
   }
   .landing-page .navbar-default .nav li a:hover {
-    color: #1ab394;
+	color: #1ab394;
   }
   .landing-page .navbar-wrapper .navbar {
-    padding-top: 0;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #e7eaec;
-    border-radius: 0;
+	padding-top: 0;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #e7eaec;
+	border-radius: 0;
   }
   .landing-page .nav > li > a {
-    padding: 25px 10px 15px 10px;
+	padding: 25px 10px 15px 10px;
   }
   .landing-page .navbar-nav > li > a {
-    padding: 20px 10px;
+	padding: 20px 10px;
   }
   .landing-page .navbar .navbar-brand {
-    margin-top: 6px;
-    border-radius: 5px;
-    font-size: 12px;
-    padding: 10px;
-    height: auto;
+	margin-top: 6px;
+	border-radius: 5px;
+	font-size: 12px;
+	padding: 10px;
+	height: auto;
   }
   .landing-page .navbar-wrapper .navbar {
-    padding-left: 15px;
-    padding-right: 5px;
+	padding-left: 15px;
+	padding-right: 5px;
   }
   .landing-page .navbar-default .navbar-nav > .active > a,
   .landing-page .navbar-default .navbar-nav > .active > a:hover {
-    color: inherit;
+	color: inherit;
   }
   .landing-page .carousel-control {
-    display: none;
+	display: none;
   }
 }
 @media (min-width: 992px) {
   .landing-page .featurette-heading {
-    margin-top: 120px;
+	margin-top: 120px;
   }
 }
 @media (max-width: 768px) {
   .landing-page .navbar .navbar-header {
-    display: block;
-    float: none;
+	display: block;
+	float: none;
   }
   .landing-page .navbar .navbar-header .navbar-toggle {
-    background-color: #ffffff;
-    padding: 9px 10px;
-    border: none;
+	background-color: #ffffff;
+	padding: 9px 10px;
+	border: none;
   }
 }
 body.rtls {
@@ -7259,7 +7259,7 @@ body.rtls .footer.fixed {
 @media (max-width: 992px) {
   body.rtls .chat-users,
   body.rtls .chat-statistic {
-    margin-right: 0;
+	margin-right: 0;
   }
 }
 body.rtls.mini-navbar .footer.fixed,
@@ -7313,30 +7313,30 @@ body.rtls.top-navigation .footer.fixed {
 }
 @media (max-width: 768px) {
   body.rtls .navbar-top-links li:last-child {
-    margin-left: 20px;
+	margin-left: 20px;
   }
   .body-small.rtls #page-wrapper {
-    position: inherit;
-    margin: 0 0 0 0;
-    min-height: 1000px;
+	position: inherit;
+	margin: 0 0 0 0;
+	min-height: 1000px;
   }
   .body-small.rtls .navbar-static-side {
-    display: none;
-    z-index: 2001;
-    position: absolute;
-    width: 70px;
+	display: none;
+	z-index: 2001;
+	position: absolute;
+	width: 70px;
   }
   .body-small.rtls.mini-navbar .navbar-static-side {
-    display: block;
+	display: block;
   }
   .rtls.fixed-sidebar.body-small .navbar-static-side {
-    display: none;
-    z-index: 2001;
-    position: fixed;
-    width: 220px;
+	display: none;
+	z-index: 2001;
+	position: fixed;
+	width: 220px;
   }
   .rtls.fixed-sidebar.body-small.mini-navbar .navbar-static-side {
-    display: block;
+	display: block;
   }
 }
 .rtls .ltr-support {
@@ -7826,7 +7826,7 @@ body.md-skin {
 }
 @media (max-width: 768px) {
   .md-skin .wrapper-content {
-    padding: 30px 0 40px;
+	padding: 30px 0 40px;
   }
 }
 .md-skin .page-heading {
@@ -8001,7 +8001,7 @@ body.md-skin {
 }
 @media (max-width: 768px) {
   .md-skin .dashboard-header {
-    margin: 20px 0 0 0;
+	margin: 20px 0 0 0;
   }
 }
 .md-skin ul.notes li div {
@@ -8123,114 +8123,114 @@ body.md-skin {
 }
 @media (min-width: 768px) {
   #page-wrapper {
-    position: inherit;
-    margin: 0 0 0 220px;
-    min-height: 1200px;
+	position: inherit;
+	margin: 0 0 0 220px;
+	min-height: 1200px;
   }
   .navbar-static-side {
-    z-index: 2001;
-    position: absolute;
-    width: 220px;
+	z-index: 2001;
+	position: absolute;
+	width: 220px;
   }
   .navbar-top-links .dropdown-messages,
   .navbar-top-links .dropdown-tasks,
   .navbar-top-links .dropdown-alerts {
-    margin-left: auto;
+	margin-left: auto;
   }
 }
 @media (max-width: 768px) {
   #page-wrapper {
-    position: inherit;
-    margin: 0 0 0 0;
-    min-height: 1000px;
+	position: inherit;
+	margin: 0 0 0 0;
+	min-height: 1000px;
   }
   .body-small .navbar-static-side {
-    display: none;
-    z-index: 2001;
-    position: absolute;
-    width: 70px;
+	display: none;
+	z-index: 2001;
+	position: absolute;
+	width: 70px;
   }
   .body-small.mini-navbar .navbar-static-side {
-    display: block;
+	display: block;
   }
   .lock-word {
-    display: none;
+	display: none;
   }
   .navbar-form-custom {
-    display: none;
+	display: none;
   }
   .navbar-header {
-    display: inline;
-    float: left;
+	display: inline;
+	float: left;
   }
   .sidebard-panel {
-    z-index: 2;
-    position: relative;
-    width: auto;
-    min-height: 100% !important;
+	z-index: 2;
+	position: relative;
+	width: auto;
+	min-height: 100% !important;
   }
   .sidebar-content .wrapper {
-    padding-right: 0;
-    z-index: 1;
+	padding-right: 0;
+	z-index: 1;
   }
   .fixed-sidebar.body-small .navbar-static-side {
-    display: none;
-    z-index: 2001;
-    position: fixed;
-    width: 220px;
+	display: none;
+	z-index: 2001;
+	position: fixed;
+	width: 220px;
   }
   .fixed-sidebar.body-small.mini-navbar .navbar-static-side {
-    display: block;
+	display: block;
   }
   .ibox-tools {
-    float: none;
-    text-align: right;
-    display: block;
+	float: none;
+	text-align: right;
+	display: block;
   }
 }
 @media (max-width: 350px) {
   .timeline-item .date {
-    text-align: left;
-    width: 110px;
-    position: relative;
-    padding-top: 30px;
+	text-align: left;
+	width: 110px;
+	position: relative;
+	padding-top: 30px;
   }
   .timeline-item .date i {
-    position: absolute;
-    top: 0;
-    left: 15px;
-    padding: 5px;
-    width: 30px;
-    text-align: center;
-    border: 1px solid #e7eaec;
-    background: #f8f8f8;
+	position: absolute;
+	top: 0;
+	left: 15px;
+	padding: 5px;
+	width: 30px;
+	text-align: center;
+	border: 1px solid #e7eaec;
+	background: #f8f8f8;
   }
   .timeline-item .content {
-    border-left: none;
-    border-top: 1px solid #e7eaec;
-    padding-top: 10px;
-    min-height: 100px;
+	border-left: none;
+	border-top: 1px solid #e7eaec;
+	padding-top: 10px;
+	min-height: 100px;
   }
   .nav.navbar-top-links li.dropdown {
-    display: none;
+	display: none;
   }
   .ibox-tools {
-    float: none;
-    text-align: left;
-    display: inline-block;
+	float: none;
+	text-align: left;
+	display: inline-block;
   }
 }
 /* Only demo */
 @media (max-width: 1000px) {
   .welcome-message {
-    display: none;
+	display: none;
   }
 }
 @media print {
   nav.navbar-static-side {
-    display: none;
+	display: none;
   }
   #page-wrapper {
-    margin: 0;
+	margin: 0;
   }
 }

@@ -46,7 +46,7 @@
 }
 
 .daterangepicker.show-calendar .calendar {
-    display: block;
+	display: block;
 }
 
 .daterangepicker .calendar.single .calendar-date {

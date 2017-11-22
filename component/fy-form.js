@@ -351,8 +351,9 @@ avalon.component("fy-form", {
 		},
 		onData:avalon.noop, //处理数据的回掉 onData()
 		back:function(){
-			if(self==top) location.href=document.referrer;
-			else history.back();
+			self.document.location.href=self.document.referrer;
+			//if(self==top) location.href=document.referrer;
+			//else history.back();
 		},
 		getWidgetHtml:function(){
 			var sHtml='<wbr ms-widget="{is:\'fy-alert\',$id:\''+this.$alertId+'\'}" />';

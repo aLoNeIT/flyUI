@@ -180,7 +180,7 @@ tbody,
 
 /* kill the scrollbars and allow natural height */
 .fc-scroller,
-.fc-day-grid-container,    /* these divs might be assigned height, which we need to cleared */
+.fc-day-grid-container,	/* these divs might be assigned height, which we need to cleared */
 .fc-time-grid-container {  /* */
 	overflow: visible !important;
 	height: auto !important;

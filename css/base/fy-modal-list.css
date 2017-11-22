@@ -1,5 +1,5 @@
 .fly-modal {
-	position:absolute;
+	position:fixed;
 	top:0;
 	left:0;
 	right: 0;
@@ -85,7 +85,7 @@
 .list-group-item:hover {
 	cursor: pointer;
 }
-.list-group-item.selectRow {
+.list-group-item.selectedRow {
 	background-color: #999;
 	color: #fff;
 }

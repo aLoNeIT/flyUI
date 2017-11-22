@@ -15,7 +15,7 @@ avalon.component("fy-modal-input", {
 							'</div>'+
 							'<div class="modal-body" ms-css="{height:@height,overflow:\'auto\'}">'+
 								'<div class="row">'+
-									'<div class="col-md-12 text-left" ms-for="($index,el) in @aInput">'+
+									'<div class="col-md-12 text-left" ms-for="($index,el) in @aInput" ms-visible="@el.type!=\'hidden\'">'+
 										'<label ms-text="el.label">新的密码</label>'+
 										'<div class="m-b-sm" ms-class="el.onClick?\'input-group\':\'\'">'+
 											'<span class="input-group-btn">'+

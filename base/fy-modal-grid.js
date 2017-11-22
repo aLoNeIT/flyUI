@@ -24,17 +24,20 @@ avalon.component('fy-modal-grid', {
 							'</table>'+
 						'</div>';
 		// modal模板
-		var modal='<div class="modal-dialog modal-lg" ms-visible="@isShow">'+
-						'<div class="modal-content">'+
-							'<div class="modal-header">'+
-								'<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true" ms-click="@hide">&times;</span><span class="sr-only">Close</span></button>'+
-								'<h4 class="modal-title" ms-text="@title"></h4>'+
-							'</div>'+
-							'<div class="modal-body">'+
-								sContent+
-							'</div>'+
-							'<div class="modal-footer">'+
-								'<button type="button" class="btn btn-primary" data-dismiss="modal" ms-click="@hide">关闭</button>'+
+		var modal= '<div class="fy-modal" ms-visible="@isShow">'+
+						'<div class="modal-overlay" ms-click="@hide"></div>'+
+						'<div class="modal-dialog modal-lg animated" ms-class=\"@animateCss\" ms-css="{width:@width}">'+
+							'<div class="modal-content">'+
+								'<div class="modal-header">'+
+									'<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true" ms-click="@hide">&times;</span><span class="sr-only">Close</span></button>'+
+									'<h4 class="modal-title" ms-text="@title"></h4>'+
+								'</div>'+
+								'<div class="modal-body">'+
+									sContent+
+								'</div>'+
+								'<div class="modal-footer">'+
+									'<button type="button" class="btn btn-primary" data-dismiss="modal" ms-click="@hide">关闭</button>'+
+								'</div>'+
 							'</div>'+
 						'</div>'+
 					'</div>';
@@ -51,6 +54,12 @@ avalon.component('fy-modal-grid', {
 			name:"名称",
 		}],//需要显示的字段
 		selectFields:[],
+		animateCss:"",
+		animate:{
+			show:"fadeInUp",
+			hide:"fadeOutDown",
+			time:500
+		},
 		getFields:function(){//根据fields获取显示的字段
 			var aFields=[];
 			avalon.each(this.fields,function(key,value){
@@ -67,10 +76,19 @@ avalon.component('fy-modal-grid', {
 		show:function(sTitle,oData){
 			sTitle=sTitle||this.title;
 			this.title=sTitle;
+			this.animateCss=this.animate.show;
 			this.isShow=true;
 		},
 		hide:function(){
-			this.isShow=false;
+			var oSelf=this;
+			this.animateCss=this.animate.hide;
+			if(this.animate.time>0){
+				setTimeout(function(){
+					oSelf.isShow=false;
+				},this.animate.time);
+			}else{
+				this.isShow=false;
+			}
 		},
 		onReady:function(){
 			this.getFields();

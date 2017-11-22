@@ -207,7 +207,7 @@ avalon.component("fy-datagrid", {
 		},
 		onBack:avalon.noop,//后退
 		back:function(){
-			location.href=document.referrer;
+			self.document.location.href=self.document.referrer;
 			//history.back();
 		},
 		pagerId:'pager_'+Math.random(),
