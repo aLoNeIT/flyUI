@@ -87,7 +87,7 @@ avalon.component("fy-form", {
 				showwidth:10,
 				extend:{
 					html:"",
-					action"{
+					action:{
 						
 					},
 				}
@@ -123,14 +123,28 @@ avalon.component("fy-form", {
 		$alert:{},//对话框对象
 		onReady:function(){
 			this.$alert=avalon.vmodels[this.$alertId];
+			//avalon.log("form onReady");
 		},
+		onInit:function(){
+			// this.$alert=avalon.vmodels[this.$alertId];
+			// avalon.log("form onInit");
+		},
+
 		confirm:function(){
 			//先进行数据校验
 			var oField={},oSelf=this,sResult="";
-			var oData=new FormData();
-			var oData={};
+			//var oData=new FormData();
+			var oData={},oSelf=this;
 			avalon.each(this.data,function(key,value){
-				if(key.indexOf("fakeField_")==0) return true;
+				if(key.indexOf("fakefield_")==0) {
+					//将fakefield内保存的值写入到原始字段中
+					delete oSelf.data[key];
+					key=key.replace("fakefield_","");
+					oSelf.data[key]=avalon.keyValue(value);
+				}
+			});
+			avalon.each(this.data,function(key,value){
+				
 				oField=oSelf.fields[key];
 				if(!oField) return true;//无字段则略过
 				key=key.replace(oSelf.$prefix,"");
@@ -236,13 +250,9 @@ avalon.component("fy-form", {
 						uValue=0.00;
 						break;
 					case 3:
-						uValue=avalon.formatDateTime(new Date(),"yyyy-MM-dd");
-						break;
 					case 4:
-						uValue=avalon.formatDateTime(new Date(),"HH:mm:ss");
-						break;
 					case 5:
-						uValue=avalon.formatDateTime(new Date(),"yyyy-MM-dd HH:mm:ss");
+						uValue=avalon.curTime();
 						break;
 					case 6:
 						if(oItem.select=="") uValue="";
@@ -276,11 +286,14 @@ avalon.component("fy-form", {
 			this.updateUrl=readUrl;
 			var result=this.procFields(fields);
 			this.fields=result.fields;
+			this.data=result.data;
 			//请求数据
 			var oSelf=this;
+			this.$alert.wait("请求数据中","请稍等...");
 			avalon.get(readUrl,function(result){
+				oSelf.$alert.hide();
 				if(result.state!=0){
-					this.$alert.error("请求失败",result.mess,function(){
+					oSelf.$alert.error("请求失败",result.mess,function(){
 						oSelf.back();
 					})
 				}else{//查询成功，显示界面
@@ -298,9 +311,9 @@ avalon.component("fy-form", {
 					});
 					oSelf.onData(result.table);
 					oSelf.data=result.table;
-					oSelf.isShow=true;
 				}
 			});
+			this.isShow=true;
 		},
 		save:function(url,fields){//添加数据的窗口
 			this.readOnly=false;
@@ -313,16 +326,22 @@ avalon.component("fy-form", {
 			this.isShow=true;
 		},
 		update:function(url,fields,readUrl){//更新数据的窗口
+			avalon.log("form update");
 			this.readOnly=false;
 			this.updateUrl=url;
 			var result=this.procFields(fields);
 			this.fields=result.fields;
+			this.data=result.data;
 			this.method="put";
 			//请求数据
 			var oSelf=this;
+			this.$alert.wait();
+			//var oAlert=avalon.openAlertWait();
 			avalon.get(readUrl,function(oResult){
+				oSelf.$alert.hide();
+				//oAlert.hide();
 				if(oResult.state!=0){
-					this.$alert.error("请求失败",oResult.mess,function(){
+					oSelf.$alert.error("请求失败",oResult.mess,function(){
 						oSelf.back();
 					})
 				}else{//查询成功，显示界面
@@ -345,14 +364,18 @@ avalon.component("fy-form", {
 					});
 					oSelf.onData(oResult.table);
 					oSelf.data=oResult.table;
-					oSelf.isShow=true;
 				}
 			});
+			this.isShow=true;
 		},
 		onData:avalon.noop, //处理数据的回掉 onData()
 		back:function(){
-			self.document.location.href=self.document.referrer;
-			//if(self==top) location.href=document.referrer;
+			if(self==top) location.href=document.referrer;
+			else{
+				if(top.document.location.href!=self.document.referrer)
+					self.document.location.href=self.document.referrer;
+			}
+			//if(self==top) location.href=self.document.referrer;
 			//else history.back();
 		},
 		getWidgetHtml:function(){
@@ -454,18 +477,27 @@ avalon.component("fy-form", {
 									+'<span class="input-group-btn">'
 										+'<input type="button" value="选择" ms-click="@openDatePicker($event,\''+item.fieldname+'\')" class="btn btn-primary" target="'+dateId+'"/>'
 									+'</span>'
-									+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\'] | date(\'yyyy-MM-dd\')" id="'+dateId+'" ></span>'
+									+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\'] | unixdate(\'yyyy-MM-dd\')" id="'+dateId+'" ></span>'
 									+'<input type="hidden" class="form-control" ms-duplex="@data[\''+item.fieldname+'\']" />'
 								+'</div>';
 						break;
 					case 4://时间
+						var dateId="date_"+(Math.random()+"").substr(3,6);
+						sHtml+='<div class="input-group">'
+									+'<span class="input-group-btn">'
+										+'<input type="button" value="选择" ms-click="@openDatePicker($event,\''+item.fieldname+'\')" class="btn btn-primary" target="'+dateId+'"/>'
+									+'</span>'
+									+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\'] | unixdate(\'HH:mm:ss\')" id="'+dateId+'" ></span>'
+									+'<input type="hidden" class="form-control" ms-duplex="@data[\''+item.fieldname+'\']" />'
+								+'</div>';
+						break;
 					case 5://日期时间
 						var dateId="date_"+(Math.random()+"").substr(3,6);
 						sHtml+='<div class="input-group">'
 									+'<span class="input-group-btn">'
 										+'<input type="button" value="选择" ms-click="@openDatePicker($event,\''+item.fieldname+'\')" class="btn btn-primary" target="'+dateId+'"/>'
 									+'</span>'
-									+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\'] | date(\'yyyy-MM-dd HH:mm:ss\')" id="'+dateId+'" ></span>'
+									+'<span class="form-control" ms-text="@data[\''+item.fieldname+'\'] | unixdate(\'yyyy-MM-dd HH:mm:ss\')" id="'+dateId+'" ></span>'
 									+'<input type="hidden" class="form-control" ms-duplex="@data[\''+item.fieldname+'\']" />'
 								+'</div>';
 						break;
@@ -492,7 +524,8 @@ avalon.component("fy-form", {
 							}
 							else{
 								if(item.unit==""){
-									sHtml+='<input '+(item.readonly?'readonly="true"':'')+' type="text" class="form-control" ms-duplex="@data[\''+item.fieldname+'\']"/>';
+									if(!item.fakefield) sHtml+='<input '+(item.readonly?'readonly="true"':'')+' type="text" class="form-control" ms-duplex="@data[\''+item.fieldname+'\']"/>';
+									else sHtml+='<input '+(item.readonly?'readonly="true"':'')+' class="form-control" ms-duplex="@data[\'fakefield_'+item.fieldname+'\']" />';
 								}else{//有单位时候的样式
 									sHtml+='<div class="input-group">'
 											+'<input type="text" class="form-control" ms-duplex="@data[\''+item.fieldname+'\']"/>'
@@ -548,6 +581,8 @@ avalon.component("fy-form", {
 									+'<input type="text" class="form-control" readonly="" ms-duplex="@data[\''+item.fieldname+'\']" />'
 								+'</div>';
 						break;
+					case 11://添加多个组件
+					sHtml+='<wbr ms-widget="{is:\'fy-upload\',$id:\'upload\',fieldName:'+item.fieldname+'}" />'
 				}
 			}
 			return sHtml;
@@ -619,7 +654,7 @@ avalon.component("fy-form", {
 			oDatePicker.show({
 				dom:oDom,
 				onSelected:function(oDate){
-					oSelf.data[fieldName]=oDate.getTime();
+					oSelf.data[fieldName]=oDate.getTime()/1000;
 				}
 			});
 		}

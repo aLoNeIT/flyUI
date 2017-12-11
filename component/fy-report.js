@@ -12,7 +12,7 @@ avalon.component("fy-report", {
 							+'</div>'
 						+'</div>'
 						+'<div class="wrapper wrapper-content">'
-							+'<wbr ms-widget="{is:\'fy-filter\',$id:@filterId,onFilter:@onFilter}"/>'
+							+'<wbr ms-widget="{is:\'fy-filter\',$id:@filterId,onFilter:@onFilter,createtime:@createtime}"/>'
 							+'<div class="row">'
 								+'<div class="col-md-12">'
 									+'<div class="ibox">'
@@ -20,28 +20,11 @@ avalon.component("fy-report", {
 											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline" ms-click="@back">返回</a>'
 											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</a>'
 											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-click="@print(1)">打印</a>'
+											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-click="@derivation()">导出</a>'
 										+'</div>'
 										+'<!--startprint1-->'
-										+'<div class="ibox-content">'
-											+'<div class="row">'
-												+'<div class="col-lg-2 col-md-3 col-xs-4" ms-for="($index,el) in @count">'
-													+'<div class="col-xs-12 text-left m-b-xs">{{el.name}}：<b class="m-l">{{el.value}}</b></div>'
-												+'</div>'
-											+'</div>'
-											+'<div class="table-responsive">'
-												+'<table class="table table-hover dataTables-example">'
-													+'<thead>'
-														+'<tr>'
-															+'<th ms-for="($key,el) in @fields" ms-css="{width:el.showwidth+\'%\'}" ms-visible="el.showwidth>0">{{el.name}}</th>'
-														+'</tr>'
-													+'</thead>'
-													+'<tbody>'
-														+'<tr ms-for="($index,el) in @data">'
-															+'<td ms-for="(key,value) in el | selectGridData(el)" ms-html="@procValue(key,value,el)"></td>'
-														+'</tr>'
-													+'</tbody>'
-												+'</table>'
-											+'</div>'
+										+'<div class="ibox-content" ms-html="@getReport()">'
+
 										+'</div>'
 										+'<!--endprint1-->'
 									+'</div>'
@@ -62,6 +45,7 @@ avalon.component("fy-report", {
 		}],
 		*/
 		fields:{},
+		createtime:'createtime',
 		/* fields范例
 		{
 			st_code: {
@@ -161,6 +145,46 @@ avalon.component("fy-report", {
 			location.href=document.referrer;
 			//history.back();
 		},
+		getReport:function(){
+			var sumHtml="",tableHtml="",headHtml="",bodyHtml="";
+			sumHtml='<div class="row">'
+						+'<div class="col-lg-2 col-md-3 col-xs-4" ms-for="($index,el) in @count">'
+							+'<div class="col-xs-12 text-left m-b-xs">{{el.name}}：<b class="m-l">{{el.value}}</b></div>'
+						+'</div>'
+					+'</div>';
+			tableHtml='<div class="table-responsive">'
+						+'<table class="table table-hover dataTables-example">'
+							+'{headHtml}'
+							+'{bodyHtml}'
+						+'</table>'
+					+'</div>';
+			headHtml='<thead>'
+						+'<tr>'
+							+'<th ms-for="($key,el) in @fields" ms-css="{width:el.showwidth+\'%\'}" ms-visible="el.showwidth>0">{{el.name}}</th>'
+						+'</tr>'
+					+'</thead>';
+			bodyHtml='<tbody>';
+			//进入循环，处理单元格内容
+			var i=0,key="",item=null,value="";
+			for(i=0;i<this.data.length;i++){
+				bodyHtml+='<tr>';
+				for(key in this.fields){
+					item=this.fields[key];//或得到该字段定义
+					value=this.data[i][key];//或得到该字段当前记录行所对应的值
+					//根据字段内的process函数来再加工内容
+					if(item.process) value= item.process(value,key,item);
+					// else{
+					// 	switch(item.type){
+
+					// 	}
+					// }
+					bodyHtml+="<td>"+value+"</td>";
+				}
+				bodyHtml+='</tr>';
+			}
+			tableHtml=tableHtml.replace("{headHtml}",headHtml).replace("{bodyHtml}",bodyHtml);
+			return sumHtml+tableHtml;
+		},
 		print:function(oper){
 			if(oper<10){
 				bdhtml=window.document.body.innerHTML;//获取当前页的html代码
@@ -186,6 +210,7 @@ avalon.component("fy-report", {
 				window.print();
 			}
 		},
+		derivation:avalon.noop,
 		onReady:function(){
 			var oFilter=avalon.vmodels[this.filterId];
 			oFilter.show(this.filterFields);
