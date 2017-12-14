@@ -41,7 +41,8 @@ avalon.ajax=function(sUrl,oData,options){
 		switch(sType){
 			case "text":
 			case "html":return oResponse.text();
-			default:return oResponse.json();
+			case "json":return oResponse.json();
+			default:return oResponse.blob();
 		}
 	}).then(function(oResult){
 		if(fnSuccess) fnSuccess(oResult);
@@ -412,6 +413,7 @@ avalon.keyTable=function(iDict){
 };
 
 avalon.keyValue=function(str,pattern){
+	if(typeof(str)=="number") str=String(str);
 	pattern=pattern||"-";
 	if(str.indexOf(pattern)>=0){
 		var result=str.split("-");
@@ -421,12 +423,12 @@ avalon.keyValue=function(str,pattern){
 
 avalon.keyShow=function(str,pattern){
 	pattern=pattern||"-";
-	if(str.indexOf('-')>=0){
+	if(str.indexOf(pattern)>=0){
 		var result=str.split("-");
 		if(result.length>1) return result[1];
 		else return result[0];
 	}else return str;
-}
+};
 
 avalon.formatDateTime=function(oDate,sFormat){
 	var o = {
@@ -453,10 +455,12 @@ avalon.formatDateTime=function(oDate,sFormat){
 *日期格式化
 */
 avalon.filters.unixdate = function(iSecond,sFormat){
+	iSecond=iSecond||avalon.curTime();
 	sFormat = sFormat || "yyyy-MM-dd";
 	return avalon.filters.date(iSecond*1000,sFormat);
 }
 avalon.filters.unixdateEx=function(iSecond,sFormat){
+	iSecond=iSecond||avalon.curTime();
 	sFormat=sFormat||"yyyy-MM-dd HH:mm:ss";
 	return avalon.filters.date(iSecond*1000,sFormat);
 };
@@ -524,6 +528,7 @@ avalon.curTime=function(){
 };
 
 avalon.unixToDate=function(unixTime, isFull, timeZone) {
+	unixTime=unixTime||avalon.curTime();
 	isFull=isFull!==false;
 	if(avalon.isNumber(timeZone)){
 		unixTime = parseInt(unixTime) + parseInt(timeZone) * 60 * 60;

@@ -131,12 +131,12 @@ avalon.component("fy-modal-amap", {
 		// 第二个参数 为true时不显示弹框,初始化地图获得当前所在地
 		show:function(oPosition,bInit){
 			bInit=bInit||false;
-			this.isShow=!bInit;
 			if (this.$init==false) {
 				this.animateCss=this.animate.show;
 				this._onShow();
 				this.$init=true;
-			};
+			}
+			this.isShow=!bInit;
 			if(oPosition){
 				this.setCenter(oPosition);
 			}

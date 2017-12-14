@@ -19,7 +19,7 @@ avalon.component("fy-datagrid", {
 									+'<div class="ibox">'
 										+'<div class="ibox-title">'
 											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline" ms-click="@back">返回</a>'
-											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</a>'
+											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)" ms-visible="!(false===@el.visible)">{{el.title}}</a>'
 										+'</div>'
 										+'<div class="ibox-content">'
 											+'<div class="table-responsive m-t">'
@@ -53,7 +53,8 @@ avalon.component("fy-datagrid", {
 		/*[{
 			title:"返回",
 			action:"",
-			class:"btn-primary"
+			class:"btn-primary",
+			visible:true,
 			onClick:function(wbr){avalon.log(wbr.buttons.$model);}
 		}],
 		*/
@@ -197,18 +198,12 @@ avalon.component("fy-datagrid", {
 		procValue:function(key,value,el){//使用特殊方法处理字段内容
 			var oItem=this.fields[key];
 			if(!oItem||!oItem.process) return value;
-			else if(oItem.process) return oItem.process(value,key,el);
-		},
-		extendAction:function(key,funcname,$event,el){
-			var oItem=this.fields[key];
-			if(oItem&&oItem.extend&&avalon.isFunction(oItem.extend[funcname])){
-				oItem.extend[funcname].call(this,$event,el);
-			}
+			else if(oItem.process) return oItem.process(value,el);
 		},
 		onBack:avalon.noop,//后退
 		back:function(){
-			self.document.location.href=self.document.referrer;
-			//history.back();
+			if(self==top) location.href=document.referrer;
+			else history.back();
 		},
 		pagerId:'pager_'+Math.random(),
 		currentPage:1,
