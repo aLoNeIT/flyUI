@@ -37,6 +37,11 @@ avalon.component("fy-pager",{
 								+'{{@jumpText}}'
 							+'</a>'
 						+'</li>'
+						+'<li>'
+							+'<span class="info">'
+								+' 共 <b>{{@pageText}}</b> 页 / 每页 <b>{{@numText}}</b> 条 / 总计 <b>{{@countText}}</b> 条 '
+							+'</span>'
+						+'</li>'
 					+'</ul>';
 		return sContent;
 	}).call(this),
@@ -109,6 +114,9 @@ avalon.component("fy-pager",{
 		nextText   : '下一页',
 		lastText   : '末页',
 		jumpText   : '跳转',
+		numText    : '0',
+		countText  : '0',
+		pageText   : '0',
 		onPageClick: avalon.noop,
 		toPage	 : function (p) {
 			var cur = this.currentPage
