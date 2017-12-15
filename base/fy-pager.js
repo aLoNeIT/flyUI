@@ -52,7 +52,7 @@ avalon.component("fy-pager",{
 		 * 是否开启低版本兼容模式
 		 * 开启，将无法开启浏览器回退功能
 		 * */
-		is_ie	  : !!window.addEventListener,
+		is_ie      : !!window.addEventListener,
 		/**
 		 * 配置复杂型单页
 		 * 默认为false
@@ -61,9 +61,9 @@ avalon.component("fy-pager",{
 		 * 如#/game?page=2
 		 * 表示单页应用进入子页面game页,当前页为2
 		 * */
-		is_more	: false,
-		hash	   : '',
-		getHref	: function (a) {
+		is_more    : false,
+		hash       : '',
+		getHref    : function (a) {
 			if (this.is_more) {
 				if (location.hash) {
 					var search = location.hash,
@@ -105,7 +105,7 @@ avalon.component("fy-pager",{
 		},
 		$buttons   : {},
 		showPages  : 5,
-		pages	  : [],
+		pages      : [],
 		totalPages : 15,
 		currentPage: 1,
 		jumpPage:1,
@@ -118,7 +118,7 @@ avalon.component("fy-pager",{
 		countText  : '0',
 		pageText   : '0',
 		onPageClick: avalon.noop,
-		toPage	 : function (p) {
+		toPage     : function (p) {
 			var cur = this.currentPage
 			var max = this.totalPages
 			switch (p) {
@@ -137,7 +137,7 @@ avalon.component("fy-pager",{
 					return p
 			}
 		},
-		cbProxy	: function (e, p) {
+		cbProxy    : function (e, p) {
 			var cur = this.toPage(p);
 			if (this.$buttons[p] || p === this.currentPage) {
 				if (cur !== 1&&cur!==this.totalPages) {
@@ -151,16 +151,16 @@ avalon.component("fy-pager",{
 			this.render(cur);
 			return this.onPageClick(e, cur);
 		},
-		render	 : function (cur) {/*更新页码*/
+		render     : function (cur) {/*更新页码*/
 			var obj = this.getPages.call(this, cur);
 			this.currentPage = obj.currentPage;
 			this.pages = obj.pages;
 		},
 		/*此处供正常单页应用*/
-		rpage	  : function () {
+		rpage      : function () {
 			return this.is_more ? /(?:#|\?)page\=(\d+)/ : /(?:#|\?)page\-(\d+)/;
 		},
-		cur		: function () { /*正确获取匹配页码*/
+		cur        : function () { /*正确获取匹配页码*/
 			var cur = this.currentPage;
 			var match = this.rpage && location.href.match(this.rpage());
 			if (match && match[1]) {
@@ -171,7 +171,7 @@ avalon.component("fy-pager",{
 			}
 			return cur;
 		},
-		onInit	 : function () {
+		onInit     : function () {
 			var that = this;
 			/**复杂单页应用，切换选项卡，重置页码
 			 * 但切换选项卡或者数据页数变化时，重置页码
@@ -180,6 +180,7 @@ avalon.component("fy-pager",{
 				that.render(that.cur())
 			});
 			this.$watch('currentPage', function () {
+				avalon.log(arguments);
 				that.render(that.cur());
 			});
 			if (!that.is_ie && !that.is_more) {
