@@ -432,13 +432,13 @@ avalon.keyShow=function(str,pattern){
 
 avalon.formatDateTime=function(oDate,sFormat){
 	var o = {
-		"M+" : oDate.getMonth()+1,                 //月份
-		"d+" : oDate.getDate(),                    //日
-		"h+" : oDate.getHours(),                   //小时
-		"m+" : oDate.getMinutes(),                 //分
-		"s+" : oDate.getSeconds(),                 //秒
+		"M+" : oDate.getMonth()+1,				 //月份
+		"d+" : oDate.getDate(),					//日
+		"H+" : oDate.getHours(),				   //小时
+		"m+" : oDate.getMinutes(),				 //分
+		"s+" : oDate.getSeconds(),				 //秒
 		"q+" : Math.floor((oDate.getMonth()+3)/3), //季度
-		"S"  : oDate.getMilliseconds()             //毫秒
+		"S"  : oDate.getMilliseconds()			 //毫秒
 	};
 	if(/(y+)/.test(sFormat)) {
 		sFormat=sFormat.replace(RegExp.$1, (oDate.getFullYear()+"").substr(4 - RegExp.$1.length));
@@ -455,6 +455,7 @@ avalon.formatDateTime=function(oDate,sFormat){
 *日期格式化
 */
 avalon.filters.unixdate = function(iSecond,sFormat){
+	if(0==iSecond) return "";
 	iSecond=iSecond||avalon.curTime();
 	sFormat = sFormat || "yyyy-MM-dd";
 	return avalon.filters.date(iSecond*1000,sFormat);
