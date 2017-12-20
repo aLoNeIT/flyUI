@@ -187,7 +187,7 @@ avalon.component("fy-datagrid", {
 		procValue:function(key,value,el){//使用特殊方法处理字段内容
 			var oItem=this.fields[key];
 			if(!oItem) return value;
-			else if(oItem.process) return oItem.process(value,el);
+			else if(oItem.process) return oItem.process(value,key,el);
 			else {
 				//根据字段类型处理
 				switch(oItem.type){

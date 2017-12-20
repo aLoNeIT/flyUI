@@ -28,8 +28,8 @@ avalon.component("fy-form", {
 														+'</div>'
 														+'<div class="hr-line-dashed"></div>'
 														+'<div class="col-sm-offset-2">'
-															+'<button type="button" class="btn btn-primary" ms-click="@confirm" ms-visible="!@readOnly">确认</button>'
-															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back"  ms-visible="@showBackbutton">返回</button>'
+															+'<button type="button" class="btn btn-primary" ms-attr="{disabled:@disabled}" ms-click="@confirm" ms-visible="!@readOnly">确认</button>'
+															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back" ms-visible="@showBackButton">返回</button>'
 															+'<button class="btn btn-primary m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</button>'
 														+'</div>'
 														+'<div ms-html="@getWidgetHtml()"></div>'
@@ -134,12 +134,12 @@ avalon.component("fy-form", {
 			// this.$alert=avalon.vmodels[this.$alertId];
 			// avalon.log("form onInit");
 		},
-
+		disabled:false, //confirm按钮可点击限制
 		confirm:function(){
 			//先进行数据校验
 			var oField={},oSelf=this,sResult="";
 			//var oData=new FormData();
-			var oData={},oSelf=this;
+			var oData={};
 			avalon.each(this.data,function(key,value){
 				if(key.indexOf("fakefield_")==0) {
 					//将fakefield内保存的值写入到原始字段中
@@ -212,7 +212,9 @@ avalon.component("fy-form", {
 				return;
 			}
 			var sUrl="";
+			this.disabled=true;
 			var fnSuccess=function(oResult){
+				oSelf.disabled=false;
 				if(oResult.state==0){
 					oSelf.$alert.show("请求成功","",function(){
 						oSelf.back();
@@ -221,15 +223,18 @@ avalon.component("fy-form", {
 					oSelf.$alert.error("请求失败",oResult.mess);
 				}
 			};
+			var fnError=function(ex){
+				oSelf.disabled=false;
+			};
 			var sData=JSON.stringify(oData);
 			switch (this.method.toLowerCase()){
 				case "post"://创建
 					sUrl=this.saveUrl;
-					avalon.post(sUrl,sData,fnSuccess);
+					avalon.post(sUrl,sData,fnSuccess,fnError);
 					break;
 				case "put"://更新
 					sUrl=this.updateUrl;
-					avalon.put(sUrl,sData,fnSuccess);
+					avalon.put(sUrl,sData,fnSuccess,fnError);
 					break;
 			}
 		},

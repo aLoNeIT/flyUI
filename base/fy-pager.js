@@ -180,7 +180,6 @@ avalon.component("fy-pager",{
 				that.render(that.cur())
 			});
 			this.$watch('currentPage', function () {
-				avalon.log(arguments);
 				that.render(that.cur());
 			});
 			if (!that.is_ie && !that.is_more) {
