@@ -15,6 +15,7 @@ avalon.component("fy-form", {
 											+'<h2>{{@title}}</h2>'
 										+'</div>'
 										+'<div class="ibox-content">'
+											+'<div ms-html="@tips"></div>'
 											+'<div class="row m-t">'
 												+'<div class="col-sm-12">'
 													+'<form class="form-horizontal" action="#" id="form" ms-validate="@validate">'
@@ -28,7 +29,8 @@ avalon.component("fy-form", {
 														+'<div class="hr-line-dashed"></div>'
 														+'<div class="col-sm-offset-2">'
 															+'<button type="button" class="btn btn-primary" ms-click="@confirm" ms-visible="!@readOnly">确认</button>'
-															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back" ms-visible="@backbtn">返回</button>'
+															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back"  ms-visible="@showBackbutton">返回</button>'
+															+'<button class="btn btn-primary m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</button>'
 														+'</div>'
 														+'<div ms-html="@getWidgetHtml()"></div>'
 													+'</form>'
@@ -48,13 +50,14 @@ avalon.component("fy-form", {
 		$datePickerId:'fy-form_datePicker_'+(Math.random()+"").substr(3,6),
 		$previewId:'fy-form_preview_'+(Math.random()+"").substr(3,6),
 		title:"Fly表单",//标题部分内容
+		tips:"",
 		$defaultField:{//默认字段内容
 			name: "",  //必填
 			fieldname: "",// 必填
 			type:6,
 			subtype:0,//6为密码字段
 			showwidth: 10,
-			max:20,
+			max:255,
 			min:1,
 			pk:false,
 			auto:true,
@@ -70,7 +73,7 @@ avalon.component("fy-form", {
 			inputwidth:0,
 			select:"",
 			tooltip:"",//placeholder提示语
-			regex:"",
+			regex:null,
 			/*
 			fakefield:{ //伪造字段，用于合成数据,存在这个字段，会将值写入fakefield_fieldname
 				key:"field1",
@@ -91,7 +94,7 @@ avalon.component("fy-form", {
 					html:"",
 					action:{
 						
-					},
+					}
 				}
 			},
 			st_name: {
@@ -189,11 +192,10 @@ avalon.component("fy-form", {
 						}
 					}
 				}
-				//如果存在正则校验，则进行正则校验
-				if(oField.regex!=""){
-					var pattern=new RegExp(oField.regex);
-					if(!pattern.test(value)){
-						sResult=oField.name+"的数据不符合要求!";
+				//自定验证规则(正则)
+				if(oField.regex){
+					if(!oField.regex.test(value)){
+						sResult=oField.name+"不符合验证规则";
 						return false;
 					}
 				}
@@ -282,7 +284,7 @@ avalon.component("fy-form", {
 			};
 		},
 		readOnly:false,
-		backbtn:true,
+		showBackButton:true,
 		read:function(fields,readUrl){ //只读界面
 			this.readOnly=true;
 			this.updateUrl=readUrl;
@@ -328,7 +330,6 @@ avalon.component("fy-form", {
 			this.isShow=true;
 		},
 		update:function(url,fields,readUrl){//更新数据的窗口
-			avalon.log("form update");
 			this.readOnly=false;
 			this.updateUrl=url;
 			var result=this.procFields(fields);
@@ -586,7 +587,8 @@ avalon.component("fy-form", {
 								+'</div>';
 						break;
 					case 11://添加多个组件
-					sHtml+='<wbr ms-widget="{is:\'fy-upload\',$id:\'upload\',fieldName:'+item.fieldname+'}" />'
+						sHtml+='<wbr ms-widget="{is:\'fy-upload\',$id:\'upload\',fieldName:'+item.fieldname+'}" />';
+						break;
 				}
 			}
 			return sHtml;
@@ -596,21 +598,30 @@ avalon.component("fy-form", {
 			var oFile=document.querySelector("#"+avalon($event.target).attr("target"));
 			oFile.click();
 		},
+		chooseFile:function($event,fieldName){
+			var oFile=document.querySelector("#"+avalon($event.target).attr("target"));
+			oFile.click();
+		},
 		previewImage:function($event,fieldName){
 			var preview=avalon.vmodels[this.$previewId];
 			preview.show(this.data[fieldName]);
 		},
 		changeFile:function($event,fieldName){
+			var oFile=document.querySelector("#"+avalon($event.target).attr("target"));
+			oFile.value="正在上传文件…";
+			oFile.setAttribute("disabled", true);
 			if($event.target.value=="") return;
 			//开始上传文件
 			var oData=new FormData();
 			var oSelf=this;
 			oData.append(fieldName,$event.target.files[0]);
 			avalon.post(this.uploadUrl,oData,function(oResult){
+				oFile.value="选择文件";
+				oFile.removeAttribute("disabled");
 				if(oResult.state==0){
 					oSelf.data[fieldName]=oResult.mess;
 				}else{
-					this.$alert.error("上传失败",oResult.mess);
+					oSelf.$alert.error("上传失败",oResult.mess);
 				}
 			});
 		},

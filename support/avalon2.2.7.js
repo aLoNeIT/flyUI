@@ -7930,13 +7930,13 @@ https://github.com/RubyLouvre/avalon/tree/2.2.4
         var list = vm.$events['on' + name];
         if (list) {
             list.forEach(function (el) {
-                setTimeout(function () {
+                //setTimeout(function () {
                     el.callback.call(vm, {
                         type: name.toLowerCase(),
                         target: vdom.dom,
                         vmodel: vm
                     });
-                }, 0);
+                //}, 0);
             });
         }
     }

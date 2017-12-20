@@ -200,10 +200,19 @@ avalon.component("fy-datagrid", {
 					case 5:
 						return avalon.unixToDate(value);
 						break;
+					case 7:
+						return true==value?"是":"否";
+						break;
 					default:
 						return value;
 						break;
 				}
+			}
+		},
+		extendAction:function(key,funcname,$event,el){
+			var oItem=this.fields[key];
+			if(oItem&&oItem.extend&&avalon.isFunction(oItem.extend[funcname])){
+				oItem.extend[funcname].call(this,$event,el);
 			}
 		},
 		onBack:avalon.noop,//后退
