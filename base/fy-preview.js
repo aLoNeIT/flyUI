@@ -2,7 +2,6 @@
 	authro:小风风
 	createDate:2017-06-07
 	description:flyui的图片预览组件
-	
 	传入图片url或者img对象
 	再次点击关闭预览
  */
@@ -21,7 +20,7 @@ avalon.component("fy-preview", {
 		return sHtml;
 	}).call(this),
 	defaults: {
-		domId:"preview_"+Math.random(),
+		domId:"fy-preview_"+(Math.random()+"").substr(3,6),
 		height:"",
 		imgWidth:"",
 		imgHeight:"",
@@ -75,6 +74,11 @@ avalon.component("fy-preview", {
 				if(img.width>width) this.imgWidth=width;
 			}else{
 				if(img.height>height) this.imgHeight=height;
+				else{
+					//height>img.height
+					//计算高度差，进行top设置
+					img.style.marginTop=Math.floor((height-img.height)/2)+"px";
+				}
 			}
 		},
 		onReady:function(){

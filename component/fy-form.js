@@ -39,12 +39,14 @@ avalon.component("fy-form", {
 								+'</div>'
 							+'</div>'
 						+'</div>'
+						+'<wbr ms-widget="{is:\'fy-preview\',$id:@$previewId}" />'
 						+'<wbr ms-widget="{is:\'fy-datepicker\',$id:@$datePickerId,autoClose:true}" />'
 					+'</div>';
 		return sContent;
 	}).call(this),
 	defaults: {
-		$datePickerId:'datePicker_'+Math.random(),
+		$datePickerId:'fy-form_datePicker_'+(Math.random()+"").substr(3,6),
+		$previewId:'fy-form_preview_'+(Math.random()+"").substr(3,6),
 		title:"Fly表单",//标题部分内容
 		$defaultField:{//默认字段内容
 			name: "",  //必填
@@ -407,6 +409,8 @@ avalon.component("fy-form", {
 						sHtml+='<span class="form-control" ms-text="@data[\''+item.fieldname+'\'] | unixdate(\'yyyy-MM-dd\')"></span>';
 						break;
 					case 4:
+						sHtml+='<span class="form-control" ms-text="@data[\''+item.fieldname+'\'] | unixdate(\'HH:mm:ss\')"></span>';
+						break;
 					//日期时间
 					case 5:
 						sHtml+='<span class="form-control" ms-text="@data[\''+item.fieldname+'\'] | unixdate(\'yyyy-MM-dd HH:mm:ss\')"></span>';
@@ -593,7 +597,8 @@ avalon.component("fy-form", {
 			oFile.click();
 		},
 		previewImage:function($event,fieldName){
-			this.$alert.warn("开发中");
+			var preview=avalon.vmodels[this.$previewId];
+			preview.show(this.data[fieldName]);
 		},
 		changeFile:function($event,fieldName){
 			if($event.target.value=="") return;

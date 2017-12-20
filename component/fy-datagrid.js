@@ -64,7 +64,8 @@ avalon.component("fy-datagrid", {
 			st_code: {
 				name: "门店编码",
 				fieldname: "st_code",
-				showwidth: 20
+				showwidth: 20,
+				type:6
 			},
 			st_name: {
 				name: "门店名称",
@@ -105,18 +106,6 @@ avalon.component("fy-datagrid", {
 				result[this.$selectedField[i]]=el[this.$selectedField[i]];
 			}
 			return result;
-			/*
-			if(this.selectedField!=null){
-				return this.selectedField;
-			}else{
-				var result = {};
-				avalon.each(this.fields, function ($index, oItem) {
-					if (oItem.showwidth && oItem.showwidth > 0) result[oItem.fieldname]=el[oItem.fieldname];
-				});
-				this.selectedField = result;
-				return result;
-			}
-			*/
 		},
 		data:[],
 		/* 数据范例
@@ -197,8 +186,25 @@ avalon.component("fy-datagrid", {
 		},
 		procValue:function(key,value,el){//使用特殊方法处理字段内容
 			var oItem=this.fields[key];
-			if(!oItem||!oItem.process) return value;
+			if(!oItem) return value;
 			else if(oItem.process) return oItem.process(value,el);
+			else {
+				//根据字段类型处理
+				switch(oItem.type){
+					case 3:
+						return avalon.unixToDate(value,false);
+						break;
+					case 4:
+						return avalon.filters.unixdate(value,"HH:mm:ss");
+						break;
+					case 5:
+						return avalon.unixToDate(value);
+						break;
+					default:
+						return value;
+						break;
+				}
+			}
 		},
 		onBack:avalon.noop,//后退
 		back:function(){
