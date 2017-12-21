@@ -2,6 +2,7 @@
 author:aLoNe.Adams.K 小风风
 createDate:2017-11-01
 description:报表组件,其实就是个没分页的列表,还有些自定义的数据,自带打印功能按钮
+			显示数据的列表渲染速度太慢改用原生写法。
  */
 avalon.component("fy-report", {
 	template:(function(){
@@ -12,7 +13,7 @@ avalon.component("fy-report", {
 							+'</div>'
 						+'</div>'
 						+'<div class="wrapper wrapper-content">'
-							+'<wbr ms-widget="{is:\'fy-filter\',$id:@filterId,onFilter:@onFilter,createtime:@createtime}"/>'
+							+'<wbr ms-widget="{is:\'fy-filter\',$id:@filterId,onFilter:@onFilter}"/>'
 							+'<div class="row">'
 								+'<div class="col-md-12">'
 									+'<div class="ibox">'
@@ -20,10 +21,10 @@ avalon.component("fy-report", {
 											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline" ms-click="@back">返回</a>'
 											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</a>'
 											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-click="@print(1)">打印</a>'
-											+'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-click="@derivation()">导出</a>'
+											// +'<a href="javascript:void(0);" class="btn btn-primary btn-outline m-l-xs" ms-click="@derivation()">导出</a>'
 										+'</div>'
 										+'<!--startprint1-->'
-										+'<div class="ibox-content" ms-html="@getReport()">'
+										+'<div class="ibox-content" ms-attr="{id:@contentId}">'
 
 										+'</div>'
 										+'<!--endprint1-->'
@@ -44,8 +45,38 @@ avalon.component("fy-report", {
 			onClick:function(wbr){avalon.log(wbr.buttons.$model);}
 		}],
 		*/
+		$defaultField:{//默认字段内容
+			name: "",  //必填
+			fieldname: "",// 必填
+			type:6,
+			subtype:0,//6为密码字段
+			showwidth: 10,
+			max:255,
+			min:1,
+			pk:false,
+			auto:true,
+			unit:"",//单位
+			keyid:0,
+			keytable:"",
+			keyfield:"",
+			keyshow:"",
+			default:"",
+			null:true,//1可为空，0不能为空
+			readonly:false,//只读
+			noinput:false,//不需要输入框
+			inputwidth:0,
+			select:"",
+			tooltip:"",//placeholder提示语
+			/*
+			fakefield:{ //伪造字段，用于合成数据,存在这个字段，会将值写入fakefield_fieldname
+				key:"field1",
+				value:"field2"
+			},
+			*/
+			fakefield:"",
+			virtual:false//虚拟字段
+		},
 		fields:{},
-		createtime:'createtime',
 		/* fields范例
 		{
 			st_code: {
@@ -76,35 +107,6 @@ avalon.component("fy-report", {
 		filterFields:{},
 		showFilter:false,
 		onFilter:avalon.noop,
-		$selectedField:[],
-		selectDataBy:function(el){//过滤需要显示的字段
-			if(this.$selectedField.length==0){
-				//在$selectedField内保存需要展示的字段
-				var oSelf=this;
-				avalon.each(this.fields, function ($index, oItem) {
-					if (oItem.showwidth && oItem.showwidth > 0)
-						oSelf.$selectedField.push(oItem.fieldname);
-				});
-			}
-			var result = {};
-			var i=0;
-			for(;i<this.$selectedField.length;i++){
-				result[this.$selectedField[i]]=el[this.$selectedField[i]];
-			}
-			return result;
-			/*
-			if(this.selectedField!=null){
-				return this.selectedField;
-			}else{
-				var result = {};
-				avalon.each(this.fields, function ($index, oItem) {
-					if (oItem.showwidth && oItem.showwidth > 0) result[oItem.fieldname]=el[oItem.fieldname];
-				});
-				this.selectedField = result;
-				return result;
-			}
-			*/
-		},
 		data:[],
 		/* 数据范例
 		[{
@@ -130,47 +132,62 @@ avalon.component("fy-report", {
 			}
 		},
 		selectedRow:[],//选中的行数据
-		procValue:function(key,value,el){//使用特殊方法处理字段内容
-			var oItem=this.fields[key];
-			if(!oItem||!oItem.process) return value;
-			else if(oItem.process) return oItem.process(value,key,el);
-		},
-		extendAction:function(key,funcname,$event,el){
-			var oItem=this.fields[key];
-			if(oItem&&oItem.extend&&avalon.isFunction(oItem.extend[funcname])){
-				oItem.extend[funcname].call(this,$event,el);
-			}
-		},
 		back:function(){
 			location.href=document.referrer;
 			//history.back();
 		},
-		getReport:function(){
-			var sumHtml="",tableHtml="",headHtml="",bodyHtml="";
-			sumHtml='<div class="row">'
-						+'<div class="col-lg-2 col-md-3 col-xs-4" ms-for="($index,el) in @count">'
-							+'<div class="col-xs-12 text-left m-b-xs">{{el.name}}：<b class="m-l">{{el.value}}</b></div>'
-						+'</div>'
-					+'</div>';
+		contentId:"report_content_"+Math.random(),//表格div的domid
+		show:function(data,headerData,footerData){
+			var headerHtml="",tableHtml="",headHtml="",bodyHtml="";
+			var key="",item=null;
+			headerHtml='<div class="row">';
+			for(key in headerData){
+				item=headerData[key];
+				headerHtml+='<div class="col-lg-2 col-md-3 col-xs-4">'
+							+'<div class="col-xs-12 text-left m-b-xs">'+item.name+'：<b class="m-l">'+item.value+'</b></div>'
+						+'</div>';
+			}
+			headerHtml+='</div>';
+			// footerHtml='<div class="row">';
+			// for(key in footerData){
+			// 	item=footerData[key];
+			// 	footerHtml+='<div class="col-lg-2 col-md-3 col-xs-4">'
+			// 				+'<div class="col-xs-12 text-left m-t-xs">'+item.name+'：<b class="m-l">'+item.value+'</b></div>'
+			// 			+'</div>';
+			// }
+			// footerHtml+='</div>';
+			footerHtml='';
+			if(footerData){
+				footerData.colspan==footerData.colspan||0;
+				footerHtml+='<tr><td colspan="'+footerData.colspan+'">合计</td>';
+				for(key in footerData.data){
+					footerHtml+='<td>'+footerData.data[key]+'</td>';
+				}
+				footerHtml+='</tr>';
+			}
 			tableHtml='<div class="table-responsive">'
 						+'<table class="table table-hover dataTables-example">'
 							+'{headHtml}'
 							+'{bodyHtml}'
+							+'{footerHtml}'
 						+'</table>'
 					+'</div>';
 			headHtml='<thead>'
-						+'<tr>'
-							+'<th ms-for="($key,el) in @fields" ms-css="{width:el.showwidth+\'%\'}" ms-visible="el.showwidth>0">{{el.name}}</th>'
-						+'</tr>'
+					+'<tr><th style="width:5%;">序号</th>';
+			for(key in this.fields){
+				item=this.fields[key];
+				headHtml+='<th style="width:'+item.showwidth+'%;'+(item.showwidth<=0?'display:none;':'')+'">'+item.name+'</th>';
+			}
+			headHtml+='</tr>'
 					+'</thead>';
 			bodyHtml='<tbody>';
 			//进入循环，处理单元格内容
-			var i=0,key="",item=null,value="";
-			for(i=0;i<this.data.length;i++){
-				bodyHtml+='<tr>';
+			var i=0,value="";
+			for(i=0;i<data.length;i++){
+				bodyHtml+='<tr><td>'+(i+1)+'</td>';
 				for(key in this.fields){
 					item=this.fields[key];//或得到该字段定义
-					value=this.data[i][key];//或得到该字段当前记录行所对应的值
+					value=data[i][key];//或得到该字段当前记录行所对应的值
 					//根据字段内的process函数来再加工内容
 					if(item.process) value= item.process(value,key,item);
 					// else{
@@ -182,8 +199,10 @@ avalon.component("fy-report", {
 				}
 				bodyHtml+='</tr>';
 			}
-			tableHtml=tableHtml.replace("{headHtml}",headHtml).replace("{bodyHtml}",bodyHtml);
-			return sumHtml+tableHtml;
+			bodyHtml+='</tbody>';
+			tableHtml=tableHtml.replace("{headHtml}",headHtml).replace("{bodyHtml}",bodyHtml).replace("{footerHtml}",footerHtml);
+			var dom=document.getElementById(this.contentId);
+			if(dom) dom.innerHTML=headerHtml+tableHtml;
 		},
 		print:function(oper){
 			if(oper<10){
@@ -214,11 +233,6 @@ avalon.component("fy-report", {
 		onReady:function(){
 			var oFilter=avalon.vmodels[this.filterId];
 			oFilter.show(this.filterFields);
-			avalon.filters.selectGridData=this.selectDataBy;
-			var oSelf=this;
-			this.$watch("data",function(){
-				oSelf.selectedRow=[];
-			});
 		}
 	}
 });
