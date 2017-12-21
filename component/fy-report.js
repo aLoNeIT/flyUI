@@ -25,7 +25,6 @@ avalon.component("fy-report", {
 										+'</div>'
 										+'<!--startprint1-->'
 										+'<div class="ibox-content" ms-attr="{id:@contentId}">'
-
 										+'</div>'
 										+'<!--endprint1-->'
 									+'</div>'
@@ -133,8 +132,8 @@ avalon.component("fy-report", {
 		},
 		selectedRow:[],//选中的行数据
 		back:function(){
-			location.href=document.referrer;
-			//history.back();
+			if(self==top) location.href=document.referrer;
+			else history.back();
 		},
 		contentId:"report_content_"+Math.random(),//表格div的domid
 		show:function(data,headerData,footerData){
