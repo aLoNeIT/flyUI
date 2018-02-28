@@ -4,7 +4,7 @@ createDate:2017-07-26
 description:flyui配合datagrid的筛选组件
  */
 avalon.component("fy-filter", {
-	template: (function() {
+	template: (function () {
 		// 内容表格部分
 		var sContent = '<div class="row m-b-xs" ms-visible="@isShow">' +
 			'<div ms-for="($key,el) in @fields" ms-class="@getFieldCss($key,el)">' +
@@ -95,7 +95,7 @@ avalon.component("fy-filter", {
 		},
 		*/
 		data: {},
-		createtime:"createtime",
+		createtime: "createtime",
 		/*
 		{
 			st_code:"0001",
@@ -107,7 +107,7 @@ avalon.component("fy-filter", {
 		// $prefix:"",//字段前缀
 		$alertId: "form-alert_" + (Math.random() + "").substr(3, 6), //对话框id
 		$alert: {}, //对话框对象
-		onReady: function() {
+		onReady: function () {
 			this.$alert = avalon.vmodels[this.$alertId];
 		},
 		// seachClick: function($event) {
@@ -115,82 +115,82 @@ avalon.component("fy-filter", {
 		// 		this.onFilter(this.data.$model);
 		// 	}
 		// },
-		seachClick:function($event){
-			if(avalon.isFunction(this.onFilter)){
-				var oField={},
-					oData={},
-					oSelf=this,
-					sSign="",
-					tempData={};
-				avalon.each(this.data,function(key,value){
-					if(key.indexOf("fakefield_")==0){
-						tempData[key]=value;
+		seachClick: function ($event) {
+			if (avalon.isFunction(this.onFilter)) {
+				var oField = {},
+					oData = {},
+					oSelf = this,
+					sSign = "",
+					tempData = {};
+				avalon.each(this.data, function (key, value) {
+					if (key.indexOf("fakefield_") == 0) {
+						tempData[key] = value;
 						return true;
 					}
-					oField=oSelf.fields[key];
-					if(oField.keyid>0&&value!=""){//拆分字符串 前半部分id
-						oData[key]=avalon.keyValue(value);
-					}else if(value!=""||value!=0){
-						oData[key]=value;
+					oField = oSelf.fields[key];
+					if (oField.keyid > 0 && value != "") { //拆分字符串 前半部分id
+						oData[key] = avalon.keyValue(value);
+					} else if (value != "" || value != 0) {
+						oData[key] = value;
 					}
-					if(value!=""||value!=0){
-						switch(oField.matchtype){
+					if (value != "" || value != 0) {
+						switch (oField.matchtype) {
 							case 1:
-								oData[key]=[">=",oData[key]];
+								oData[key] = [">=", oData[key]];
 								break;
 							case 2:
-								oData[key]=["<",oData[key]];
+								oData[key] = ["<", oData[key]];
 								break;
 							case 3:
-								oData[key]=["<>",oData[key]];
+								oData[key] = ["<>", oData[key]];
 								break;
 							case 4:
-								oData[key]=["like","%"+oData[key]+"%"];
+								oData[key] = ["like", "%" + oData[key] + "%"];
 								break;
 							case 5:
-								oData[key]=["like","%"+oData[key]];
+								oData[key] = ["like", "%" + oData[key]];
 								break;
 							case 6:
-								oData[key]=["like",+oData[key]+"%"];
+								oData[key] = ["like", +oData[key] + "%"];
 								break;
 						}
 					}
 				});
-				if(oData["start_time"]){
-					var oData0=[];
-					oData[this.createtime]=oData[this.createtime]||[];
+				if (oData["start_time"]) {
+					var oData0 = [];
+					oData[this.createtime] = oData[this.createtime] || [];
 					oData0.push('egt');
 					oData0.push(oData["start_time"]);
 					oData[this.createtime].push(oData0);
 					delete oData["start_time"];
 				}
-				if(oData["end_time"]){
-					var oData1=[];
-					oData[this.createtime]=oData[this.createtime]||[];
+				if (oData["end_time"]) {
+					var oData1 = [];
+					oData[this.createtime] = oData[this.createtime] || [];
 					oData1.push('lt');
 					oData1.push(oData["end_time"]);
 					oData[this.createtime].push(oData1);
 					delete oData["end_time"];
 				}
-				if(oData[this.createtime]&&oData[this.createtime].length==1)
-					oData[this.createtime]=oData[this.createtime][0];
-				this.onFilter(oData,tempData);
+				if (oData[this.createtime] && oData[this.createtime].length == 1)
+					oData[this.createtime] = oData[this.createtime][0];
+				this.onFilter(oData, tempData);
 			}
 		},
 		onFilter: avalon.noop,
-		actionProxy: function($event, field, action) { //自定义函数代理
+		actionProxy: function ($event, field, action) { //自定义函数代理
 			if (this.fields[field] && this.fields[field].extend &&
 				this.fields[field].extend.action &&
 				this.fields[field].extend.action[action])
 				this.fields[field].extend.action[action].call(this, $event);
 		},
-		procFields: function(fields) {
+		procFields: function (fields) {
 			var oSelf = this;
 			var oFields = {},
 				oItem = {},
 				oData = {},
 				uValue = 0;
-			avalon.each(fields, function(key, item) {
+			avalon.each(fields, function (key, item) {
 				oItem = avalon.mix({}, oSelf.$defaultField, item);
 				oFields[key] = oItem;
 				//处理默认数据
@@ -207,10 +207,10 @@ avalon.component("fy-filter", {
 						uValue = 0;
 						break;
 					case 6:
-						if(oItem.select=="") uValue="";
-						else{
-							var oOptions=oItem.select.split(";");
-							if(oOptions.length>0) uValue=avalon.keyValue(oOptions[0]);
+						if (oItem.select == "") uValue = "";
+						else {
+							var oOptions = oItem.select.split(";");
+							if (oOptions.length > 0) uValue = avalon.keyValue(oOptions[0]);
 						}
 						break;
 					case 7:
@@ -221,9 +221,9 @@ avalon.component("fy-filter", {
 						break;
 				}
 				oData[oItem.fieldname] = oItem.default !== "" ? oItem.default : uValue;
-				if(oItem.fakefield!==""){
+				if (oItem.fakefield !== "") {
 					//存在虚假字段
-					oData["fakefield_"+oItem.fieldname]=oItem.default!==""?oItem.default:uValue;
+					oData["fakefield_" + oItem.fieldname] = oItem.default !== "" ? oItem.default : uValue;
 				}
 			});
 			return {
@@ -231,19 +231,19 @@ avalon.component("fy-filter", {
 				data: oData
 			};
 		},
-		show: function(fields) {
+		show: function (fields) {
 			if (!fields) return;
 			var result = this.procFields(fields);
 			this.fields = result.fields;
 			this.data = result.data;
 			this.isShow = !(JSON.stringify(this.fields.$model) == "{}");
 		},
-		getNameHtml: function(key, item) { //获取字段名的html
+		getNameHtml: function (key, item) { //获取字段名的html
 			var sHtml = item.name + '：' +
 				(item.null == 1 ? '' : '<span class="text-danger"> * </span>');
 			return sHtml;
 		},
-		getFieldCss: function(key, item) { //获取每个字段项的样式
+		getFieldCss: function (key, item) { //获取每个字段项的样式
 			if ((item.type == 9) //文件上传
 				||
 				(item.type == 8) //大文本
@@ -253,7 +253,7 @@ avalon.component("fy-filter", {
 				return "col-sm-6";
 			else return "col-sm-3 m-t-xs";
 		},
-		getFieldHtml: function(key, item) {
+		getFieldHtml: function (key, item) {
 			//开始处理字段
 			var sHtml = "";
 			if (item.extend && item.extend.html) {
@@ -281,8 +281,8 @@ avalon.component("fy-filter", {
 								var inputId = "input_" + (Math.random() + "").substr(3, 6);
 								sHtml += '<span class="input-group-addon" ms-html="@getNameHtml($key,el)"></span>' +
 									// '<input type="text" class="form-control" readonly="" ms-attr="{id:\'' + inputId + '\'}" ms-duplex="@data[\'' + item.fieldname + '\']" ms-dblclick="@reset(\'' + item.fieldname + '\')" ms-attr="{placeholder:\'' + item.tooltip + '\'}"/>' +
-									'<input type="text" class="form-control" readonly="" ms-attr="{id:\''+inputId+'\'}" ms-duplex="@data[\'fakefield_'+item.fieldname+'\']" />'+
-									'<input type="hidden" class="form-control" readonly="" ms-duplex="@data[\''+item.fieldname+'\']" />'+
+									'<input type="text" class="form-control" readonly="" ms-attr="{id:\'' + inputId + '\'}" ms-duplex="@data[\'fakefield_' + item.fieldname + '\']" />' +
+									'<input type="hidden" class="form-control" readonly="" ms-duplex="@data[\'' + item.fieldname + '\']" />' +
 									'<span class="input-group-btn">' +
 									'<input type="button" value="选择" ms-click="@openKeyData($event,\'' + item.fieldname + '\')" class="btn btn-primary" ms-attr="{target:\'' + inputId + '\'}"/>' +
 									'</span>';
@@ -292,11 +292,12 @@ avalon.component("fy-filter", {
 							}
 						} else {
 							//当select有内容的时候，需要生成select组件
-							sHtml += '<span class="input-group-addon" ms-html="@getNameHtml($key,el)"></span>' ;
+							sHtml += '<span class="input-group-addon" ms-html="@getNameHtml($key,el)"></span>' +
+								'<select class="form-control" ms-duplex="@data[\'' + item.fieldname + '\']">';
 							sHtml += '<select class="form-control" ms-duplex="@data[\'' + item.fieldname + '\']">';
 							//select值是分号分割
 							var aOptions = item.select.split(";");
-							avalon.each(aOptions, function($index, value) {
+							avalon.each(aOptions, function ($index, value) {
 								sHtml += '<option value="' + avalon.keyValue(value) + '">' + value + '</option>';
 							});
 							sHtml += '</select>';
@@ -318,7 +319,7 @@ avalon.component("fy-filter", {
 			return sHtml;
 		},
 		//以下是该组件内部的函数
-		openKeyData: function($event, fieldName) { //打开外键数据
+		openKeyData: function ($event, fieldName) { //打开外键数据
 			var oField = this.fields[fieldName];
 			if (oField.extend && oField.extend.action) {
 				//优先执行用户自定义数据
@@ -328,18 +329,18 @@ avalon.component("fy-filter", {
 				alert("暂不支持dict相关方法!<keyid:" + oField.keyid + ">");
 			}
 		},
-		openDatePicker: function($event, fieldName) { //打开日期选择界面
+		openDatePicker: function ($event, fieldName) { //打开日期选择界面
 			var oDatePicker = avalon.vmodels[this.$datePickerId];
 			var oDom = document.querySelector("#" + avalon($event.target).attr("target"));
 			var oSelf = this;
 			oDatePicker.show({
 				dom: oDom,
-				onSelected: function(oDate) {
+				onSelected: function (oDate) {
 					oSelf.data[fieldName] = oDate.getTime() / 1000;
 				}
 			});
 		},
-		getDatetime: function(timestamp, type) {
+		getDatetime: function (timestamp, type) {
 			if (timestamp) {
 				switch (type) {
 					case 3:
@@ -352,11 +353,11 @@ avalon.component("fy-filter", {
 			}
 			return '';
 		},
-		reset: function(fieldname) {
+		reset: function (fieldname) {
 			if (fieldname === true) {
 				//清理所有数据
 				var oSelf = this;
-				avalon.each(this.fields, function(key, item) {
+				avalon.each(this.fields, function (key, item) {
 					var uValue = "";
 					switch (item.type) {
 						case 1:
