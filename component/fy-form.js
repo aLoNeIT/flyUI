@@ -30,7 +30,7 @@ avalon.component("fy-form", {
 														+'<div class="col-sm-offset-2">'
 															+'<button type="button" class="btn btn-primary" ms-attr="{disabled:@disabled}" ms-click="@confirm" ms-visible="!@readOnly">确认</button>'
 															+'<button type="button" class="btn btn-white m-l-xs" ms-click="@back" ms-visible="@showBackButton">返回</button>'
-															+'<button class="btn btn-primary m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</button>'
+															+'<button type="button" class="btn btn-primary m-l-xs" ms-for="($index,el) in @buttons" ms-class="@el.class" ms-click="@buttonClick(el)">{{el.title}}</button>'
 														+'</div>'
 														+'<div ms-html="@getWidgetHtml()"></div>'
 													+'</form>'
