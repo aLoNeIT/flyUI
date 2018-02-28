@@ -15,6 +15,7 @@ avalon.component("fy-modal-amap", {
 								'<h2 class="modal-title">拖动箭头选择地址</h2>'+
 							'</div>'+
 							'<div ms-attr="{id:@$domId}" ms-css="{height:@height}" style="margin:auto;"></div>'+
+							'<div><input type="text" ms-attr="{id:@$searchId}" name="keyword" placeholder="请输入关键字" style="position:absolute;top:80px;left:20px;width:25%;" /></div>'+
 							'<div class="modal-footer">'+
 								'<button type="button" class="btn btn-primary m-r-xs" ms-click="@confirm" ms-visible="@buttons.onConfirm!=avalon.noop">确定</button>'+
 								'<button type="button" class="btn btn-white" ms-click="@hide">关闭</button>'+
@@ -52,6 +53,10 @@ avalon.component("fy-modal-amap", {
 			title:"拖动箭头选择地址"
 		},//标记配置
 		$init:false,
+
+		$citycode:null, //城市，默认全国
+		$searchId:"search-input",
+
 		animateCss:"",
 		animate:{
 			show:"fadeInUp",
@@ -75,6 +80,8 @@ avalon.component("fy-modal-amap", {
 				if(status==="complete"&&result.info==="OK"){
 					oSelf.$address=result.regeocode.formattedAddress;
 					oSelf.cbProxy("onGetAddress",arguments);
+					console.log(result);
+					oSelf.$citycode=result.regeocode.addressComponent.citycode;// 地址信息城市
 				}
 			});
 		},
@@ -106,6 +113,27 @@ avalon.component("fy-modal-amap", {
 			AMap.event.addListener(this.$marker,"dragend",function(e){
 				oSelf.cbProxy("onMarkerDragend",arguments);
 				oSelf.cbAddress(e.lnglat);
+			});
+			// 搜索框(暂订实现功能)
+			this.$amap.plugin(["AMap.Autocomplete","AMap.PlaceSearch"],function(){
+				this.$autocomplete=new AMap.Autocomplete({
+					city:oSelf.$citycode||"",
+					input:oSelf.$searchId//使用联想输入的input的id
+				});
+				// 搜索插件
+				/*var placeSearch=new AMap.PlaceSearch({
+					city:oSelf.$citycode||"", //城市，默认全国
+					map:oSelf.$amap
+				});*/
+				AMap.event.addListener($autocomplete,"select",function(e){
+					console.log(e.poi);
+					// placeSearch.setCity(e.poi.adcode);
+					// placeSearch.search(e.poi.name);
+					// 移动marker至当前位置
+					oSelf.$marker.setPosition(e.poi.location);
+					oSelf.$amap.setCenter(e.poi.location);
+					oSelf.cbAddress(e.poi.location);
+				});
 			});
 		},
 		onLocation:avalon.noop,
